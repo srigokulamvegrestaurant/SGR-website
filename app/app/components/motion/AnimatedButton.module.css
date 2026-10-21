@@ -1,0 +1,190 @@
+/* ============================================================================
+   ANIMATED BUTTON — Press feedback, shine sweep, icon nudge, loading/success
+   Sri Gokulam Veg Restaurant
+   ============================================================================ */
+
+/* ── Base button reset ──────────────────────────────────────────────────── */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  border-radius: 32px;
+  border: none;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+  /* GPU-accelerated press feedback */
+  transition:
+    transform 0.12s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.2s ease,
+    filter 0.15s ease,
+    background 0.2s ease;
+  will-change: transform;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Press-down scale */
+.btn:active:not(:disabled) {
+  transform: scale(0.93) !important;
+  filter: brightness(1.1);
+}
+
+/* Hover lift */
+.btn:hover:not(:disabled) {
+  transform: translateY(-3px);
+}
+
+/* Focus ring (keyboard nav) */
+.btn:focus-visible {
+  outline: 3px solid var(--gold-bright, #e2a829);
+  outline-offset: 3px;
+}
+
+/* Disabled */
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ── Variant: Gold ──────────────────────────────────────────────────────── */
+.variantGold {
+  background: var(--gold-pill, linear-gradient(180deg, #fce59b 0%, #e2a628 50%, #bf8111 100%));
+  color: var(--midnight-blue, #051B41);
+  box-shadow: var(--shadow-gold, 0 6px 20px rgba(226,168,41,0.38));
+}
+
+.variantGold:hover:not(:disabled) {
+  box-shadow: 0 10px 30px rgba(226,168,41,0.6), 0 0 0 1px rgba(226,168,41,0.4);
+}
+
+/* ── Variant: Navy ──────────────────────────────────────────────────────── */
+.variantNavy {
+  background: rgba(14,41,84,0.85);
+  color: var(--gold-light, #fbe08e);
+  border: 1.5px solid var(--peacock-bright, #0059B3);
+  box-shadow: var(--shadow-peacock, 0 6px 20px rgba(0,89,179,0.45));
+  backdrop-filter: blur(6px);
+}
+
+.variantNavy:hover:not(:disabled) {
+  background: var(--peacock-blue, #004080);
+  border-color: var(--gold-light, #fbe08e);
+  box-shadow: 0 10px 30px rgba(0,89,179,0.65);
+}
+
+/* ── Variant: Outline ───────────────────────────────────────────────────── */
+.variantOutline {
+  background: transparent;
+  color: var(--midnight-blue, #051B41);
+  border: 2px solid currentColor;
+}
+
+.variantOutline:hover:not(:disabled) {
+  background: rgba(5,27,65,0.06);
+}
+
+/* ── Shine sweep layer ──────────────────────────────────────────────────── */
+.shine {
+  position: absolute;
+  top: -60%;
+  left: -80%;
+  width: 45%;
+  height: 220%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255,255,255,0.45) 50%,
+    transparent 100%
+  );
+  transform: rotate(25deg) translateX(0);
+  pointer-events: none;
+  /* Animate sweep on mount, then on hover */
+  animation: shineSweep 3.5s ease-in-out infinite;
+  opacity: 0;
+}
+
+.btn:hover .shine {
+  animation: shineSweepFast 0.55s ease forwards;
+}
+
+@keyframes shineSweep {
+  0% { left: -80%; opacity: 0; }
+  15% { opacity: 1; }
+  30% { left: 160%; opacity: 0; }
+  100% { left: 160%; opacity: 0; }
+}
+
+@keyframes shineSweepFast {
+  from { left: -80%; opacity: 1; }
+  to   { left: 160%; opacity: 0; }
+}
+
+/* ── Icon nudge on hover ────────────────────────────────────────────────── */
+.icon {
+  display: inline-flex;
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.btn:hover .icon {
+  transform: scale(1.18) rotate(-5deg);
+}
+
+/* ── Loading state ──────────────────────────────────────────────────────── */
+.spinner {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border: 2px solid rgba(255,255,255,0.35);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Success state ──────────────────────────────────────────────────────── */
+.success {
+  pointer-events: none;
+}
+
+.successIcon {
+  display: inline-flex;
+  animation: successPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes successPop {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+/* ── Label ──────────────────────────────────────────────────────────────── */
+.label {
+  position: relative;
+  z-index: 1;
+}
+
+/* ── Reduced Motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .btn {
+    transition: none !important;
+  }
+  .shine {
+    display: none;
+  }
+  .icon {
+    transition: none !important;
+  }
+  .btn:hover {
+    transform: none !important;
+  }
+}

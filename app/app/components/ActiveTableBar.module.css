@@ -1,0 +1,212 @@
+/* ============================================================================
+   ACTIVE TABLE BAR & FLOATING KOT STATUS PILL
+   ============================================================================ */
+
+.tableBanner {
+  background: linear-gradient(90deg, #071f4a 0%, #0c2b60 100%);
+  color: #ffffff;
+  padding: 8px 16px;
+  border-bottom: 1.5px solid var(--gold-temple, #c59b27);
+  box-shadow: 0 2px 10px rgba(5, 27, 65, 0.2);
+}
+
+.bannerInner {
+  max-width: 1320px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.tableInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.statusDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 10px #10b981;
+  animation: pulseDot 1.4s infinite;
+  flex-shrink: 0;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.85); opacity: 0.8; }
+  50% { transform: scale(1.25); opacity: 1; }
+  100% { transform: scale(0.85); opacity: 0.8; }
+}
+
+.tableInfo strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--gold-light, #fbe08e);
+  letter-spacing: 0.3px;
+}
+
+.joinedTag {
+  color: #86efac;
+  font-weight: 750;
+  font-size: 0.78rem;
+}
+
+.tableInfo small {
+  display: block;
+  font-size: 0.72rem;
+  color: #cbd5e1;
+}
+
+.btnChangeTable {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 750;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.btnChangeTable:hover {
+  background: rgba(255, 255, 255, 0.25);
+  border-color: var(--gold-light, #fbe08e);
+  color: var(--gold-light, #fbe08e);
+}
+
+.btnChangeTable:active {
+  transform: scale(0.94) !important;
+}
+
+/* ============================================================================
+   FLOATING KOT STATUS PILL (Shown when order is active)
+   ============================================================================ */
+
+.floatingKotPill {
+  position: fixed;
+  bottom: 22px;
+  left: 20px;
+  background: linear-gradient(135deg, #051B41 0%, #0E2954 60%, #004080 100%);
+  color: #ffffff;
+  border: 2px solid var(--gold-bright, #e2a829);
+  border-radius: 40px;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  box-shadow: 0 10px 30px rgba(5, 27, 65, 0.5), 0 0 20px rgba(220, 162, 37, 0.4);
+  z-index: 997;
+  cursor: pointer;
+  user-select: none;
+  animation: slideUpPill 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.25s ease;
+}
+
+@keyframes slideUpPill {
+  from { transform: translateY(50px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.floatingKotPill:hover {
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 14px 35px rgba(5, 27, 65, 0.6), 0 0 25px rgba(220, 162, 37, 0.6);
+}
+
+.floatingKotPill:active {
+  transform: scale(0.92) !important;
+  box-shadow: 0 0 30px #ffdf00 !important;
+}
+
+.kotPillLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.flameIcon {
+  font-size: 1.4rem;
+  animation: flameFlicker 1.5s infinite alternate;
+}
+
+@keyframes flameFlicker {
+  0% { transform: scale(1); filter: drop-shadow(0 0 4px #f59e0b); }
+  100% { transform: scale(1.2); filter: drop-shadow(0 0 10px #ef4444); }
+}
+
+.kotPillTitle {
+  font-size: 0.84rem;
+  font-weight: 850;
+  color: var(--gold-light, #fbe08e);
+}
+
+.kotPillSub {
+  font-size: 0.72rem;
+  color: #cbd5e1;
+}
+
+.kotPillSub strong {
+  color: #ffffff;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.btnViewTicket {
+  background: var(--gold-pill, linear-gradient(180deg, #fce59b 0%, #e2a628 50%, #bf8111 100%));
+  color: var(--midnight-blue, #051B41);
+  border: none;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 900;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+  .tableBanner {
+    padding: 6px 12px;
+  }
+
+  .tableInfo strong {
+    font-size: 0.8rem;
+  }
+
+  .tableInfo small {
+    display: none;
+  }
+
+  .btnChangeTable {
+    padding: 4px 10px;
+    font-size: 0.7rem;
+  }
+
+  .floatingKotPill {
+    bottom: 90px; /* Above floating cart */
+    left: 14px;
+    right: 14px;
+    justify-content: space-between;
+    padding: 8px 14px;
+  }
+
+  .kotPillTitle {
+    font-size: 0.78rem;
+  }
+
+  .kotPillSub {
+    font-size: 0.68rem;
+  }
+
+  .btnViewTicket {
+    padding: 5px 10px;
+    font-size: 0.72rem;
+  }
+}

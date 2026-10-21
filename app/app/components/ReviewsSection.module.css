@@ -1,0 +1,1461 @@
+/* ============================================================================
+   REVIEWS & SOCIAL PROOF SECTION — Moving Wall, Instagram Reels & YouTube Vlogs
+   ============================================================================ */
+
+.reviewsSection {
+  background: var(--white-layer, #ffffff);
+  padding: 85px 24px 95px;
+  position: relative;
+  overflow: hidden;
+  border-top: 2px solid #eef2f6;
+  border-bottom: 2px solid #eef2f6;
+}
+
+.container {
+  max-width: 1320px;
+  margin: 0 auto;
+}
+
+/* Header */
+.headerBox {
+  text-align: center;
+  max-width: 840px;
+  margin: 0 auto 40px;
+}
+
+.pillEmblem {
+  display: inline-block;
+  background: linear-gradient(135deg, #051B41 0%, #0E2954 60%, #004080 100%);
+  color: #ffffff;
+  font-family: 'Cinzel', serif;
+  font-size: 1.25rem;
+  font-weight: 800;
+  padding: 8px 32px;
+  border-radius: 40px;
+  border: 2px solid var(--gold-bright, #e2a829);
+  box-shadow: 0 6px 22px rgba(5, 27, 65, 0.28);
+  letter-spacing: 1px;
+  margin-bottom: 14px;
+}
+
+.title {
+  font-family: 'Cinzel', serif;
+  font-size: 2.3rem;
+  color: var(--midnight-blue, #051B41);
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  color: var(--text-muted, #51647a);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+/* Social Proof Stats Badges */
+.statsRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+.statBadge {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 18px;
+  padding: 10px 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(5, 27, 65, 0.05);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.statBadge:hover {
+  transform: translateY(-2px);
+  border-color: var(--peacock-bright, #0059B3);
+}
+
+.statIcon {
+  font-size: 1.2rem;
+}
+
+.statBadge strong {
+  font-size: 1.15rem;
+  color: var(--midnight-blue, #051B41);
+  font-weight: 900;
+}
+
+.statSub {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+/* Tab Bar & "Write a Review" Button */
+.tabBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  background: #f8fafc;
+  padding: 12px 18px;
+  border-radius: 50px;
+  border: 1.5px solid #e2e8f0;
+  margin-bottom: 40px;
+}
+
+.tabButtons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.tabBtn {
+  background: #ffffff;
+  color: var(--midnight-blue, #051B41);
+  border: 1.5px solid #cbd5e1;
+  padding: 9px 20px;
+  border-radius: 25px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+}
+
+.tabFullText {
+  display: inline;
+}
+
+.tabShortText {
+  display: none;
+}
+
+.tabBtn:hover {
+  border-color: var(--peacock-bright, #0059B3);
+  color: var(--peacock-bright, #0059B3);
+}
+
+.tabBtn:active {
+  transform: scale(0.94) !important;
+  box-shadow: 0 0 15px rgba(0, 89, 179, 0.5) !important;
+}
+
+.tabActive {
+  background: linear-gradient(135deg, #051B41 0%, #0E2954 100%);
+  color: var(--gold-light, #fbe08e);
+  border-color: var(--peacock-bright, #0059B3);
+  box-shadow: 0 4px 14px rgba(5, 27, 65, 0.25);
+}
+
+.btnWriteReview {
+  background: var(--gold-pill, linear-gradient(180deg, #fce59b 0%, #e2a628 50%, #bf8111 100%));
+  color: var(--midnight-blue, #051B41);
+  font-weight: 850;
+  font-size: 0.95rem;
+  padding: 11px 26px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(220, 162, 37, 0.45);
+  transition: all 0.2s ease;
+}
+
+.btnWriteReview:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(220, 162, 37, 0.65);
+}
+
+.btnWriteReview:active {
+  transform: scale(0.93) translateY(1px) !important;
+  box-shadow: 0 0 35px rgba(251, 224, 142, 1), 0 0 50px rgba(220, 162, 37, 0.8) !important;
+  filter: brightness(1.15) !important;
+}
+
+/* Submission Success Toast */
+.toastSuccess {
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1.5px solid #a7f3d0;
+  padding: 14px 22px;
+  border-radius: 16px;
+  font-weight: 800;
+  font-size: 0.92rem;
+  margin-bottom: 28px;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.2);
+  animation: slideInToast 0.3s ease;
+}
+
+@keyframes slideInToast {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Sub-headers for sections */
+.subHeaderWrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.trackTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 1.45rem;
+  color: var(--midnight-blue, #051B41);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.pauseHint {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.igSvgBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+.igSvgIcon {
+  display: block;
+}
+
+.ytRedIcon {
+  color: #ff0000;
+}
+
+/* ============================================================================
+   MOVING CUSTOMER REVIEWS (INFINITE MARQUEE CAROUSEL)
+   ============================================================================ */
+
+.movingSectionWrap {
+  margin-bottom: 60px;
+}
+
+.marqueeOuter {
+  width: 100%;
+  overflow: hidden;
+  position: relative;
+  padding: 14px 0;
+  mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
+}
+
+.marqueeTrack {
+  display: flex;
+  gap: 24px;
+  width: max-content;
+  animation: reviewMarquee 42s linear infinite;
+  will-change: transform;
+}
+
+.marqueeTrack:hover {
+  animation-play-state: paused;
+}
+
+@keyframes reviewMarquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.reviewCard {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 22px;
+  padding: 24px;
+  width: 360px;
+  flex-shrink: 0;
+  box-shadow: 0 8px 24px rgba(5, 27, 65, 0.06);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  user-select: none;
+}
+
+.reviewCard:hover {
+  transform: translateY(-5px);
+  border-color: var(--peacock-bright, #0059B3);
+  box-shadow: 0 14px 34px rgba(5, 27, 65, 0.12), 0 0 20px rgba(0, 119, 230, 0.15);
+}
+
+.reviewCard:active {
+  transform: scale(0.97) !important;
+  border-color: var(--gold-bright, #e2a829) !important;
+  box-shadow: 0 0 25px rgba(226, 168, 41, 0.4) !important;
+}
+
+.cardTop {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.avatarWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 2px solid #ffffff;
+}
+
+.nameMeta {
+  flex-grow: 1;
+}
+
+.reviewerName {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--midnight-blue, #051B41);
+  margin-bottom: 2px;
+}
+
+.reviewerCity {
+  font-size: 0.76rem;
+  color: #64748b;
+  display: block;
+}
+
+.greenVerified {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.cardDate {
+  font-size: 0.72rem;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.ratingRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.stars {
+  color: #eab308;
+  font-size: 1.1rem;
+  letter-spacing: 2px;
+}
+
+.dishPill {
+  background: #fdf8e8;
+  color: var(--gold-temple, #c59b27);
+  border: 1px solid #fae8b2;
+  font-size: 0.74rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.reviewQuote {
+  font-size: 0.92rem;
+  color: #334155;
+  line-height: 1.55;
+  font-style: italic;
+  flex-grow: 1;
+}
+
+/* ============================================================================
+   INSTAGRAM REELS SHOWCASE (9:16 VERTICAL CARDS)
+   ============================================================================ */
+
+.socialMediaSection {
+  margin-bottom: 60px;
+}
+
+.reelsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+}
+
+.reelCard {
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  aspect-ratio: 9 / 16;
+  background: #051B41;
+  box-shadow: 0 10px 28px rgba(5, 27, 65, 0.16);
+  border: 1.5px solid rgba(0, 89, 179, 0.3);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.reelCard:hover {
+  transform: translateY(-8px) scale(1.02);
+  border-color: #e1306c;
+  box-shadow: 0 18px 40px rgba(225, 48, 108, 0.25), 0 0 25px rgba(253, 29, 29, 0.2);
+}
+
+.reelCard:active {
+  transform: scale(0.95) !important;
+  box-shadow: 0 0 35px rgba(225, 48, 108, 0.6) !important;
+}
+
+.reelMediaBox {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.reelImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s ease;
+}
+
+.reelCard:hover .reelImg {
+  transform: scale(1.08);
+}
+
+.reelOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(5, 27, 65, 0.4) 0%,
+    rgba(5, 27, 65, 0.1) 40%,
+    rgba(5, 27, 65, 0.88) 100%
+  );
+  z-index: 1;
+}
+
+.reelHeaderBadge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  padding: 4px 10px;
+  border-radius: 14px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  z-index: 2;
+  letter-spacing: 0.5px;
+}
+
+.playButtonPill {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(8px);
+  border: 2px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  transition: all 0.25s ease;
+}
+
+.reelCard:hover .playButtonPill {
+  background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  transform: translate(-50%, -50%) scale(1.15);
+  box-shadow: 0 0 25px rgba(225, 48, 108, 0.7);
+}
+
+.playTriangle {
+  color: #ffffff;
+  font-size: 1.2rem;
+  margin-left: 3px;
+}
+
+.reelStats {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.68rem;
+  color: #ffffff;
+  font-weight: 700;
+  z-index: 2;
+}
+
+.reelBottomMeta {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  z-index: 2;
+  color: #ffffff;
+}
+
+.creatorHandle {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--gold-light, #fbe08e);
+  margin-bottom: 4px;
+}
+
+.reelCaptionTitle {
+  font-size: 0.88rem;
+  font-weight: 700;
+  line-height: 1.35;
+  margin-bottom: 8px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.audioBadge {
+  font-size: 0.7rem;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ============================================================================
+   YOUTUBE FOOD VLOGS & REVIEWS (16:9 WIDESCREEN CARDS)
+   ============================================================================ */
+
+.youtubeSection {
+  margin-bottom: 50px;
+}
+
+.youtubeGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 26px;
+}
+
+.ytCard {
+  background: #ffffff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 22px;
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(5, 27, 65, 0.08);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+}
+
+.ytCard:hover {
+  transform: translateY(-6px);
+  border-color: #ff0000;
+  box-shadow: 0 16px 36px rgba(255, 0, 0, 0.15), 0 0 25px rgba(255, 0, 0, 0.1);
+}
+
+.ytCard:active {
+  transform: scale(0.96) !important;
+  box-shadow: 0 0 30px rgba(255, 0, 0, 0.4) !important;
+}
+
+.ytThumbWrap {
+  position: relative;
+  height: 200px;
+  overflow: hidden;
+  background: #051B41;
+}
+
+.ytThumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.ytCard:hover .ytThumb {
+  transform: scale(1.06);
+}
+
+.ytThumbOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 40%, rgba(5, 27, 65, 0.75) 100%);
+}
+
+.ytPlayBadge {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 58px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+}
+
+.ytCard:hover .ytPlayBadge {
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+.ytSvgIcon {
+  width: 100%;
+  height: 100%;
+}
+
+.ytDuration {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  background: rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+}
+
+.ytRatingBadge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #16a34a;
+  color: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 3px 10px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.ytCardBody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.ytChannelRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.ytChannelIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+}
+
+.ytChannelName {
+  font-size: 0.86rem;
+  color: var(--midnight-blue, #051B41);
+}
+
+.ytSubscribers {
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.ytTitle {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--midnight-blue, #051B41);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.ytDesc {
+  font-size: 0.84rem;
+  color: #64748b;
+  line-height: 1.5;
+  flex-grow: 1;
+}
+
+/* ============================================================================
+   GOOGLE MAPS CTA BANNER
+   ============================================================================ */
+
+.googleCtaBox {
+  background: linear-gradient(135deg, #051B41 0%, #0E2954 60%, #004080 100%);
+  border: 2px solid var(--gold-temple, #c59b27);
+  border-radius: 26px;
+  padding: 28px 36px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  color: #ffffff;
+  box-shadow: 0 12px 36px rgba(5, 27, 65, 0.25);
+}
+
+.googleLeft {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.googleIcon {
+  font-size: 2.8rem;
+}
+
+.googleTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 1.35rem;
+  color: var(--gold-light, #fbe08e);
+  margin-bottom: 4px;
+}
+
+.googleDesc {
+  color: #cbd5e1;
+  font-size: 0.92rem;
+  max-width: 580px;
+  line-height: 1.5;
+}
+
+.btnGoogleMaps {
+  background: var(--gold-pill, linear-gradient(180deg, #fce59b 0%, #e2a628 50%, #bf8111 100%));
+  color: var(--midnight-blue, #051B41);
+  font-weight: 850;
+  font-size: 0.95rem;
+  padding: 13px 26px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(220, 162, 37, 0.45);
+  transition: all 0.2s ease;
+}
+
+.btnGoogleMaps:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(220, 162, 37, 0.65);
+}
+
+.btnGoogleMaps:active {
+  transform: scale(0.93) translateY(1px) !important;
+  box-shadow: 0 0 35px rgba(251, 224, 142, 1) !important;
+}
+
+/* ============================================================================
+   MODALS: "ADD YOUR REVIEW" & VIDEO / REEL PREVIEW
+   ============================================================================ */
+
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 27, 65, 0.78);
+  backdrop-filter: blur(8px);
+  z-index: 10008;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modalCard {
+  background: #ffffff;
+  border-radius: 28px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 25px 60px rgba(5, 27, 65, 0.45), 0 0 40px rgba(0, 119, 230, 0.35);
+  border: 2px solid var(--gold-temple, #c59b27);
+  animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.mediaModalCard {
+  background: #ffffff;
+  border-radius: 28px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(5, 27, 65, 0.5);
+  border: 2px solid var(--peacock-bright, #0059B3);
+  animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modalHeader {
+  background: linear-gradient(135deg, #051B41 0%, #0E2954 60%, #004080 100%);
+  color: #ffffff;
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid var(--gold-temple, #c59b27);
+}
+
+.modalHeaderTitle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modalHeaderIcon {
+  font-size: 1.6rem;
+}
+
+.modalHeaderTitle h3 {
+  font-family: 'Cinzel', serif;
+  font-size: 1.15rem;
+  color: var(--gold-light, #fbe08e);
+  margin-bottom: 2px;
+}
+
+.modalHeaderTitle p {
+  font-size: 0.75rem;
+  color: #cbd5e1;
+}
+
+.modalCloseBtn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.modalCloseBtn:hover, .modalCloseBtn:active {
+  background: rgba(255, 255, 255, 0.35);
+  transform: rotate(90deg) scale(1.1);
+}
+
+.reviewForm {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.formGroupRating {
+  background: #fdfaf3;
+  border: 1.5px solid #fae8b2;
+  padding: 14px 18px;
+  border-radius: 16px;
+}
+
+.formGroupRating label {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--midnight-blue, #051B41);
+  display: block;
+  margin-bottom: 8px;
+}
+
+.interactiveStars {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.starInput {
+  font-size: 2.2rem;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: transform 0.2s ease, color 0.2s ease;
+  user-select: none;
+}
+
+.starInput:hover {
+  transform: scale(1.2);
+}
+
+.starFilled {
+  color: #eab308;
+  filter: drop-shadow(0 2px 6px rgba(234, 179, 8, 0.45));
+}
+
+.ratingLabelText {
+  margin-left: 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--gold-temple, #c59b27);
+}
+
+.formRowTwo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.formField label {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--midnight-blue, #051B41);
+}
+
+.textInput, .selectInput, .textareaInput {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1.5px solid #cbd5e1;
+  font-size: 0.9rem;
+  font-family: inherit;
+  color: var(--midnight-blue, #051B41);
+  background: #ffffff;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.textInput:focus, .selectInput:focus, .textareaInput:focus {
+  border-color: var(--peacock-bright, #0059B3);
+  box-shadow: 0 0 0 3px rgba(0, 89, 179, 0.15);
+}
+
+.formActions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.btnCancel {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btnPublish {
+  background: var(--gold-pill, linear-gradient(180deg, #fce59b 0%, #e2a628 50%, #bf8111 100%));
+  color: var(--midnight-blue, #051B41);
+  font-weight: 850;
+  font-size: 0.95rem;
+  padding: 12px 24px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(220, 162, 37, 0.45);
+  transition: all 0.2s ease;
+}
+
+.btnPublish:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(220, 162, 37, 0.65);
+}
+
+.btnPublish:active {
+  transform: scale(0.93) translateY(1px) !important;
+  box-shadow: 0 0 35px rgba(251, 224, 142, 1) !important;
+}
+
+/* Media Modal Styles */
+.mediaModalHeader {
+  background: linear-gradient(135deg, #051B41 0%, #0E2954 100%);
+  color: #ffffff;
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mediaModalTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mediaTypeIcon {
+  font-size: 1.4rem;
+}
+
+.mediaModalTitleWrap h4 {
+  font-size: 0.95rem;
+  color: #ffffff;
+}
+
+.mediaViewsPill {
+  font-size: 0.72rem;
+  color: var(--gold-light, #fbe08e);
+  font-weight: 700;
+}
+
+.mediaPlayerStage {
+  position: relative;
+  height: 280px;
+  background: #000000;
+  overflow: hidden;
+}
+
+.mediaModalImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.simulatedPlayOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.pulseCenterPlay {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  border: 2.5px solid #ffffff;
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  font-size: 1.6rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-left: 4px;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+  animation: pulsePlay 2s infinite ease-in-out;
+}
+
+@keyframes pulsePlay {
+  0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+  50% { transform: scale(1.12); box-shadow: 0 0 35px rgba(255, 255, 255, 0.85); }
+  100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 255, 255, 0.5); }
+}
+
+.videoPlayingBadge {
+  background: rgba(0, 0, 0, 0.75);
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.mediaModalFooter {
+  padding: 20px;
+}
+
+.mediaModalFooter h4 {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 1.15rem;
+  color: var(--midnight-blue, #051B41);
+  margin-bottom: 6px;
+}
+
+.mediaModalFooter p {
+  color: #64748b;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin-bottom: 18px;
+}
+
+.mediaModalButtons {
+  display: flex;
+  gap: 10px;
+}
+
+.btnOrderFromVideo {
+  flex: 1;
+  background: var(--gold-pill, linear-gradient(180deg, #fce59b 0%, #e2a628 50%, #bf8111 100%));
+  color: var(--midnight-blue, #051B41);
+  font-weight: 850;
+  font-size: 0.9rem;
+  padding: 11px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 16px rgba(220, 162, 37, 0.4);
+}
+
+.btnOpenExternal {
+  background: #f1f5f9;
+  color: var(--midnight-blue, #051B41);
+  border: 1.5px solid #cbd5e1;
+  padding: 11px 18px;
+  border-radius: 25px;
+  font-weight: 700;
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+/* ============================================================================
+   MOBILE RESPONSIVENESS (99% MOBILE-FRIENDLY DESIGN)
+   ============================================================================ */
+
+@media (max-width: 1024px) {
+  .reelsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .youtubeGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .reviewsSection {
+    padding: 45px 14px 60px;
+  }
+
+  .title {
+    font-size: 1.65rem;
+  }
+
+  .pillEmblem {
+    font-size: 0.95rem;
+    padding: 6px 20px;
+  }
+
+  /* 2x2 Grid for Social Proof Badges */
+  .statsRow {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 18px;
+  }
+
+  .statBadge {
+    padding: 8px 10px;
+    border-radius: 14px;
+    gap: 6px;
+  }
+
+  .statBadge strong {
+    font-size: 0.95rem;
+  }
+
+  .statSub {
+    font-size: 0.72rem;
+    line-height: 1.2;
+  }
+
+  /* Compact 3-Tab Segmented Filter Bar */
+  .tabBar {
+    flex-direction: column;
+    align-items: stretch;
+    border-radius: 18px;
+    padding: 10px;
+    gap: 10px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .tabButtons {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    width: 100%;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .tabFullText {
+    display: none;
+  }
+
+  .tabShortText {
+    display: inline;
+  }
+
+  .tabBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 9px 4px;
+    font-size: 0.76rem;
+    border-radius: 12px;
+    gap: 4px;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .btnWriteReview {
+    width: 100%;
+    justify-content: center;
+    padding: 12px 20px;
+    font-size: 0.92rem;
+    min-height: 48px;
+  }
+
+  /* Subheader titles */
+  .subHeaderWrap {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    margin-bottom: 16px;
+  }
+
+  .trackTitle {
+    font-size: 1.2rem;
+    line-height: 1.35;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .pauseHint {
+    font-size: 0.75rem;
+    color: #64748b;
+  }
+
+  /* Moving Cards */
+  .movingSectionWrap {
+    margin-bottom: 45px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .reviewCard {
+    width: min(290px, 80vw);
+    padding: 16px;
+  }
+
+  /* Instagram Reels Horizontal Swipe Track */
+  .socialMediaSection {
+    margin-bottom: 45px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .reelsGrid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 14px;
+    padding: 4px 4px 18px;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
+    box-sizing: border-box;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .reelsGrid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .reelCard {
+    flex: 0 0 215px;
+    width: 215px;
+    height: 380px;
+    scroll-snap-align: start;
+    flex-shrink: 0;
+    border-radius: 20px;
+  }
+
+  .reelHeaderBadge {
+    top: 10px;
+    left: 10px;
+    font-size: 0.68rem;
+    padding: 3px 8px;
+  }
+
+  .reelStats {
+    top: 10px;
+    right: 10px;
+    font-size: 0.65rem;
+    padding: 3px 7px;
+  }
+
+  .playButtonPill {
+    width: 44px;
+    height: 44px;
+  }
+
+  .reelBottomMeta {
+    padding: 12px;
+  }
+
+  .creatorHandle {
+    font-size: 0.76rem;
+    font-weight: 800;
+  }
+
+  .reelCaptionTitle {
+    font-size: 0.8rem;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+
+  .audioBadge {
+    font-size: 0.64rem;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* YouTube Grid */
+  .youtubeSection {
+    margin-bottom: 45px;
+    width: 100%;
+    max-width: 100%;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .youtubeGrid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .ytCard {
+    width: 100%;
+    border-radius: 18px;
+  }
+
+  .ytCardBody {
+    padding: 16px;
+  }
+
+  .ytTitle {
+    font-size: 0.98rem;
+    line-height: 1.4;
+  }
+
+  .ytDesc {
+    font-size: 0.82rem;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .googleCtaBox {
+    flex-direction: column;
+    text-align: center;
+    padding: 24px 18px;
+    border-radius: 20px;
+  }
+
+  .googleLeft {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .btnGoogleMaps {
+    width: 100%;
+    justify-content: center;
+  }
+
+  /* Modal Bottom Sheet on Mobile */
+  .modalOverlay {
+    align-items: flex-end;
+    padding: 0;
+  }
+
+  .modalCard, .mediaModalCard {
+    border-radius: 26px 26px 0 0;
+    max-height: 88vh;
+    animation: slideUpMobile 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes slideUpMobile {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .mediaModalButtons {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .btnOrderFromVideo, .btnOpenExternal {
+    width: 100%;
+    min-height: 48px;
+  }
+
+  .formRowTwo {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+}
+

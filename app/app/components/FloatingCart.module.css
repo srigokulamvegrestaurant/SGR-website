@@ -1,0 +1,164 @@
+/* ============================================================================
+   FLOATING CART / ACTIVE TAB (Desktop Pill & Mobile Circular Badge)
+   ============================================================================ */
+
+.floatingCart {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--gold-pill, linear-gradient(180deg, #fce59b 0%, #e2a628 50%, #bf8111 100%));
+  color: var(--midnight-blue, #051B41);
+  padding: 12px 24px;
+  border-radius: 40px;
+  font-weight: 850;
+  font-size: 0.95rem;
+  box-shadow: 0 8px 25px rgba(220, 162, 37, 0.55), 0 0 15px rgba(251, 224, 142, 0.4);
+  cursor: pointer;
+  z-index: 998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+  border: 1.5px solid #ffffff;
+  animation: cartAmbientPulse 3.5s ease-in-out infinite;
+}
+
+@keyframes cartAmbientPulse {
+  0% {
+    box-shadow: 0 8px 25px rgba(220, 162, 37, 0.55), 0 0 15px rgba(251, 224, 142, 0.4);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow: 0 12px 35px rgba(220, 162, 37, 0.75), 0 0 25px rgba(251, 224, 142, 0.65);
+    transform: translateY(-2px);
+  }
+  100% {
+    box-shadow: 0 8px 25px rgba(220, 162, 37, 0.55), 0 0 15px rgba(251, 224, 142, 0.4);
+    transform: translateY(0);
+  }
+}
+
+.floatingCart:hover {
+  transform: translateY(-4px) scale(1.05) !important;
+  box-shadow: 0 14px 38px rgba(220, 162, 37, 0.8), 0 0 30px rgba(251, 224, 142, 0.8) !important;
+}
+
+.floatingCart:active {
+  transform: scale(0.92) !important;
+  box-shadow: 0 0 35px #ffdf00, 0 0 55px rgba(220, 162, 37, 0.9) !important;
+  filter: brightness(1.18) !important;
+}
+
+/* Desktop Horizontal Pill Wrap */
+.desktopPillWrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cartIcon {
+  font-size: 1.15rem;
+}
+
+.cartLabel {
+  letter-spacing: 0.3px;
+}
+
+.cartCount {
+  font-weight: 800;
+}
+
+.cartDivider {
+  color: var(--midnight-blue, #051B41);
+  opacity: 0.6;
+}
+
+.cartTotal {
+  font-weight: 900;
+  font-size: 1.05rem;
+}
+
+/* Mobile-Only Circular Floating Badge Elements */
+.mobileCircleWrap {
+  display: none;
+}
+
+/* ============================================================================
+   MOBILE RESPONSIVENESS — Circular Floating Order Badge
+   ============================================================================ */
+@media (max-width: 768px) {
+  .floatingCart {
+    bottom: 20px;
+    right: 20px;
+    width: 62px;
+    height: 62px;
+    padding: 0;
+    border-radius: 50%;
+    border: 2.5px solid #ffffff;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.38), 0 0 22px rgba(251, 224, 142, 0.75);
+    background: radial-gradient(circle at 35% 30%, #fff2b2 0%, #e2a628 55%, #b27508 100%);
+  }
+
+  .desktopPillWrap {
+    display: none;
+  }
+
+  .mobileCircleWrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    pointer-events: none;
+  }
+
+  .mobileCartIcon {
+    font-size: 1.45rem;
+    line-height: 1;
+    margin-top: -2px;
+    filter: drop-shadow(0 2px 4px rgba(5, 27, 65, 0.2));
+  }
+
+  .mobilePrice {
+    font-size: 0.68rem;
+    font-weight: 900;
+    color: var(--midnight-blue, #051B41);
+    margin-top: 1px;
+    line-height: 1;
+    letter-spacing: -0.3px;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+  }
+
+  .mobileBadge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: linear-gradient(135deg, #051B41 0%, #004080 100%);
+    color: #fbe08e;
+    border: 2px solid #ffffff;
+    min-width: 23px;
+    height: 23px;
+    border-radius: 12px;
+    font-size: 0.74rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.4), 0 0 8px rgba(0, 89, 179, 0.6);
+    animation: badgePop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  @keyframes badgePop {
+    from { transform: scale(0.4); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+
+  .floatingCart:active {
+    transform: scale(0.88) !important;
+    box-shadow: 0 0 30px #ffdf00, 0 0 50px rgba(220, 162, 37, 1) !important;
+  }
+}

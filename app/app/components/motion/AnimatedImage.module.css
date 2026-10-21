@@ -1,0 +1,100 @@
+/* ============================================================================
+   ANIMATED IMAGE — Fade-in reveal, hover zoom, lift, float
+   Sri Gokulam Veg Restaurant
+   ============================================================================ */
+
+/* ── Container ──────────────────────────────────────────────────────────── */
+.imgContainer {
+  position: relative;
+  overflow: hidden;
+  /* Start fully visible — the image fades in via .img opacity */
+  border-radius: inherit;
+  transition:
+    box-shadow 0.3s ease,
+    transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  will-change: transform;
+  /* Ensure the container always fills its parent */
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Hover: lift + glow */
+.imgContainer:hover {
+  transform: translateY(-4px) scale(1.01);
+  box-shadow:
+    0 16px 40px rgba(5, 27, 65, 0.2),
+    0 0 0 2px rgba(0, 119, 230, 0.2);
+}
+
+/* ── Image element ──────────────────────────────────────────────────────── */
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 1 !important;
+  transform: scale(1);
+  transition:
+    transform 0.4s cubic-bezier(0.25, 1, 0.5, 1),
+    filter 0.3s ease;
+  will-change: transform;
+  background-color: #eef2f7;
+}
+
+.imgLoaded {
+  opacity: 1 !important;
+  transform: scale(1);
+}
+
+/* Hover zoom on the image */
+.imgContainer:hover .img {
+  transform: scale(1.06);
+}
+
+/* ── Fallback: show image immediately if JS is slow ─────────────────────── */
+/* (noscript / SSR — img is visible by default before hydration) */
+.img {
+  /* background colour while loading */
+  background-color: #eef2f7;
+}
+
+/* ── Featured floating bob animation ────────────────────────────────────── */
+.featured {
+  animation: imageBob 5s ease-in-out infinite;
+}
+
+@keyframes imageBob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-7px); }
+}
+
+/* ── Mobile: disable hover transforms on touch ───────────────────────────── */
+@media (hover: none) {
+  .imgContainer:hover {
+    transform: none;
+    box-shadow: none;
+  }
+  .imgContainer:hover .imgLoaded {
+    transform: scale(1);
+  }
+}
+
+/* ── Reduced Motion ─────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  .imgContainer {
+    transition: none !important;
+  }
+  .imgContainer:hover {
+    transform: none !important;
+  }
+  .img {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .featured {
+    animation: none !important;
+  }
+}

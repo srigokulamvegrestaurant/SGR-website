@@ -1,0 +1,46 @@
+/* ============================================================================
+   PARALLAX SECTION — Subtle background parallax depth
+   Sri Gokulam Veg Restaurant
+   ============================================================================ */
+
+.parallaxSection {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Background layer that moves with parallax */
+.parallaxBg {
+  position: absolute;
+  inset: -15%; /* Extra space so edges don't show during translate */
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  will-change: transform;
+  /* Start with no transform — JS applies translate3d on scroll */
+  transform: translate3d(0, 0, 0);
+  z-index: 0;
+}
+
+/* Content stays fixed above the moving background */
+.parallaxContent {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+
+/* Disable inset on mobile (no parallax applied) */
+@media (max-width: 767px) {
+  .parallaxBg {
+    inset: 0;
+    transform: none !important;
+    will-change: auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .parallaxBg {
+    transform: none !important;
+    will-change: auto;
+  }
+}

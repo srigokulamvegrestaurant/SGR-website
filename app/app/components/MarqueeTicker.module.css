@@ -1,0 +1,55 @@
+.marqueeBar {
+  background: linear-gradient(135deg, #051B41 0%, #0E2954 35%, #0059B3 65%, #0E2954 85%, #051B41 100%);
+  padding: 12px 0;
+  overflow: hidden;
+  max-width: 100vw;
+  width: 100%;
+  contain: paint;
+  white-space: nowrap;
+  border-bottom: 2px solid var(--gold-temple, #c59b27);
+  box-shadow: 0 4px 20px rgba(0, 89, 179, 0.35);
+  position: relative;
+  z-index: 10;
+}
+
+.marqueeTrack {
+  display: inline-flex;
+  align-items: center;
+  animation: marqueeScroll 32s linear infinite;
+  will-change: transform;
+}
+
+.marqueeBar:hover .marqueeTrack {
+  animation-play-state: paused;
+}
+
+.marqueeItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--gold-light, #fbe08e);
+  font-weight: 800;
+  font-size: 0.88rem;
+  letter-spacing: 1.2px;
+  padding: 0 16px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+.itemIcon {
+  font-size: 1.1rem;
+}
+
+.itemSep {
+  color: var(--peacock-bright, #0059B3);
+  margin-left: 16px;
+  font-size: 1.2rem;
+}
+
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}

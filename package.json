@@ -1,0 +1,13 @@
+{
+  "name": "sri-gokulam-veg-restaurant",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Sri Gokulam Veg Restaurant — High-Performance POS, KDS & Analytics Engine",
+  "scripts": {
+    "postinstall": "npm --prefix app install",
+    "dev": "npm --prefix app run dev",
+    "build": "npm --prefix app run build",
+    "start": "npm --prefix app run start",
+    "lint": "npm --prefix app run lint"
+  }
+}

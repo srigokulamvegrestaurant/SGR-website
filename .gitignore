@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+app/node_modules/
+
+# Next.js build outputs
+.next/
+app/.next/
+out/
+app/out/
+build/
+app/build/
+
+# Local state & logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.pem
+.DS_Store
+
+# Environment variables
+.env
+.env*.local
+
+# Agents & ide temporary files
+.agents/
+
+# Backup snapshots
+.data/backups/
+app/.data/backups/

@@ -1,0 +1,50 @@
+.particlesContainer {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 2;
+  contain: strict;
+}
+
+.particle {
+  position: absolute;
+  bottom: -20px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #fff6d6 0%, #fcd34d 45%, #d97706 100%);
+  box-shadow: 0 0 10px rgba(251, 191, 36, 0.7), 0 0 20px rgba(245, 158, 11, 0.35);
+  animation-name: particleFloat;
+  animation-timing-function: cubic-bezier(0.25, 1, 0.5, 1);
+  animation-iteration-count: infinite;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translateY(0) translateX(0) scale(0.6) rotate(0deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.8;
+  }
+  75% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-850px) translateX(var(--drift, 30px)) scale(1.1) rotate(180deg);
+    opacity: 0;
+  }
+}
+
+@media (max-width: 640px) {
+  .particle:nth-child(n + 9) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .particlesContainer {
+    display: none;
+  }
+}

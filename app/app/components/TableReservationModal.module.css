@@ -1,0 +1,365 @@
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 27, 65, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  padding: 16px;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modalCard {
+  background: #ffffff;
+  color: #0f172a;
+  border-radius: 24px;
+  max-width: 540px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(245, 158, 11, 0.2);
+  overflow: hidden;
+  position: relative;
+  animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.modalHeader {
+  background: linear-gradient(135deg, #051b41 0%, #0d3268 100%);
+  color: #ffffff;
+  padding: 22px 24px;
+  position: relative;
+  border-bottom: 3px solid #f59e0b;
+  flex-shrink: 0;
+}
+
+.headerIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  background: rgba(245, 158, 11, 0.18);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  border-radius: 12px;
+  font-size: 1.4rem;
+  margin-bottom: 8px;
+}
+
+.modalTitle {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.modalSubtitle {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+  margin: 4px 0 0;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: rgba(255, 255, 255, 0.12);
+  border: none;
+  color: #ffffff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.closeBtn:hover {
+  background: rgba(255, 255, 255, 0.25);
+  transform: rotate(90deg);
+}
+
+.modalBody {
+  padding: 22px 24px 28px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.formGroup {
+  margin-bottom: 16px;
+}
+
+.label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.inputField {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  color: #0f172a;
+  outline: none;
+  background: #f8fafc;
+  transition: all 0.2s;
+  box-sizing: border-box;
+}
+
+.inputField:focus {
+  border-color: #f59e0b;
+  background: #ffffff;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.15);
+}
+
+.chipsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.chipBtn {
+  background: #f1f5f9;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 9px 6px;
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: #475569;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.chipBtn:hover {
+  border-color: #f59e0b;
+  color: #b45309;
+}
+
+.chipBtnActive {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  color: #92400e;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.2);
+}
+
+.sectionGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.timeSlotsWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.timeSlotHeading {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.timeChips {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.submitBtn {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #051b41;
+  font-weight: 800;
+  font-size: 1rem;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 20px;
+  width: 100%;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(245, 158, 11, 0.35);
+  transition: all 0.2s;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.submitBtn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.45);
+}
+
+.submitBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.errorBox {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  margin-bottom: 14px;
+}
+
+/* Success View */
+.successCard {
+  text-align: center;
+  padding: 10px 0;
+}
+
+.successIcon {
+  font-size: 3.5rem;
+  margin-bottom: 12px;
+}
+
+.successTitle {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #051b41;
+  margin: 0 0 6px;
+}
+
+.successSubtitle {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin: 0 0 20px;
+}
+
+.ticketBox {
+  background: #f8fafc;
+  border: 1.5px dashed #cbd5e1;
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.ticketRow {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  font-size: 0.9rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.ticketRow:last-child {
+  border-bottom: none;
+}
+
+.ticketLabel {
+  color: #64748b;
+  font-weight: 600;
+}
+
+.ticketVal {
+  color: #0f172a;
+  font-weight: 800;
+}
+
+.callNotice {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: 10px;
+  padding: 12px;
+  font-size: 0.84rem;
+  color: #1e40af;
+  margin-bottom: 18px;
+}
+
+.guestContactRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ============================================================================
+   MOBILE RESPONSIVENESS
+   ============================================================================ */
+@media (max-width: 520px) {
+  .modalOverlay {
+    padding: 8px 8px 0;
+    align-items: flex-end;
+  }
+
+  .modalCard {
+    border-radius: 24px 24px 0 0;
+    max-height: 94vh;
+  }
+
+  .modalHeader {
+    padding: 16px 18px;
+  }
+
+  .modalTitle {
+    font-size: 1.15rem;
+  }
+
+  .modalSubtitle {
+    font-size: 0.78rem;
+  }
+
+  .modalBody {
+    padding: 16px 18px 24px;
+  }
+
+  .guestContactRow {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .chipsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .sectionGrid {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .timeChips {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+
+  .inputField {
+    font-size: 16px; /* Prevents iOS Safari auto-zoom on focus */
+    padding: 11px 12px;
+  }
+
+  .submitBtn {
+    font-size: 0.95rem;
+    padding: 13px 18px;
+    min-height: 48px;
+  }
+}

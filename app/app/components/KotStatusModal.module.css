@@ -1,0 +1,538 @@
+/* ============================================================================
+   KOT STATUS MODAL — Waiter OTP, Digital KOT & Cooking Tracker
+   ============================================================================ */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 27, 65, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 28px;
+  width: 100%;
+  max-width: 480px;
+  overflow: hidden;
+  box-shadow: 0 25px 65px rgba(5, 27, 65, 0.5), 0 0 35px rgba(220, 162, 37, 0.35);
+  border: 2px solid var(--peacock-bright, #0059B3);
+  animation: popIn 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  display: flex;
+  flex-direction: column;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.header {
+  background: linear-gradient(135deg, #051B41 0%, #0E2954 60%, #004080 100%);
+  color: #ffffff;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 3px solid var(--gold-temple, #c59b27);
+}
+
+.headerTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerIcon {
+  font-size: 1.6rem;
+}
+
+.headerTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 1.15rem;
+  color: var(--gold-light, #fbe08e);
+}
+
+.headerSubtitle {
+  font-size: 0.75rem;
+  color: #cbd5e1;
+}
+
+.closeBtn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover, .closeBtn:active {
+  background: rgba(255, 255, 255, 0.35);
+  transform: rotate(90deg) scale(1.1);
+}
+
+.body {
+  padding: 20px;
+  max-height: calc(88vh - 75px);
+  overflow-y: auto;
+}
+
+/* Success Banner */
+.successBanner {
+  background: #f0fdf4;
+  border: 1.5px solid #86efac;
+  border-radius: 18px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.successEmoji {
+  font-size: 2.2rem;
+}
+
+.successBanner h4 {
+  font-size: 0.95rem;
+  color: #166534;
+  font-weight: 850;
+  margin-bottom: 2px;
+}
+
+.successBanner p {
+  font-size: 0.78rem;
+  color: #15803d;
+  font-weight: 600;
+}
+
+/* ============================================================================
+   BIG 4-DIGIT WAITER OTP CARD
+   ============================================================================ */
+
+.otpCard {
+  background: linear-gradient(180deg, #fffcf0 0%, #fff7d6 100%);
+  border: 2px solid var(--gold-bright, #e2a829);
+  border-radius: 22px;
+  padding: 18px;
+  text-align: center;
+  box-shadow: 0 8px 24px rgba(220, 162, 37, 0.25);
+  margin-bottom: 20px;
+}
+
+.otpHeader {
+  font-family: 'Cinzel', serif;
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: var(--midnight-blue, #051B41);
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.otpDigitsBox {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.otpDigitItem {
+  width: 54px;
+  height: 60px;
+  background: #ffffff;
+  border: 2px solid var(--midnight-blue, #051B41);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Cinzel', serif;
+  font-size: 1.9rem;
+  font-weight: 900;
+  color: var(--midnight-blue, #051B41);
+  box-shadow: 0 4px 12px rgba(5, 27, 65, 0.15), inset 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.otpInstructions {
+  font-size: 0.82rem;
+  color: #334155;
+  line-height: 1.45;
+  margin-bottom: 12px;
+}
+
+.smsNotice {
+  background: #ffffff;
+  border: 1px dashed #cbd5e1;
+  border-radius: 10px;
+  padding: 8px 10px;
+  font-size: 0.72rem;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  margin-bottom: 14px;
+}
+
+.smsIcon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.btnSimulateWaiter {
+  width: 100%;
+  background: var(--midnight-blue, #051B41);
+  color: var(--gold-light, #fbe08e);
+  border: 1.5px solid var(--peacock-bright, #0059B3);
+  padding: 12px;
+  border-radius: 20px;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(5, 27, 65, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btnSimulateWaiter:hover {
+  background: var(--peacock-blue, #004080);
+  transform: translateY(-2px);
+}
+
+.btnSimulateWaiter:active {
+  transform: scale(0.94) !important;
+  box-shadow: 0 0 20px rgba(0, 119, 230, 0.6) !important;
+}
+
+.otpVerifiedBanner {
+  background: #10b981;
+  color: #ffffff;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+}
+
+/* ============================================================================
+   KITCHEN PREPARATION TIMER & TRACKER
+   ============================================================================ */
+
+.kitchenTimerCard {
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+.timerHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.timerTitleWrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.84rem;
+  color: var(--midnight-blue, #051B41);
+}
+
+.flameIcon {
+  font-size: 1.1rem;
+}
+
+.countdownBadge {
+  background: var(--midnight-blue, #051B41);
+  color: var(--gold-light, #fbe08e);
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.76rem;
+  font-weight: 850;
+  font-family: monospace;
+}
+
+.progressBarWrapper {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progressBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #e2a829 0%, #10b981 100%);
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.stepLabelsRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.66rem;
+  font-weight: 750;
+}
+
+.stepActive {
+  color: #10b981;
+}
+
+.stepInactive {
+  color: #94a3b8;
+}
+
+.stepPulsing {
+  color: #f59e0b;
+  animation: pulseStep 1.2s infinite;
+}
+
+@keyframes pulseStep {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
+
+/* ============================================================================
+   DIGITAL KOT RECEIPT
+   ============================================================================ */
+
+.kotReceipt {
+  background: #fffef8;
+  border: 1px solid #e7dfc6;
+  border-radius: 14px;
+  padding: 16px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.8rem;
+  color: #1f2937;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.receiptBrand {
+  text-align: center;
+  font-weight: 900;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+}
+
+.receiptSub {
+  text-align: center;
+  font-size: 0.7rem;
+  color: #6b7280;
+  margin-bottom: 8px;
+}
+
+.receiptDivider {
+  text-align: center;
+  letter-spacing: 2px;
+  color: #9ca3af;
+  margin: 6px 0;
+  font-size: 0.72rem;
+}
+
+.receiptMetaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 12px;
+  font-size: 0.74rem;
+  margin-bottom: 6px;
+}
+
+.kotItemsList {
+  margin: 8px 0;
+}
+
+.kotHeaderRow {
+  display: flex;
+  justify-content: space-between;
+  font-weight: 850;
+  border-bottom: 1px dashed #d1d5db;
+  padding-bottom: 4px;
+  margin-bottom: 6px;
+  font-size: 0.72rem;
+}
+
+.kotItemRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.kotItemName {
+  flex: 1;
+  font-weight: 700;
+}
+
+.kotItemQty {
+  width: 40px;
+  text-align: center;
+}
+
+.kotItemPrice {
+  width: 60px;
+  text-align: right;
+  font-weight: 750;
+}
+
+.kotNotesBox {
+  background: #fef3c7;
+  border-left: 2px solid #f59e0b;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  color: #92400e;
+  margin-top: 6px;
+}
+
+.kotTotalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.92rem;
+  font-weight: 900;
+  margin: 8px 0 4px;
+}
+
+.receiptBarcode {
+  text-align: center;
+  letter-spacing: 3px;
+  font-weight: 900;
+  font-size: 1.1rem;
+  margin-top: 8px;
+  opacity: 0.7;
+}
+
+.receiptFooter {
+  text-align: center;
+  font-size: 0.65rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.waiterAlertToast {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  color: #1e40af;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 0.78rem;
+  font-weight: 750;
+  text-align: center;
+  margin-bottom: 14px;
+  animation: fadeIn 0.2s ease;
+}
+
+/* Actions Row */
+.actionsRow {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.btnOrderMore {
+  background: var(--gold-pill, linear-gradient(180deg, #fce59b 0%, #e2a628 50%, #bf8111 100%));
+  color: var(--midnight-blue, #051B41);
+  font-weight: 850;
+  font-size: 0.92rem;
+  padding: 13px;
+  border-radius: 25px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 6px 20px rgba(220, 162, 37, 0.45);
+  transition: all 0.2s ease;
+}
+
+.btnOrderMore:hover {
+  transform: translateY(-2px);
+}
+
+.btnOrderMore:active {
+  transform: scale(0.93) !important;
+}
+
+.btnCallWaiter {
+  background: #ffffff;
+  color: var(--midnight-blue, #051B41);
+  border: 1.5px solid #cbd5e1;
+  padding: 11px;
+  border-radius: 25px;
+  font-weight: 750;
+  font-size: 0.86rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btnCallWaiter:hover {
+  border-color: var(--peacock-bright, #0059B3);
+}
+
+/* ============================================================================
+   MOBILE RESPONSIVENESS
+   ============================================================================ */
+@media (max-width: 600px) {
+  .modal {
+    border-radius: 26px 26px 0 0;
+    max-height: 90vh;
+    margin-top: auto;
+    animation: slideUpMobile 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  @keyframes slideUpMobile {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  .otpDigitItem {
+    width: 46px;
+    height: 52px;
+    font-size: 1.6rem;
+  }
+}

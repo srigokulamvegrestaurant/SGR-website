@@ -1,0 +1,5478 @@
+/* ════════════════════════════════════════════════════════════════════════
+   Sri Gokulam Veg Restaurant — Enterprise Back-Office Admin Suite
+   Optimized for TVSE TP 415C Touch POS (1024x768) & TVSE RP3200 Plus 3" Thermal Printer
+   Dual-Theme Engine: Crisp Counter White (Light) & Krishna Midnight Blue (Dark)
+   ════════════════════════════════════════════════════════════════════════ */
+
+/* ─── Dual-Theme Custom Property Tokens (Scoped to .adminContainer) ─── */
+.adminContainer,
+.adminContainer[data-theme="dark"] {
+  /* Absolute Deep Pitch-Black OLED UI (Pure Jet Black & Vibrant POS Accents: Blue, Green, Red) */
+  --bg-page: #000000;               /* True pure dark black page background */
+  --bg-nav: #09090b;                /* High-contrast jet black header */
+  --bg-tabbar: #000000;             /* Pitch black tab bar */
+  --bg-card: #0d0d11;               /* Deep dark black card surfaces */
+  --bg-card-subtle: #151518;        /* Subtle dark black element surface */
+  --bg-input: #08080a;              /* Deep dark input field */
+  --text-primary: #ffffff;          /* Pure crisp white typography */
+  --text-secondary: #e4e4e7;        /* Zinc-200 readable secondary text */
+  --text-muted: #a1a1aa;            /* Zinc-400 clear metadata */
+  --border-subtle: #27272a;         /* High-contrast zinc border */
+  --border-card: rgba(59, 130, 246, 0.28); /* Modern sapphire blue card border */
+  --accent-primary: #2563eb;        /* Vibrant Royal Blue primary */
+  --accent-blue: #3b82f6;           /* Electric Blue highlight */
+  --accent-green: #10b981;          /* Radiant Emerald Green (revenue/settled/ready) */
+  --accent-red: #ef4444;            /* Vibrant Crimson Red (urgent/alerts/cleaning) */
+  --accent-cyan: #06b6d4;           /* High-contrast Cyan */
+  --accent-purple: #8b5cf6;         /* Royal Purple / Indigo */
+  --accent-gold: #3b82f6;           /* Fallback redirected to Electric Blue */
+  --card-shadow: 0 4px 24px rgba(0, 0, 0, 0.95);
+  --footer-bg: #000000;             /* Pure black footer */
+
+  min-height: 100vh;
+  height: auto;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif);
+  display: flex;
+  flex-direction: column;
+  transition: background-color 0.25s ease, color 0.25s ease;
+  overflow-x: hidden;
+  overflow-y: visible;
+  width: 100%;
+}
+
+/* ─── Crisp Counter White / Light Mode Theme ────────────────────────── */
+.adminContainer[data-theme="light"] {
+  --bg-page: #f4f5f8;
+  --bg-nav: #ffffff;
+  --bg-tabbar: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-card-subtle: #f1f5f9;
+  --bg-input: #ffffff;
+  --text-primary: #09090b;
+  --text-secondary: #27272a;
+  --text-muted: #52525b;
+  --border-subtle: #e4e4e7;
+  --border-card: rgba(37, 99, 235, 0.2);
+  --accent-primary: #1d4ed8;
+  --accent-blue: #2563eb;
+  --accent-green: #059669;
+  --accent-red: #dc2626;
+  --accent-cyan: #0284c7;
+  --accent-purple: #7c3aed;
+  --accent-gold: #2563eb;
+  --card-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
+  --footer-bg: #ffffff;
+}
+
+/* ─── Top Navigation & Command Bar ───────────────────────────────────── */
+.topNav {
+  background: var(--bg-nav);
+  border-bottom: 1px solid var(--border-subtle);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  transition: background 0.25s ease;
+}
+
+.navInner {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0.6rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.brandGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.brandLogo {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #051b41;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  box-shadow: 0 0 14px rgba(212, 175, 55, 0.35);
+  border: 2px solid rgba(212, 175, 55, 0.6);
+  flex-shrink: 0;
+  overflow: hidden;
+  padding: 0;
+}
+
+.brandLogoImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+  display: block;
+}
+
+.brandMeta h1 {
+  font-family: var(--font-heading, "Cinzel", Georgia, serif);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0.03em;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.brandSub {
+  font-size: 0.7rem;
+  color: #3b82f6;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.navControls {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* Segmented Light / Dark Black Mode Toggle Pill */
+.themePillToggle {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.themeOption {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.themeOption:hover {
+  color: var(--text-primary);
+}
+
+.themeOptionActive {
+  background: #2563eb;
+  color: #ffffff !important;
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+.roleSelector {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 0.25rem 0.65rem;
+  gap: 0.4rem;
+}
+
+.roleSelector label {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.roleSelect {
+  background: transparent;
+  color: #3b82f6;
+  font-weight: 700;
+  font-size: 0.8rem;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
+.roleSelect option {
+  background: var(--bg-card);
+  color: var(--text-primary);
+}
+
+.liveBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+}
+
+.pulseDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: pulseAnim 2s infinite ease-in-out;
+}
+
+@keyframes pulseAnim {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.navLinks {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.btnNavAlt {
+  font-size: 0.75rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.btnNavAlt:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.maintenanceAlert {
+  background: #b91c1c;
+  color: #ffffff;
+  padding: 0.35rem 1rem;
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+/* ─── Tab Navigation Bar (Optimized for 1024px POS Touch) ────────────── */
+.tabBar {
+  background: var(--bg-tabbar);
+  border-bottom: 1px solid var(--border-subtle);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.tabBar::-webkit-scrollbar {
+  display: none;
+}
+
+.tabInner {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.tabBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 700;
+  padding: 0.8rem 0.95rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-bottom: 3px solid transparent;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.tabBtn:hover {
+  color: var(--text-primary);
+}
+
+.tabActive {
+  color: #3b82f6;
+  border-bottom: 3px solid #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+.tabBadge {
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 0.65rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  font-weight: 800;
+}
+
+/* ─── Main Content Container ─────────────────────────────────────────── */
+.adminBody {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1.25rem;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+/* ─── Module 1: Overview & Analytics ─────────────────────────────────── */
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.metricCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  padding: 1.1rem;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.metricHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+}
+
+.metricTitle {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.metricIcon {
+  font-size: 1.2rem;
+}
+
+.metricValue {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  font-family: var(--font-heading, monospace);
+  margin-bottom: 0.3rem;
+}
+
+.metricSub {
+  font-size: 0.72rem;
+  color: #10b981;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-weight: 600;
+}
+
+.analyticsColumns {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .analyticsColumns {
+    grid-template-columns: 1fr;
+  }
+}
+
+.panelBox {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 1.25rem;
+  box-shadow: var(--card-shadow);
+}
+
+.panelBox h3 {
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-top: 0;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.65rem;
+}
+
+.heatmapList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.heatmapItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.heatmapMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8rem;
+}
+
+.heatmapHour {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.heatmapLabel {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.heatBarWrap {
+  background: var(--bg-card-subtle);
+  border-radius: 9999px;
+  height: 7px;
+  overflow: hidden;
+}
+
+.heatBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
+  border-radius: 9999px;
+  transition: width 0.6s ease;
+}
+
+.topDishesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.topDishRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-card-subtle);
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+}
+
+.dishRank {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(37, 99, 235, 0.18);
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.dishTitle {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+  margin-left: 0.65rem;
+}
+
+.dishCount {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #0284c7;
+  background: rgba(2, 132, 199, 0.12);
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   MODULE 2: HIGH-SPEED POS BILLING (OPTIMIZED FOR TVSE TP 415C TOUCH)
+   ══════════════════════════════════════════════════════════════════════ */
+.posLayout {
+  display: grid;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 1.25rem;
+}
+
+/* Touch POS Table Selector Grid */
+.posTablesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.posTableCard {
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.75rem 0.4rem;
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+  user-select: none;
+  touch-action: manipulation;
+  min-height: 76px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.posTableCard:active,
+.posTableCard:hover {
+  transform: translateY(-2px);
+  border-color: #3b82f6;
+}
+
+.posTableSelected {
+  border-color: #2563eb !important;
+  background: rgba(37, 99, 235, 0.15) !important;
+  box-shadow: 0 0 14px rgba(37, 99, 235, 0.4);
+}
+
+.posTableNum {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+.posTableSub {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 700;
+  margin-top: 0.15rem;
+}
+
+.posTableBill {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #10b981;
+  margin-top: 0.25rem;
+}
+
+/* POS Order Inspector */
+.posOrderInspector {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.posItemList {
+  max-height: 230px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 0.85rem;
+  padding-right: 0.25rem;
+}
+
+.posItemRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-card-subtle);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  border: 1px solid var(--border-subtle);
+}
+
+.posItemName {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.posItemMeta {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.posItemPrice {
+  font-weight: 800;
+  color: #10b981;
+}
+
+/* Quick Touch Tender Bar for TVSE TP 415C Touch Screen */
+.touchTenderBar {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.btnTenderChip {
+  flex: 1;
+  min-width: 55px;
+  height: 42px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+  font-weight: 800;
+  font-size: 0.85rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.btnTenderChip:active,
+.btnTenderChip:hover {
+  background: rgba(34, 197, 94, 0.15);
+  border-color: #22c55e;
+  color: #16a34a;
+}
+
+/* Change to Return Banner */
+.changeReturnBox {
+  background: rgba(34, 197, 94, 0.12);
+  border: 2px solid #22c55e;
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-weight: 800;
+}
+
+.changeReturnLabel {
+  font-size: 0.85rem;
+  color: #16a34a;
+  text-transform: uppercase;
+}
+
+.changeReturnValue {
+  font-size: 1.4rem;
+  color: #16a34a;
+  font-family: monospace;
+}
+
+/* Discount Inputs */
+.posDiscountBox {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.posDiscountInput {
+  flex: 1;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 0.55rem 0.75rem;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  height: 42px;
+  box-sizing: border-box;
+}
+
+.posDiscountInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.posPayModes {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.4rem;
+  margin-bottom: 0.85rem;
+}
+
+.payModeBtn {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 0.65rem 0.3rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.15s ease;
+  min-height: 44px;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.payModeActive {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #3b82f6 !important;
+}
+
+.btnSettle {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.9rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(22, 163, 74, 0.35);
+  transition: all 0.15s ease;
+  min-height: 52px;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.btnSettle:active,
+.btnSettle:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   TVSE RP3200 PLUS 3" (80MM) THERMAL RECEIPT PRINTER STYLES
+   ══════════════════════════════════════════════════════════════════════ */
+.thermalReceiptBox {
+  background: #ffffff;
+  color: #000000;
+  font-family: "Courier New", Courier, monospace;
+  padding: 1.25rem 1rem;
+  border-radius: 6px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  position: relative;
+  max-width: 380px;
+  margin: 0 auto;
+  border-top: 3px dashed #9ca3af;
+  border-bottom: 3px dashed #9ca3af;
+}
+
+.thermalReceiptBox pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: #000000;
+}
+
+.thermalActions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+  justify-content: center;
+}
+
+.btnThermalPrint {
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+  padding: 0.65rem 1.1rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  min-height: 44px;
+  user-select: none;
+  touch-action: manipulation;
+  transition: all 0.15s ease;
+}
+
+.btnThermalPrint:active,
+.btnThermalPrint:hover {
+  background: #0369a1;
+}
+
+/* ─── Isolated @media print rules for TVSE RP3200 Plus 80mm Roll ────── */
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Hide entire admin UI during thermal printing */
+  .topNav,
+  .tabBar,
+  .adminFooter,
+  .thermalActions,
+  .posTablesGrid,
+  .posOrderInspector,
+  .metricsGrid,
+  .analyticsColumns,
+  .kdsStationTabs,
+  .kdsTicketsGrid,
+  .floorSectionsWrap,
+  .inventoryLayout,
+  .cdnBanner,
+  .cdnGrid,
+  .devHubGrid {
+    display: none !important;
+  }
+
+  .adminContainer {
+    min-height: auto !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .adminBody {
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+
+  .posLayout {
+    display: block !important;
+  }
+
+  /* Target exact 72mm printable width for 80mm (3") TVSE roll */
+  .thermalReceiptBox {
+    display: block !important;
+    position: static !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 72mm !important;
+    max-width: 80mm !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    color: #000000 !important;
+    background: #ffffff !important;
+    font-size: 11pt !important;
+    line-height: 1.25 !important;
+  }
+
+  .thermalReceiptBox pre {
+    font-family: "Courier New", Courier, monospace !important;
+    font-size: 10pt !important;
+    color: #000000 !important;
+    margin: 0 !important;
+  }
+
+  @page {
+    size: 80mm auto;
+    margin: 2mm;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   MODULE 3: KITCHEN DISPLAY SYSTEM (KDS)
+   ══════════════════════════════════════════════════════════════════════ */
+.kdsStationTabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.kdsStationBtn {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.6rem 1rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.kdsStationActive {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #3b82f6;
+  font-weight: 800;
+}
+
+.kdsPerformanceBar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+  .kdsPerformanceBar {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.kdsMetricCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.75rem 1rem;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.kdsMetricTitle {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kdsMetricValue {
+  font-size: 1.35rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.kdsMetricSub {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.kdsOtpWarningBanner {
+  background: rgba(234, 179, 8, 0.12);
+  border: 1px solid #eab308;
+  border-radius: 8px;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: #eab308;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.kdsTopControlsRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.kdsViewToggleGroup {
+  display: flex;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 3px;
+}
+
+.kdsViewToggleBtn {
+  background: transparent;
+  border: none;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.kdsViewToggleBtnActive {
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+
+.kdsTicketsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+  gap: 1rem;
+}
+
+.kdsTicketCard {
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s ease;
+}
+
+.ticketNew {
+  border-color: #38bdf8;
+  animation: ticketPulse 2s infinite alternate;
+}
+
+@keyframes ticketPulse {
+  0% { box-shadow: 0 0 6px rgba(56, 189, 248, 0.3); }
+  100% { box-shadow: 0 0 16px rgba(56, 189, 248, 0.7); }
+}
+
+.ticketAccepted {
+  border-color: #8b5cf6;
+}
+
+.ticketPreparing {
+  border-color: #f59e0b;
+}
+
+.ticketReady {
+  border-color: #10b981;
+  box-shadow: 0 0 14px rgba(16, 185, 129, 0.4);
+}
+
+.ticketDelayed {
+  border-color: #ef4444 !important;
+  animation: ticketDelayedFlash 1s infinite alternate;
+}
+
+@keyframes ticketDelayedFlash {
+  0% { box-shadow: 0 0 8px rgba(239, 68, 68, 0.5); }
+  100% { box-shadow: 0 0 20px rgba(239, 68, 68, 0.9); }
+}
+
+.ticketServed {
+  border-color: var(--border-subtle);
+  opacity: 0.85;
+}
+
+.ticketCancelled {
+  border-color: #ef4444;
+  opacity: 0.75;
+}
+
+.kdsTicketHeader {
+  padding: 0.75rem 0.9rem;
+  background: var(--bg-card-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.kdsTablePill {
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.kdsSupplementaryBadge {
+  background: rgba(139, 92, 246, 0.2);
+  color: #a855f7;
+  border: 1px solid #8b5cf6;
+  font-weight: 800;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.kdsDelayedBadge {
+  background: #ef4444;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.72rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.kdsTimer {
+  font-family: monospace;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.kdsSubHeaderRow {
+  padding: 0.45rem 0.9rem;
+  background: rgba(0, 0, 0, 0.15);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px dashed var(--border-subtle);
+}
+
+.kdsItemList {
+  padding: 0.85rem;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.kdsItemCard {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.kdsItemRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.kdsItemTitle {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.25;
+}
+
+.kdsItemTaTitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.kdsItemQty {
+  background: #10b981;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 0.92rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.kdsItemMetaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  margin-top: 0.15rem;
+}
+
+.kdsVariantChip {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.kdsAddOnChip {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
+
+.kdsCookingNoteBox {
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 3px solid #ef4444;
+  padding: 0.35rem 0.55rem;
+  border-radius: 0 4px 4px 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #ef4444;
+  margin-top: 0.25rem;
+}
+
+.kdsTicketFooterNote {
+  padding: 0.5rem 0.9rem;
+  background: var(--bg-card-subtle);
+  border-top: 1px dashed var(--border-subtle);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+.kdsTicketActions {
+  padding: 0.65rem 0.85rem;
+  background: var(--bg-card-subtle);
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.btnKdsAction {
+  padding: 0.55rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 800;
+  font-size: 0.8rem;
+  cursor: pointer;
+  min-height: 42px;
+  transition: all 0.15s ease;
+  user-select: none;
+  touch-action: manipulation;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+}
+
+.btnAccept {
+  background: #8b5cf6;
+  color: #ffffff;
+  flex: 1.2;
+}
+
+.btnCooking {
+  background: #f59e0b;
+  color: #000000;
+  flex: 1.2;
+}
+
+.btnReady {
+  background: #10b981;
+  color: #ffffff;
+  flex: 1.2;
+}
+
+.btnServed {
+  background: #0284c7;
+  color: #ffffff;
+  flex: 1.2;
+}
+
+.btnNotifyWaiter {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+  border: 1px solid #10b981;
+}
+
+.btnPrintKot {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.btnCancelKot {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   MODULE 4: FLOOR PLAN & LIVE TABLE STATES
+   ══════════════════════════════════════════════════════════════════════ */
+.floorSectionsWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.floorSectionTitle {
+  font-family: var(--font-heading, "Cinzel", Georgia, serif);
+  font-size: 1.05rem;
+  color: #3b82f6;
+  margin-bottom: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-left: 4px solid #3b82f6;
+  padding-left: 0.65rem;
+  font-weight: 700;
+}
+
+.tablesGridFloor {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 1rem;
+}
+
+.floorTableCard {
+  background: var(--bg-card);
+  border: 2px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 130px;
+  transition: transform 0.15s ease;
+}
+
+.floorTableCard:hover {
+  transform: translateY(-2px);
+}
+
+.tblAvailable {
+  border-color: #16a34a;
+  background: rgba(22, 163, 74, 0.06);
+}
+
+.tblReserved {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.08);
+}
+
+.tblOccupied {
+  border-color: #ea580c;
+  background: rgba(234, 88, 12, 0.08);
+}
+
+.tblBillRequested {
+  border-color: #f43f5e !important;
+  background: rgba(244, 63, 94, 0.12) !important;
+  animation: billRequestedPulse 1.5s infinite alternate;
+}
+
+@keyframes billRequestedPulse {
+  0% { box-shadow: 0 0 6px rgba(244, 63, 94, 0.4); }
+  100% { box-shadow: 0 0 16px rgba(244, 63, 94, 0.85); }
+}
+
+.tblBillGenerated {
+  border-color: #2563eb;
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.tblPaymentPending {
+  border-color: #f43f5e;
+  background: rgba(244, 63, 94, 0.08);
+}
+
+.tblPaid {
+  border-color: #0d9488;
+  background: rgba(13, 148, 136, 0.08);
+}
+
+.tblCleaning {
+  border-color: #dc2626;
+  background: rgba(220, 38, 38, 0.08);
+  animation: cleaningBlink 2s infinite alternate;
+}
+
+@keyframes cleaningBlink {
+  0% { border-color: #dc2626; }
+  100% { border-color: #ef4444; }
+}
+
+/* Floor Summary & Filter Controls */
+.floorSummaryBar {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.floorSummaryChip {
+  padding: 0.35rem 0.65rem;
+  border-radius: 8px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.floorSummaryChipActive {
+  border-color: #2563eb !important;
+  background: rgba(37, 99, 235, 0.15) !important;
+  color: #2563eb !important;
+}
+
+.floorCommandBar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.floorSectionTabs {
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.floorSectionBtn {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.floorSectionBtnActive {
+  background: #2563eb;
+  color: #ffffff;
+  border-color: #2563eb;
+}
+
+.floorActionBtns {
+  display: flex;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.btnFloorAction {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+  user-select: none;
+  touch-action: manipulation;
+  min-height: 38px;
+}
+
+.btnFloorAction:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+.tableAlertPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: #ffffff;
+  margin-top: 0.25rem;
+}
+
+.tableShapeBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: var(--bg-card-subtle);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  border: 1px solid var(--border-subtle);
+}
+
+.tableOrderMiniTag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(37, 99, 235, 0.15);
+  color: #3b82f6;
+}
+
+.tableDrawerOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 1300;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.tableDrawerBox {
+  width: 480px;
+  max-width: 95vw;
+  height: 100vh;
+  background: var(--bg-card);
+  border-left: 1px solid var(--border-subtle);
+  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  padding: 1.25rem;
+  gap: 1rem;
+}
+
+.drawerSectionCard {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.drawerSectionTitle {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.guestOrderBlock {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.65rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.drawerSummaryRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+}
+
+.standeePreviewWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #09090b;
+  border-radius: 12px;
+  border: 1px solid #27272a;
+}
+
+.standeeCardBox {
+  width: 320px;
+  background: #ffffff;
+  color: #111827;
+  border: 3px double #dc2626;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-family: inherit;
+}
+
+.standeePaperRollBox {
+  width: 280px;
+  background: #ffffff;
+  color: #000000;
+  border: 1px dashed #71717a;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  font-family: monospace;
+}
+
+.tableModalTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.tableModalTable th {
+  background: var(--bg-card-subtle);
+  color: var(--text-muted);
+  font-weight: 700;
+  text-align: left;
+  padding: 0.5rem 0.6rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.tableModalTable td {
+  padding: 0.55rem 0.6rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+
+.floorTableHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.65rem;
+}
+
+.floorTableNumber {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.statusBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.floorTableBody {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-bottom: 0.85rem;
+  line-height: 1.4;
+}
+
+.floorTableControls {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.btnStatusQuick {
+  flex: 1;
+  padding: 0.45rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+  border-radius: 4px;
+  cursor: pointer;
+  min-height: 36px;
+  transition: all 0.15s ease;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.btnStatusQuick:active,
+.btnStatusQuick:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   MODULE 5: RECIPE BOM INVENTORY & WASTAGE
+   ══════════════════════════════════════════════════════════════════════ */
+.inventoryLayout {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .inventoryLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.inventoryTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}
+
+.inventoryTable th {
+  text-align: left;
+  padding: 0.65rem 0.75rem;
+  background: var(--bg-card-subtle);
+  color: var(--text-muted);
+  font-weight: 700;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.inventoryTable td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.stockCritical {
+  color: #dc2626;
+  font-weight: 800;
+}
+
+.stockSafe {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.recipesList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recipeCard {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.85rem;
+}
+
+.recipeTitle {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #10b981;
+  margin-bottom: 0.4rem;
+}
+
+.recipeIngList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   MODULE 6: GITHUB ASSET CDN HUB
+   ══════════════════════════════════════════════════════════════════════ */
+.cdnBanner {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  padding: 1.1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.cdnGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.cdnCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cdnCardTitle {
+  font-weight: 700;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.cdnUrlSnippet {
+  font-family: monospace;
+  font-size: 0.7rem;
+  background: var(--bg-card-subtle);
+  padding: 0.4rem 0.5rem;
+  border-radius: 4px;
+  color: #0284c7;
+  word-break: break-all;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   MODULE 7: DEVELOPER ADMIN HUB (ASWIN / AJ TECH)
+   ══════════════════════════════════════════════════════════════════════ */
+.devHubGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.25rem;
+}
+
+.toggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.toggleMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.toggleTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.toggleDesc {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #94a3b8;
+  transition: 0.25s;
+  border-radius: 9999px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.25s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #16a34a;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+}
+
+.staffUserList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.staffUserRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-card-subtle);
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+}
+
+.userRoleBadge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 9999px;
+  color: #ffffff;
+}
+
+/* ─── Footer Compliance ──────────────────────────────────────────────── */
+.adminFooter {
+  background: var(--footer-bg);
+  border-top: 1px solid var(--border-subtle);
+  padding: 1rem 1.25rem;
+  text-align: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: auto;
+}
+
+.adminFooter a {
+  color: #3b82f6;
+  text-decoration: underline;
+  font-weight: 700;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   DASHBOARD 12-MODULE SUITE STYLES (PURE DARK BLACK & CRISP LIGHT THEMES)
+   ══════════════════════════════════════════════════════════════════════ */
+
+/* ─── 10 & 11: Date Filters & Quick Actions Bar ─────────────────────── */
+.dashControlBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 0.65rem 1rem;
+  box-shadow: var(--card-shadow);
+}
+
+.dateFilterGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: var(--bg-card-subtle);
+  padding: 0.2rem;
+  border-radius: 9999px;
+  border: 1px solid var(--border-subtle);
+}
+
+.dateBtn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.35rem 0.75rem;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.dateBtn:hover {
+  color: var(--text-primary);
+}
+
+.dateBtnActive {
+  background: #2563eb;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+.quickActionsGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.quickActionBtn {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.quickActionBtn:hover {
+  border-color: #3b82f6;
+  color: #3b82f6;
+  transform: translateY(-1px);
+}
+
+.btnPrimaryGold {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+  color: #ffffff !important;
+  border: none !important;
+  font-weight: 800 !important;
+  box-shadow: 0 2px 10px rgba(37, 99, 235, 0.4);
+}
+
+.btnPrimaryGold:hover {
+  filter: brightness(1.1);
+  color: #ffffff !important;
+}
+
+/* ─── 1: 6 Summary KPI Cards Grid ───────────────────────────────────── */
+.kpiSixGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 1400px) {
+  .kpiSixGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .kpiSixGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.kpiCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 1rem 0.9rem;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.kpiCard:hover {
+  transform: translateY(-2px);
+  border-color: #3b82f6;
+}
+
+.kpiTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.4rem;
+}
+
+.kpiTitle {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.kpiIcon {
+  font-size: 1.2rem;
+}
+
+.kpiValue {
+  font-size: 1.55rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  font-family: var(--font-heading, monospace);
+  margin-bottom: 0.25rem;
+  line-height: 1.2;
+}
+
+.kpiTrend {
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ─── 2: Sales Analytics & Charts Row ────────────────────────────────── */
+.salesAnalyticsRow {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 1100px) {
+  .salesAnalyticsRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Visual Bar Chart */
+.chartContainer {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.65rem;
+  height: 160px;
+  padding: 1rem 0.5rem 0.25rem 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 0.65rem;
+}
+
+.barCol {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+.barPillWrap {
+  width: 100%;
+  max-width: 38px;
+  background: var(--bg-card-subtle);
+  border-radius: 6px 6px 0 0;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  position: relative;
+}
+
+.barPillFill {
+  width: 100%;
+  background: linear-gradient(180deg, #3b82f6 0%, #1d4ed8 100%);
+  border-radius: 6px 6px 0 0;
+  transition: height 0.5s ease;
+  min-height: 4px;
+}
+
+.barLabel {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.barAmountTip {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.62rem;
+  font-weight: 800;
+  color: #ffffff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  white-space: nowrap;
+}
+
+/* Category Progress Bars */
+.categoryList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.categoryItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.categoryMeta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.78rem;
+}
+
+.categoryBarWrap {
+  height: 6px;
+  background: var(--bg-card-subtle);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.categoryBarFill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.5s ease;
+}
+
+/* Payment Mode Chips */
+.paymentGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+}
+
+.paymentChip {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.65rem 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.paymentModeTitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.paymentModeValue {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  font-family: monospace;
+}
+
+/* ─── 4 & 5: Kitchen Pulse & Floor Table Snapshot Row ───────────────── */
+.kdsFloorRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+@media (max-width: 900px) {
+  .kdsFloorRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.kdsPulseGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.65rem;
+  margin-top: 0.5rem;
+}
+
+.kdsPulseCard {
+  border-radius: 10px;
+  padding: 0.85rem;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  border: 2px solid transparent;
+}
+
+.pulseNew {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #ef4444;
+}
+
+.pulseCooking {
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.35);
+  color: #f59e0b;
+}
+
+.pulseReady {
+  background: rgba(34, 197, 94, 0.12);
+  border-color: rgba(34, 197, 94, 0.35);
+  color: #22c55e;
+}
+
+.kdsPulseCount {
+  font-size: 1.75rem;
+  font-weight: 900;
+  font-family: monospace;
+  line-height: 1.1;
+}
+
+.kdsPulseLabel {
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+/* Mini Table Grid in Dashboard */
+.miniTablesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(58px, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
+
+.miniTableChip {
+  height: 44px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.miniTableChip:hover {
+  transform: scale(1.05);
+}
+
+/* ─── 3 & 7: Live Orders & Popular Dishes / Inventory / Audit Grid ──── */
+.dashLowerGrid {
+  display: grid;
+  grid-template-columns: 1.35fr 1fr;
+  gap: 1.25rem;
+}
+
+@media (max-width: 1100px) {
+  .dashLowerGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Live Orders Table */
+.liveOrdersTableWrap {
+  overflow-x: auto;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+}
+
+.liveOrdersTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+}
+
+.liveOrdersTable th {
+  background: var(--bg-card-subtle);
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+  font-weight: 700;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.liveOrdersTable td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.liveOrdersTable tr:hover {
+  background: var(--bg-card-subtle);
+}
+
+.orderStatusBadge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 9999px;
+  display: inline-block;
+  text-transform: uppercase;
+}
+
+.statusPaid { background: rgba(34, 197, 94, 0.15); color: #16a34a; }
+.statusReady { background: rgba(56, 189, 248, 0.15); color: #0284c7; }
+.statusPreparing { background: rgba(245, 158, 11, 0.15); color: #d97706; }
+.statusPendingOtp { background: rgba(239, 68, 68, 0.15); color: #dc2626; }
+
+/* ─── 6: Popular Dishes Leaderboard ─────────────────────────────────── */
+.popularDishCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 0.85rem;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  gap: 0.75rem;
+}
+
+.popularDishLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.popularDishIcon {
+  font-size: 1.4rem;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(37, 99, 235, 0.15);
+  border-radius: 8px;
+}
+
+.popularDishTitle {
+  font-weight: 700;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.popularDishSub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+.popularDishSales {
+  text-align: right;
+}
+
+.popularDishQty {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.popularDishRev {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* ─── 7: Inventory Low Stock Alerts Banner ──────────────────────────── */
+.invAlertBanner {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1.5px solid rgba(239, 68, 68, 0.35);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.invAlertRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.82rem;
+  border-bottom: 1px dashed rgba(239, 68, 68, 0.2);
+  padding-bottom: 0.4rem;
+}
+
+/* ─── 8: Recent Activities Audit Stream ─────────────────────────────── */
+.activityStream {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.activityItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.55rem 0.75rem;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+}
+
+.activityIcon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.activityText {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  line-height: 1.35;
+}
+
+.activityTime {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+
+/* ─── 9: Notifications Dropdown Drawer ──────────────────────────────── */
+.notifDrawer {
+  position: absolute;
+  top: 100%;
+  right: 1.5rem;
+  width: 360px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.notifHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border-subtle);
+  padding-bottom: 0.5rem;
+}
+
+.notifCard {
+  padding: 0.65rem;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  font-size: 0.78rem;
+}
+
+/* ─── 12: Admin Profile Dropdown Menu ───────────────────────────────── */
+.profileChipBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 0.25rem 0.65rem;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.profileChipBtn:hover {
+  border-color: #3b82f6;
+}
+
+.profileAvatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profileMenuModal {
+  position: absolute;
+  top: 100%;
+  right: 1rem;
+  width: 280px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   RESPONSIVENESS SPECIFICALLY TAILORED FOR 1024x768 TOUCH POS (TVSE TP 415C)
+   ══════════════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .navInner {
+    padding: 0.45rem 0.85rem;
+  }
+
+  .brandMeta h1 {
+    font-size: 0.95rem;
+  }
+
+  .adminBody {
+    padding: 0.85rem;
+  }
+
+  /* Compact tab buttons to fit on 1024px screen without overflowing */
+  .tabBtn {
+    padding: 0.7rem 0.75rem;
+    font-size: 0.78rem;
+  }
+
+  /* POS Layout for 1024x768 4:3 display */
+  .posLayout {
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+  }
+
+  .posTablesGrid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .posTableCard {
+    padding: 0.6rem 0.3rem;
+    min-height: 68px;
+  }
+
+  .posTableNum {
+    font-size: 1.05rem;
+  }
+
+  .posOrderInspector {
+    padding: 1rem;
+  }
+
+  .posItemList {
+    max-height: 180px;
+  }
+
+  /* Make touch buttons easy to tap on 15" screen */
+  .btnSettle {
+    padding: 0.8rem;
+    font-size: 1rem;
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   ENHANCED TOUCH POS SYSTEM (ALL 18 REQUIREMENTS)
+   ══════════════════════════════════════════════════════════════════════ */
+.posSystemWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+/* POS Quick Actions & Live Summary Bar */
+.posTopBar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 10px;
+  padding: 0.65rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  box-shadow: var(--card-shadow);
+}
+
+.posOrderTypePills {
+  display: flex;
+  background: var(--bg-card-subtle);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  gap: 3px;
+}
+
+.posTypeBtn {
+  background: transparent;
+  border: none;
+  padding: 0.45rem 0.85rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.posTypeBtnActive {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+.posSessionPill {
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: #3b82f6;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  user-select: none;
+  transition: all 0.15s ease;
+}
+
+.posSessionPill:hover {
+  background: rgba(37, 99, 235, 0.22);
+}
+
+.posActionButtonsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.posActionBtn {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+  user-select: none;
+  touch-action: manipulation;
+}
+
+.posActionBtn:hover {
+  border-color: #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* POS Main Grid: Left Catalog, Right Cart */
+.posMainGrid {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 1rem;
+}
+
+/* Food Menu Catalog */
+.posCatalogBox {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.posCatalogToolbar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 0.85rem;
+}
+
+.posSearchInput {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  box-sizing: border-box;
+}
+
+.posSearchInput:focus {
+  outline: none;
+  border-color: #3b82f6;
+}
+
+.posCategoryFilterRow {
+  display: flex;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+}
+
+.posCatFilterBtn {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.posCatFilterBtnActive {
+  background: #2563eb !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+.posDishesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.75rem;
+  max-height: 480px;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.posDishCard {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  user-select: none;
+  touch-action: manipulation;
+  position: relative;
+}
+
+.posDishCard:hover,
+.posDishCard:active {
+  transform: translateY(-2px);
+  border-color: #3b82f6;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+}
+
+.posDishThumb {
+  width: 100%;
+  height: 85px;
+  object-fit: cover;
+  background: #18181b;
+}
+
+.posDishInfo {
+  padding: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.posDishTitle {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.25;
+  margin-bottom: 0.15rem;
+}
+
+.posDishTaTitle {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-bottom: 0.35rem;
+}
+
+.posDishBottom {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.posDishPrice {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.posDishAddBadge {
+  background: #2563eb;
+  color: #ffffff;
+  border-radius: 6px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+/* POS Cart & Bill Pane */
+.posCartPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-card);
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: var(--card-shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.posCartHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--border-subtle);
+  margin-bottom: 0.65rem;
+}
+
+.posCartTabs {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.posCartTabBtn {
+  background: transparent;
+  border: none;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+}
+
+.posCartTabBtnActive {
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+
+.posCartCustomerBar {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 0.65rem;
+}
+
+.posCartItemsList {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 0.75rem;
+  padding-right: 0.25rem;
+}
+
+.posCartItem {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.posCartItemTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.posCartItemTitle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.posCartItemPrice {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: #10b981;
+}
+
+.posCartItemMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.posCartDetails {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.posCartQtyControl {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.posCartQtyBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.posCartQtyVal {
+  min-width: 22px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 0.88rem;
+  color: var(--text-primary);
+}
+
+.posCartItemDel {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #ef4444;
+  padding: 0 0.2rem;
+}
+
+.posCartInstructionInput {
+  background: var(--bg-input);
+  border: 1px dashed var(--border-subtle);
+  border-radius: 4px;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Bill Calculation Breakdown */
+.posBillSummary {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  margin-bottom: 0.75rem;
+  font-size: 0.82rem;
+}
+
+.posBillRow {
+  display: flex;
+  justify-content: space-between;
+  color: var(--text-secondary);
+}
+
+.posBillTotalRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px dashed var(--border-subtle);
+  padding-top: 0.4rem;
+  margin-top: 0.2rem;
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #10b981;
+}
+
+/* Punch KOT / Settle Action Buttons */
+.posCartButtonBox {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.btnPunchKot {
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.4);
+  transition: all 0.15s ease;
+  user-select: none;
+  touch-action: manipulation;
+  min-height: 48px;
+}
+
+.btnPunchKot:hover,
+.btnPunchKot:active {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+/* ─── POS MODALS & OVERLAYS ─── */
+.posModalOverlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.82);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 1rem;
+}
+
+.posModalBox {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  padding: 1.25rem;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.posModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.posModalTitle {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.posModalCloseBtn {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  border-radius: 6px;
+  padding: 0.25rem 0.6rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 700;
+  transition: all 0.15s ease;
+}
+
+.posModalCloseBtn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.posOptionPill {
+  padding: 0.5rem 0.85rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.posOptionPill:hover {
+  border-color: #3b82f6;
+}
+
+.posOptionPillActive {
+  border-color: #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: #3b82f6 !important;
+  font-weight: 700;
+}
+
+.posTableModalGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.65rem;
+}
+
+@media (max-width: 600px) {
+  .posTableModalGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.posTableModalCard {
+  background: var(--bg-card-subtle);
+  border: 2px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  transition: all 0.15s ease;
+  user-select: none;
+}
+
+.posTableModalCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.posTableModalCardSelected {
+  border-color: #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.12) !important;
+}
+
+.posCustomerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.posCustomerRow:hover {
+  border-color: #8b5cf6;
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.posQrOrderCard {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.posOtpBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.posKeypadGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.posKeypadBtn {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.85rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  touch-action: manipulation;
+  transition: all 0.1s ease;
+}
+
+.posKeypadBtn:active {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   MODULE 7: ENTERPRISE MENU MANAGEMENT SUITE (18 REQUIREMENTS)
+   Zero-Gold Styling: Blue, Red, Green, Purple, Cyan, Amber, Slate
+   Touch-Engine for TVSE TP 415C (1024x768)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. Summary Cards Strip ─── */
+.menuSummaryStrip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.menuStatCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.menuStatCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-blue);
+}
+
+.menuStatIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.35rem;
+  flex-shrink: 0;
+}
+
+.menuStatVal {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.menuStatLabel {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+
+/* ─── 2. Controls & Filter Bar ─── */
+.menuToolbar {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.menuToolbarRow1 {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.menuSearchBox {
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0 0.65rem;
+  height: 38px;
+  flex: 1;
+  min-width: 220px;
+}
+
+.menuSearchInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.menuFilterGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.menuSelect {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  color: var(--text-primary);
+  height: 38px;
+  padding: 0 0.6rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
+}
+
+.menuViewToggle {
+  display: flex;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.menuViewBtn {
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.menuViewBtnActive {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* ─── Category Pills Scroller ─── */
+.menuCatPills {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  overflow-x: auto;
+  padding-bottom: 0.25rem;
+  scrollbar-width: thin;
+}
+
+.menuCatPill {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.menuCatPill:hover {
+  border-color: #3b82f6;
+  color: var(--text-primary);
+}
+
+.menuCatPillActive {
+  background: #2563eb;
+  border-color: #3b82f6;
+  color: #ffffff;
+}
+
+.menuCatPillCount {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+}
+
+/* ─── 3. Grid / Cards View ─── */
+.menuCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 0.85rem;
+  margin-bottom: 2rem;
+}
+
+.menuCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+  position: relative;
+}
+
+.menuCard:hover {
+  border-color: #3b82f6;
+  transform: translateY(-2px);
+}
+
+.menuCardSoldOut {
+  border-color: rgba(239, 68, 68, 0.45);
+  opacity: 0.88;
+}
+
+.menuCardImgWrap {
+  height: 140px;
+  position: relative;
+  overflow: hidden;
+  background: #111;
+}
+
+.menuCardImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.menuCard:hover .menuCardImg {
+  transform: scale(1.04);
+}
+
+.menuCardOverlayBadge {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  display: flex;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.menuCardStationBadge {
+  position: absolute;
+  bottom: 0.5rem;
+  right: 0.5rem;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  color: #38bdf8;
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.menuCardBody {
+  padding: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  flex: 1;
+}
+
+.menuCardTitleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.menuCardTitle {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.menuCardTamilTitle {
+  font-size: 0.75rem;
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.menuCardDesc {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 2.7em;
+}
+
+.menuCardMetaRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.4rem;
+  border-top: 1px solid var(--border-subtle);
+  margin-top: auto;
+}
+
+.menuCardPriceBox {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.menuCardPrice {
+  font-size: 1.15rem;
+  font-weight: 900;
+  color: var(--text-primary);
+}
+
+.menuCardPriceOrig {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.menuCardActionsRow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+/* ─── 4. Table / Spreadsheet View ─── */
+.menuTableWrap {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  overflow-x: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  margin-bottom: 2rem;
+}
+
+.menuTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.menuTable th {
+  background: var(--bg-card-subtle);
+  padding: 0.75rem 0.85rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 2px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.menuTable td {
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid var(--border-subtle);
+  vertical-align: middle;
+}
+
+.menuTableRow:hover {
+  background: rgba(37, 99, 235, 0.04);
+}
+
+.menuTableRowSoldOut {
+  background: rgba(239, 68, 68, 0.03);
+}
+
+/* ─── 5. Badges & Chips ─── */
+.badgeVeg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #10b981;
+  border-radius: 3px;
+  padding: 2px;
+}
+
+.badgeVegDot {
+  width: 6px;
+  height: 6px;
+  background: #10b981;
+  border-radius: 50%;
+}
+
+.badgeDietary {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.badgeJain { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+.badgeVegan { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+.badgeGf { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+.badgePromo { background: rgba(244, 63, 94, 0.15); color: #fb7185; border: 1px solid rgba(244, 63, 94, 0.3); font-weight: 800; }
+
+.statusAvail {
+  background: rgba(16, 185, 129, 0.12);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+}
+
+.statusSoldOut {
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+}
+
+.statusInactive {
+  background: rgba(161, 161, 170, 0.12);
+  color: #a1a1aa;
+  border: 1px solid rgba(161, 161, 170, 0.3);
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+}
+
+/* ─── 6. Floating Bulk Bar ─── */
+.menuBulkBar {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #09090b;
+  border: 2px solid #3b82f6;
+  border-radius: 12px;
+  padding: 0.65rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.9);
+  z-index: 1500;
+  color: #ffffff;
+  flex-wrap: wrap;
+}
+
+/* ─── 7. Image Upload & Dropzone ─── */
+.menuImgDropzone {
+  border: 2px dashed var(--border-subtle);
+  border-radius: 10px;
+  padding: 1rem;
+  text-align: center;
+  background: var(--bg-card-subtle);
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+
+.menuImgDropzone:hover {
+  border-color: #3b82f6;
+}
+
+.menuImgThumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════ */
+/* MODULE 8: LIVE ORDER MANAGEMENT DASHBOARD                                  */
+/* ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─── 1. Summary Grid ─── */
+.ordersSummaryGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.orderKpiCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.orderKpiCard:hover {
+  transform: translateY(-2px);
+  border-color: #3b82f6;
+}
+
+.orderKpiIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.orderKpiVal {
+  font-size: 1.35rem;
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--text-primary);
+  font-family: var(--font-heading, inherit);
+}
+
+.orderKpiLabel {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+/* ─── 2. Orders Toolbar ─── */
+.ordersToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+}
+
+.ordersFilterPills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.orderFilterBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card-subtle);
+  color: var(--text-secondary);
+  font-size: 0.74rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.orderFilterBtn:hover {
+  background: rgba(59, 130, 246, 0.1);
+  color: #38bdf8;
+  border-color: #38bdf8;
+}
+
+.orderFilterBtnActive {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #3b82f6 !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.4);
+}
+
+.orderFilterBadge {
+  background: rgba(0, 0, 0, 0.25);
+  padding: 0.1rem 0.4rem;
+  border-radius: 10px;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+/* ─── 3. Search & Control Bar ─── */
+.ordersControlBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 260px;
+}
+
+.ordersSearchInput {
+  flex: 1;
+  height: 36px;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0 0.85rem;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.ordersSearchInput:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+/* ─── 4. Orders Card Grid ─── */
+.ordersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.orderCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.15);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.orderCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+  border-color: #3b82f6;
+}
+
+/* Delayed Order Glowing Pulsing Animation */
+@keyframes delayedOrderPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55);
+    border-color: #ef4444;
+  }
+  50% {
+    box-shadow: 0 0 0 7px rgba(239, 68, 68, 0.15);
+    border-color: #f43f5e;
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.55);
+    border-color: #ef4444;
+  }
+}
+
+.orderCardDelayed {
+  border: 2px solid #ef4444 !important;
+  animation: delayedOrderPulse 2s infinite ease-in-out;
+  background: linear-gradient(180deg, rgba(239, 68, 68, 0.05) 0%, var(--bg-card) 40%);
+}
+
+.orderDelayedBadge {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background: #ef4444;
+  color: #ffffff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.15rem 0.6rem;
+  border-bottom-left-radius: 8px;
+  letter-spacing: 0.03em;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  z-index: 2;
+}
+
+/* ─── 5. Order Card Elements ─── */
+.orderTopRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed var(--border-subtle);
+}
+
+.orderTableBadge {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.orderSourceTag {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.orderSourceQr {
+  background: rgba(139, 92, 246, 0.15);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.3);
+}
+
+.orderSourcePos {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.orderMetaLine {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.orderGuestName {
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.orderElapsedTimer {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ─── 6. Canonical Status Badges ─── */
+.orderStatusPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.statusOtpPending {
+  background: rgba(249, 115, 22, 0.18);
+  color: #fb923c;
+  border: 1px solid rgba(249, 115, 22, 0.4);
+}
+
+.statusOtpVerified {
+  background: rgba(14, 165, 233, 0.18);
+  color: #38bdf8;
+  border: 1px solid rgba(14, 165, 233, 0.4);
+}
+
+.statusKotSent {
+  background: rgba(99, 102, 241, 0.18);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.4);
+}
+
+.statusPreparing {
+  background: rgba(37, 99, 235, 0.18);
+  color: #60a5fa;
+  border: 1px solid rgba(37, 99, 235, 0.4);
+}
+
+.statusReady {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.4);
+}
+
+.statusServed {
+  background: rgba(20, 184, 166, 0.18);
+  color: #2dd4bf;
+  border: 1px solid rgba(20, 184, 166, 0.4);
+}
+
+.statusBilled {
+  background: rgba(168, 85, 247, 0.18);
+  color: #c084fc;
+  border: 1px solid rgba(168, 85, 247, 0.4);
+}
+
+.statusPaid {
+  background: rgba(5, 150, 105, 0.22);
+  color: #10b981;
+  border: 1px solid rgba(5, 150, 105, 0.5);
+}
+
+.statusCancelled {
+  background: rgba(239, 68, 68, 0.18);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+/* ─── 7. Order Items Box ─── */
+.orderItemsBox {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.6rem;
+  margin: 0.6rem 0;
+  max-height: 140px;
+  overflow-y: auto;
+  font-size: 0.75rem;
+}
+
+.orderItemRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.orderItemRow:last-child {
+  border-bottom: none;
+}
+
+.orderItemQty {
+  background: rgba(59, 130, 246, 0.2);
+  color: #38bdf8;
+  font-weight: 800;
+  padding: 0.05rem 0.35rem;
+  border-radius: 4px;
+  margin-right: 0.35rem;
+}
+
+/* ─── 8. Order Card Actions Row ─── */
+.orderCardActions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+  gap: 0.35rem;
+  margin-top: 0.75rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.btnOrderAction {
+  height: 32px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.btnOrderPrimary {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.btnOrderPrimary:hover {
+  background: #1d4ed8;
+}
+
+.btnOrderSuccess {
+  background: #059669;
+  color: #ffffff;
+}
+
+.btnOrderSuccess:hover {
+  background: #047857;
+}
+
+.btnOrderWarning {
+  background: #d97706;
+  color: #ffffff;
+}
+
+.btnOrderWarning:hover {
+  background: #b45309;
+}
+
+.btnOrderDanger {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btnOrderDanger:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.btnOrderGhost {
+  background: var(--bg-card-subtle);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+}
+
+.btnOrderGhost:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   CUSTOMER CRM & LOYALTY DASHBOARD STYLES (SRI GOKULAM VEG RESTAURANT)
+   ══════════════════════════════════════════════════════════════════════════ */
+.crmWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 1rem;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+  animation: fadeIn 0.25s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.crmHeader {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1.25rem 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+}
+
+.crmHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.crmTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.crmTitle {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.crmSubtitle {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.crmHeritageBadge {
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.15), rgba(245, 158, 11, 0.2));
+  color: #ea580c;
+  border: 1px solid rgba(234, 88, 12, 0.35);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.65rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.crmHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.crmActionBtnPrimary {
+  background: var(--accent-primary);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
+}
+
+.crmActionBtnPrimary:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.crmActionBtnSec {
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.crmActionBtnSec:hover {
+  background: var(--border-subtle);
+}
+
+/* KPI Summary Grid */
+.crmKpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.crmKpiCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.crmKpiCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-blue);
+}
+
+.crmKpiHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.crmKpiLabel {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+}
+
+.crmKpiIcon {
+  font-size: 1.25rem;
+}
+
+.crmKpiValue {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.crmKpiSubtext {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+/* Layout 2-Column (Main directory + Insights side) */
+.crmLayoutColumns {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+@media (max-width: 1200px) {
+  .crmLayoutColumns {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Controls Toolbar */
+.crmControlsPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.crmFilterRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.crmSearchBox {
+  display: flex;
+  align-items: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.5rem 0.85rem;
+  flex: 1;
+  min-width: 260px;
+  gap: 0.5rem;
+}
+
+.crmSearchInput {
+  border: none;
+  background: transparent;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  width: 100%;
+}
+
+.crmSortSelect {
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  border-radius: 8px;
+  padding: 0.5rem 0.85rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+  outline: none;
+}
+
+.crmSegmentPills {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.75rem;
+}
+
+.crmPill {
+  background: var(--bg-card-subtle);
+  color: var(--text-muted);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+}
+
+.crmPill:hover {
+  color: var(--text-primary);
+  background: var(--border-subtle);
+}
+
+.crmPillActive {
+  background: var(--accent-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-primary) !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+}
+
+.crmPillCount {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 0.1rem 0.45rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+}
+
+.crmPill:not(.crmPillActive) .crmPillCount {
+  background: rgba(0, 0, 0, 0.08);
+  color: var(--text-secondary);
+}
+
+/* Customer Cards Grid */
+.crmCustomersGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+  gap: 1rem;
+}
+
+.crmCustomerCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  position: relative;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+
+.crmCustomerCard:hover {
+  border-color: var(--accent-blue);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.crmCardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.crmAvatarRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.crmAvatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary), #8b5cf6);
+  color: #ffffff;
+  font-size: 1.05rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.crmCustomerMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.crmCustomerName {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.crmIdTag {
+  font-size: 0.72rem;
+  font-family: monospace;
+  font-weight: 700;
+  color: var(--accent-blue);
+  background: rgba(59, 130, 246, 0.12);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+.crmBadgeCluster {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.3rem;
+}
+
+.crmTierBadge {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  padding: 0.2rem 0.55rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+}
+
+.tierPlatinum {
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  color: #3730a3;
+  border: 1px solid #818cf8;
+}
+
+.tierGold {
+  background: linear-gradient(135deg, #fef3c7, #fde68a);
+  color: #92400e;
+  border: 1px solid #f59e0b;
+}
+
+.tierSilver {
+  background: linear-gradient(135deg, #f1f5f9, #e2e8f0);
+  color: #334155;
+  border: 1px solid #94a3b8;
+}
+
+.tierBronze {
+  background: linear-gradient(135deg, #fed7aa, #ffedd5);
+  color: #9a3412;
+  border: 1px solid #f97316;
+}
+
+.crmSegmentBadge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.segmentVIP {
+  background: rgba(139, 92, 246, 0.18);
+  color: #a78bfa;
+  border: 1px solid rgba(139, 92, 246, 0.35);
+}
+
+.segmentHighSpend {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.35);
+}
+
+.segmentRegular {
+  background: rgba(59, 130, 246, 0.18);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.35);
+}
+
+.segmentNew {
+  background: rgba(245, 158, 11, 0.18);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.segmentInactive {
+  background: rgba(107, 114, 128, 0.18);
+  color: #9ca3af;
+  border: 1px solid rgba(107, 114, 128, 0.35);
+}
+
+/* Contact Details Strip */
+.crmContactStrip {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  background: var(--bg-card-subtle);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.crmContactRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+/* Metrics Row */
+.crmMetricsRow {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  background: var(--bg-page);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.55rem 0.65rem;
+  text-align: center;
+}
+
+.crmMetricItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.crmMetricLabel {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.crmMetricVal {
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+/* Favorite Delicacies row */
+.crmFavDishes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.crmFavChip {
+  font-size: 0.72rem;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 0.2rem 0.55rem;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Actions Row */
+.crmCardActions {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-top: auto;
+  border-top: 1px solid var(--border-subtle);
+  padding-top: 0.65rem;
+}
+
+.crmBtnSm {
+  padding: 0.4rem 0.65rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.crmBtnSmPrimary {
+  background: var(--accent-primary);
+  color: #ffffff;
+  flex: 1;
+  justify-content: center;
+}
+
+.crmBtnSmPrimary:hover {
+  filter: brightness(1.1);
+}
+
+.crmBtnSmOutline {
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+
+.crmBtnSmOutline:hover {
+  background: var(--border-subtle);
+}
+
+/* CRM Sidebar Insights */
+.crmSidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.crmSideCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+}
+
+.crmSideTitle {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 0;
+}
+
+.crmLeaderboardList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.crmLeaderboardItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.55rem 0.75rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.crmLeaderboardItem:hover {
+  border-color: var(--accent-blue);
+  transform: translateX(2px);
+}
+
+.crmLeaderRank {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.5rem;
+}
+
+.crmLeaderInfo {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.1rem;
+}
+
+.crmLeaderName {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.crmLeaderSpend {
+  font-size: 0.74rem;
+  color: #10b981;
+  font-weight: 700;
+}
+
+/* CRM Modal Dialogs */
+.crmModalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeIn 0.15s ease-out;
+}
+
+.crmModalBox {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 14px;
+  width: 100%;
+  max-width: 780px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.crmModalHeader {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg-card-subtle);
+}
+
+.crmModalTitle {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+.crmModalCloseBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+}
+
+.crmModalCloseBtn:hover {
+  background: rgba(0, 0, 0, 0.1);
+  color: var(--text-primary);
+}
+
+.crmModalTabs {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.5rem 1.25rem;
+  border-bottom: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  overflow-x: auto;
+}
+
+.crmModalTabBtn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.crmModalTabBtn:hover {
+  color: var(--text-primary);
+}
+
+.crmModalTabActive {
+  color: var(--accent-primary) !important;
+  border-bottom-color: var(--accent-primary) !important;
+}
+
+.crmModalBody {
+  padding: 1.25rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.crmModalFooter {
+  padding: 0.85rem 1.25rem;
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  background: var(--bg-card-subtle);
+}
+
+/* History Tables inside modal */
+.crmHistoryTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+
+.crmHistoryTable th {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  background: var(--bg-card-subtle);
+  color: var(--text-muted);
+  font-weight: 700;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.crmHistoryTable td {
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+}
+
+.crmHistoryTable tr:hover td {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   MODULE 5: INVENTORY, SUPPLIERS, PURCHASES & FOOD COSTING DASHBOARD
+   ══════════════════════════════════════════════════════════════════════ */
+.invWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  padding: 0.5rem 0 2rem 0;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.invHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  box-shadow: var(--shadow-sm);
+}
+
+.invHeaderLeft {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.invTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.invTitle {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.invHeritageBadge {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.invSubtitle {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.invHeaderActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.invActionBtnPrimary {
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.55rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
+  transition: all 0.2s ease;
+}
+
+.invActionBtnPrimary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4);
+}
+
+.invActionBtnSec {
+  background: var(--bg-card-subtle);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.2s ease;
+}
+
+.invActionBtnSec:hover {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-color: var(--accent-blue);
+}
+
+/* KPI Analytics Cards */
+.invKpiGrid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.75rem;
+}
+
+@media (max-width: 1200px) {
+  .invKpiGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .invKpiGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.invKpiCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.95rem 1rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.invKpiCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-color);
+}
+
+.invKpiHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.invKpiLabel {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-muted);
+  font-weight: 700;
+}
+
+.invKpiIcon {
+  font-size: 1.1rem;
+}
+
+.invKpiValue {
+  font-size: 1.45rem;
+  font-weight: 900;
+  color: var(--text-primary);
+  line-height: 1.15;
+}
+
+.invKpiSubtext {
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+  line-height: 1.3;
+}
+
+/* Sub-Navigation Tabs */
+.invSubTabs {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  overflow-x: auto;
+  padding: 0.3rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+}
+
+.invSubTabBtn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 0.5rem 0.9rem;
+  border-radius: 6px;
+  cursor: pointer;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: all 0.15s ease;
+}
+
+.invSubTabBtn:hover {
+  background: var(--bg-card-subtle);
+  color: var(--text-primary);
+}
+
+.invSubTabActive {
+  background: var(--accent-primary) !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+/* Controls Toolbar */
+.invControlsPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 1rem;
+}
+
+.invFilterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.invSearchBox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--bg-input);
+  border: 1px solid var(--border-subtle);
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+  flex: 1;
+  min-width: 260px;
+}
+
+.invSearchInput {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  width: 100%;
+}
+
+.invPillsWrap {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.invPill {
+  background: var(--bg-card-subtle);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  padding: 0.3rem 0.75rem;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all 0.15s ease;
+}
+
+.invPill:hover {
+  background: var(--bg-card);
+  border-color: var(--accent-blue);
+  color: var(--text-primary);
+}
+
+.invPillActive {
+  background: var(--accent-primary) !important;
+  color: #ffffff !important;
+  border-color: var(--accent-primary) !important;
+  font-weight: 700;
+}
+
+.invPillCount {
+  background: rgba(0, 0, 0, 0.15);
+  padding: 0.1rem 0.4rem;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+/* Table Styles */
+.invTableWrap {
+  overflow-x: auto;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+.invTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.invTable th {
+  padding: 0.75rem 0.85rem;
+  background: var(--bg-card-subtle);
+  color: var(--text-muted);
+  font-weight: 700;
+  border-bottom: 1px solid var(--border-subtle);
+  white-space: nowrap;
+}
+
+.invTable td {
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+.invTable tr:hover td {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+/* Status Badges */
+.statusInStock {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.statusLowStock {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.statusOutOfStock {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+}
+
+.statusExpiring {
+  background: rgba(234, 88, 12, 0.15);
+  color: #ea580c;
+  border: 1px solid rgba(234, 88, 12, 0.4);
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.statusExpired {
+  background: rgba(185, 28, 28, 0.2);
+  color: #b91c1c;
+  border: 1px solid rgba(185, 28, 28, 0.5);
+  font-size: 0.68rem;
+  font-weight: 900;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+/* Supplier Directory Grid */
+.invSupplierGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.invSupplierCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 1.15rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.invSupplierCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--accent-blue);
+}
+
+/* Recipe BOM & Food Costing Grid */
+.invRecipeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1rem;
+}
+
+.invRecipeCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 1.15rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.invRecipeCard:hover {
+  border-color: var(--accent-blue);
+}
+
+.invCostMeter {
+  height: 8px;
+  background: var(--bg-input);
+  border-radius: 9999px;
+  overflow: hidden;
+  margin-top: 0.25rem;
+}
+
+.invCostFill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}

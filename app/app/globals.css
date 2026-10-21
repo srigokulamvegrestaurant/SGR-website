@@ -1,0 +1,469 @@
+/* ============================================================================
+   SRI GOKULAM VEG RESTAURANT — MASTER DESIGN TOKENS & GLOBAL STYLES
+   ============================================================================
+   Color Palette: Client-Approved Dark Navy Gradient with Glowing Shine
+   Typography: Cinzel, Playfair Display, Mukta Malar, Plus Jakarta Sans
+   ============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Mukta+Malar:wght@600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* ======================================================================
+     EXACT CLIENT-SPECIFIED BLUE PALETTE & GLOWING SHINE SYSTEM
+     ====================================================================== */
+  --midnight-blue: #051B41;
+  --royal-blue: #0E2954;
+  --peacock-blue: #004080;
+  --peacock-bright: #0059B3;
+  --peacock-glow: #0077e6;
+
+  /* Dark Navy Gradients */
+  --navy-gradient-linear: linear-gradient(135deg, #051B41 0%, #0E2954 35%, #0059B3 65%, #0E2954 85%, #051B41 100%);
+  --navy-gradient-vertical: linear-gradient(180deg, #051B41 0%, #0E2954 50%, #004080 100%);
+  --navy-gradient-radial: radial-gradient(circle at center, #0059B3 0%, #0E2954 45%, #051B41 100%);
+  --navy-glow-ambient: 0 0 28px rgba(0, 89, 179, 0.5), 0 0 55px rgba(0, 119, 230, 0.28);
+  --navy-glow-border: 1.5px solid rgba(0, 119, 230, 0.55);
+
+  /* The Sacred White & Cream Layer */
+  --white-layer: #ffffff;
+  --ivory-cream: #fdfcf9;
+  --sky-wash: #f4f8fd;
+
+  /* Traditional Temple Gold & Sacred Butter Accents */
+  --butter-cream: #fffdf7;
+  --butter-gold: #f6c445;
+  --gold-temple: #c59b27;
+  --gold-bright: #e2a829;
+  --gold-light: #fbe08e;
+  --gold-grad: linear-gradient(135deg, #fae292 0%, #e0a324 50%, #b3790e 100%);
+  --gold-pill: linear-gradient(180deg, #fce59b 0%, #e2a628 50%, #bf8111 100%);
+
+  /* Typography & Accents */
+  --text-dark: #051B41;
+  --text-muted: #51647a;
+  --leaf-green: #16a34a;
+
+  /* Shadows & Glowing Auras */
+  --shadow-sm: 0 4px 14px rgba(5, 27, 65, 0.08);
+  --shadow-md: 0 10px 25px -4px rgba(5, 27, 65, 0.12);
+  --shadow-lg: 0 20px 40px -8px rgba(5, 27, 65, 0.2);
+  --shadow-gold: 0 6px 20px rgba(226, 168, 41, 0.38);
+  --shadow-peacock: 0 6px 20px rgba(0, 89, 179, 0.45);
+  --glass-nav: rgba(5, 27, 65, 0.96);
+
+  /* Layout */
+  --max-width: 1320px;
+
+  /* ======================================================================
+     ANIMATION TOKENS — mirrors components/motion/tokens.js for CSS
+     ====================================================================== */
+
+  /* Durations */
+  --dur-micro: 0.15s;
+  --dur-fast: 0.35s;
+  --dur-standard: 0.6s;
+  --dur-slow: 1.0s;
+  --dur-page: 0.45s;
+
+  /* Easings */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Glow values */
+  --glow-gold: 0 0 18px rgba(226, 168, 41, 0.55), 0 0 40px rgba(246, 196, 69, 0.25);
+  --glow-gold-hover: 0 8px 28px rgba(226, 168, 41, 0.65), 0 0 50px rgba(246, 196, 69, 0.3);
+  --glow-peacock: 0 0 18px rgba(0, 89, 179, 0.5), 0 0 35px rgba(0, 119, 230, 0.25);
+  --glow-card: 0 4px 22px rgba(5, 27, 65, 0.12);
+  --glow-card-hover: 0 14px 40px rgba(5, 27, 65, 0.2), 0 0 0 2px rgba(0, 119, 230, 0.3);
+  --glow-border-gold: rgba(226, 168, 41, 0.45);
+  --glow-border-peacock: rgba(0, 119, 230, 0.45);
+}
+
+/* ============================================================================
+   GLOBAL RESET & BASE TYPOGRAPHY
+   ============================================================================ */
+
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-width: 100%;
+  width: 100%;
+  height: auto;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--white-layer);
+  color: var(--text-dark);
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-width: 100%;
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  line-height: 1.6;
+}
+
+/* App Router template.js wrapper — must be layout-transparent
+   so it doesn't clip the hero, break sticky header, or add scroll containers */
+body > div:first-child,
+body > main {
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  touch-action: manipulation;
+}
+
+button, [role="button"] {
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+/* Universal Mobile Touch Pop & Glow Feedback */
+button:active, a:active, [role="button"]:active {
+  transform: scale(0.96);
+  filter: brightness(1.12);
+  transition: transform 0.08s ease, filter 0.08s ease;
+}
+
+/* Universal glowing focus ring — brand-matched, WCAG 2.1 compliant */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2.5px solid var(--gold-bright, #e2a829);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(226, 168, 41, 0.2);
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* ============================================================================
+   REUSABLE UTILITY CLASSES
+   ============================================================================ */
+
+.container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.section-header {
+  text-align: center;
+  max-width: 700px;
+  margin: 0 auto 45px;
+}
+
+.section-pill {
+  display: inline-block;
+  background: linear-gradient(135deg, #051B41 0%, #0E2954 60%, #004080 100%);
+  color: #ffffff;
+  font-family: 'Cinzel', serif;
+  font-size: 1.3rem;
+  font-weight: 800;
+  padding: 8px 30px;
+  border-radius: 40px;
+  border: 2px solid var(--gold-bright);
+  box-shadow: 0 6px 22px rgba(5, 27, 65, 0.28);
+  letter-spacing: 1px;
+  margin-bottom: 12px;
+}
+
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-size: 2.2rem;
+  color: var(--midnight-blue);
+  margin-bottom: 8px;
+}
+
+.section-desc {
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+/* Gold CTA Button */
+.btn-gold {
+  background: var(--gold-pill);
+  color: var(--midnight-blue);
+  font-weight: 800;
+  font-size: 0.9rem;
+  padding: 9px 20px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: var(--shadow-gold);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-gold:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--glow-gold-hover);
+}
+
+/* QR CTA Button */
+.btn-navy {
+  background: rgba(14, 41, 84, 0.75);
+  color: var(--gold-light);
+  border: 1.5px solid var(--peacock-bright);
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 8px 18px;
+  border-radius: 30px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.btn-navy:hover {
+  background: var(--peacock-blue);
+  border-color: var(--gold-light);
+  box-shadow: var(--glow-peacock);
+  transform: translateY(-2px);
+}
+
+/* Veg Badge */
+.veg-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 8px;
+  padding: 4px 8px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  color: var(--leaf-green);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Price Tag */
+.price-tag {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--midnight-blue);
+}
+
+/* ============================================================================
+   RESPONSIVE BREAKPOINTS
+   ============================================================================ */
+
+@media (max-width: 1024px) {
+  :root {
+    --max-width: 960px;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .section-pill {
+    font-size: 1.1rem;
+    padding: 6px 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* ============================================================================
+   PREMIUM MOTION & SCROLL REVEAL ENGINE
+   ============================================================================ */
+
+/* 1. Scroll-Triggered Fade & Slide Up */
+.reveal-on-scroll,
+[data-reveal="up"] {
+  opacity: 0;
+  transform: translateY(36px);
+  transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+[data-reveal="scale"] {
+  opacity: 0;
+  transform: scale(0.92) translateY(24px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+[data-reveal="left"] {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+[data-reveal="right"] {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: transform, opacity;
+}
+
+/* Active Revealed State */
+.reveal-on-scroll.is-revealed,
+[data-reveal].is-revealed {
+  opacity: 1 !important;
+  transform: translate(0) scale(1) !important;
+}
+
+/* 2. Staggered Grid Item Delays */
+.reveal-stagger > *:nth-child(1) { transition-delay: 0.04s; }
+.reveal-stagger > *:nth-child(2) { transition-delay: 0.12s; }
+.reveal-stagger > *:nth-child(3) { transition-delay: 0.20s; }
+.reveal-stagger > *:nth-child(4) { transition-delay: 0.28s; }
+.reveal-stagger > *:nth-child(5) { transition-delay: 0.36s; }
+.reveal-stagger > *:nth-child(6) { transition-delay: 0.44s; }
+.reveal-stagger > *:nth-child(7) { transition-delay: 0.52s; }
+.reveal-stagger > *:nth-child(8) { transition-delay: 0.60s; }
+
+/* 3. Shimmer Sheen Sweep for CTAs & Badges */
+.shimmer-active {
+  position: relative;
+  overflow: hidden;
+}
+
+.shimmer-active::after {
+  content: '';
+  position: absolute;
+  top: -60%;
+  left: -80%;
+  width: 50%;
+  height: 220%;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 100%
+  );
+  transform: rotate(25deg);
+  animation: globalSheen 4.5s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes globalSheen {
+  0% { left: -80%; }
+  25% { left: 160%; }
+  100% { left: 160%; }
+}
+
+/* 4. Ambient Pulse & Golden Aura Animations */
+@keyframes goldPulseAura {
+  0% {
+    box-shadow: 0 0 0 0 rgba(226, 168, 41, 0.5), 0 4px 18px rgba(5, 27, 65, 0.15);
+  }
+  70% {
+    box-shadow: 0 0 0 14px rgba(226, 168, 41, 0), 0 8px 25px rgba(5, 27, 65, 0.2);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(226, 168, 41, 0), 0 4px 18px rgba(5, 27, 65, 0.15);
+  }
+}
+
+@keyframes peacockPulseGlow {
+  0% {
+    box-shadow: 0 0 15px rgba(0, 89, 179, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(0, 119, 230, 0.65), 0 0 15px rgba(251, 224, 142, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 15px rgba(0, 89, 179, 0.35);
+  }
+}
+
+/* 5. Food Aroma / Steam Vapor Animation */
+@keyframes foodSteamRise {
+  0% {
+    transform: translateY(0) scale(0.95);
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.85;
+  }
+  60% {
+    transform: translateY(-12px) scale(1.1) rotate(2deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-24px) scale(1.25) rotate(-3deg);
+    opacity: 0;
+  }
+}
+
+/* 6. Comprehensive Reduced Motion — covers all animation systems */
+@media (prefers-reduced-motion: reduce) {
+  /* CSS reveal system */
+  .reveal-on-scroll,
+  [data-reveal],
+  .reveal-stagger > * {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* Shimmer sweeps */
+  .shimmer-active::after {
+    display: none !important;
+  }
+
+  /* All keyframe animations */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* Hero banner Ken Burns and content-in */
+  .slideActive .slidePhoto {
+    animation: none !important;
+  }
+
+  /* Button/card active transforms still work — just fast */
+  button:active,
+  a:active,
+  [role="button"]:active {
+    transition: transform 0.001ms !important;
+  }
+}
