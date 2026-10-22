@@ -26,12 +26,14 @@ export default function Home() {
   const [selectedTables, setSelectedTables] = useState([]);
   const [activeOrder, setActiveOrder] = useState(null);
   const [cms, setCms] = useState(null);
+  const [liveMenu, setLiveMenu] = useState([]);
+  const [liveCategories, setLiveCategories] = useState([]);
 
-  // Restore cart from sessionStorage if user previously added items
+  // Restore cart from localStorage or sessionStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = sessionStorage.getItem('sgr_cart');
+        const saved = localStorage.getItem('sgr_cart') || sessionStorage.getItem('sgr_cart');
         if (saved) {
           const parsed = JSON.parse(saved);
           if (Array.isArray(parsed) && parsed.length > 0) {
@@ -39,16 +41,30 @@ export default function Home() {
           }
         }
       } catch (e) {}
+
+      // Cross-tab/window storage synchronization
+      const handleStorageChange = (e) => {
+        if (e.key === 'sgr_cart') {
+          try {
+            const updated = e.newValue ? JSON.parse(e.newValue) : [];
+            setCart(Array.isArray(updated) ? updated : []);
+          } catch (err) {}
+        }
+      };
+      window.addEventListener('storage', handleStorageChange);
+      return () => window.removeEventListener('storage', handleStorageChange);
     }
   }, []);
 
-  // Sync cart to sessionStorage when user adds/removes items
+  // Sync cart to localStorage and sessionStorage when user adds/removes items
   useEffect(() => {
     if (typeof window !== 'undefined') {
       try {
         if (cart && cart.length > 0) {
+          localStorage.setItem('sgr_cart', JSON.stringify(cart));
           sessionStorage.setItem('sgr_cart', JSON.stringify(cart));
         } else {
+          localStorage.removeItem('sgr_cart');
           sessionStorage.removeItem('sgr_cart');
         }
       } catch (e) {}
@@ -89,8 +105,10 @@ export default function Home() {
       try {
         const res = await fetch(`/api/cms?t=${Date.now()}`, { cache: 'no-store' });
         const data = await res.json();
-        if (!ignore && data.success && data.cms) {
-          setCms(data.cms);
+        if (!ignore && data.success) {
+          if (data.cms) setCms(data.cms);
+          if (Array.isArray(data.menu)) setLiveMenu(data.menu);
+          if (Array.isArray(data.categories)) setLiveCategories(data.categories);
         }
       } catch (e) {
         console.error('Failed to load dynamic CMS data:', e);
@@ -263,6 +281,8 @@ export default function Home() {
                 key="menu"
                 onAddToCart={handleAddToCart}
                 activeCategoryFilter={activeCategoryFilter}
+                liveMenu={liveMenu}
+                liveCategories={liveCategories}
               />
             );
           case 'chooseUs':

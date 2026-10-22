@@ -39,7 +39,10 @@ export default function OrderDrawer({
 
   if (!isOpen) return null;
 
-  const totalAmount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const cgst = Math.round(subtotal * 0.025 * 100) / 100; // 2.5% CGST
+  const sgst = Math.round(subtotal * 0.025 * 100) / 100; // 2.5% SGST
+  const totalAmount = Math.round((subtotal + cgst + sgst) * 100) / 100;
 
   // Switch to Guest Details checkout form
   const handleProceedToDetails = () => {
@@ -290,9 +293,19 @@ export default function OrderDrawer({
         {/* Footer Actions */}
         {cart.length > 0 && (
           <div className={styles.drawerFooter}>
-            <div className={styles.totalRow}>
-              <span>Total Payable Amount:</span>
-              <span className={styles.totalPrice}>₹{totalAmount}</span>
+            <div className={styles.breakdownBox}>
+              <div className={styles.subtotalRow}>
+                <span>Items Subtotal:</span>
+                <span>₹{subtotal}</span>
+              </div>
+              <div className={styles.taxRow}>
+                <span>GST (CGST 2.5% + SGST 2.5%):</span>
+                <span>₹{(cgst + sgst).toFixed(2)}</span>
+              </div>
+              <div className={styles.totalRow}>
+                <span>Total Payable (GST Incl.):</span>
+                <span className={styles.totalPrice}>₹{totalAmount}</span>
+              </div>
             </div>
 
             {checkoutStep === 'cart' ? (

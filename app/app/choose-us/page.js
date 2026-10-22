@@ -33,14 +33,61 @@ export default function ChooseUsPage() {
 
     // Load active dining tab
     try {
-      const stored = localStorage.getItem('sgr_active_cart');
+      const stored = localStorage.getItem('sgr_cart') || sessionStorage.getItem('sgr_cart');
       if (stored) {
-        setCart(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setCart(parsed);
+        }
       }
     } catch {
       /* ignore */
     }
+
+    const handleStorageChange = (e) => {
+      if (e.key === 'sgr_cart') {
+        try {
+          const updated = e.newValue ? JSON.parse(e.newValue) : [];
+          setCart(Array.isArray(updated) ? updated : []);
+        } catch (err) {}
+      }
+    };
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
+
+  // Sync cart to storage when updated
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        if (cart && cart.length > 0) {
+          localStorage.setItem('sgr_cart', JSON.stringify(cart));
+          sessionStorage.setItem('sgr_cart', JSON.stringify(cart));
+        } else {
+          localStorage.removeItem('sgr_cart');
+          sessionStorage.removeItem('sgr_cart');
+        }
+      } catch (e) {}
+    }
+  }, [cart]);
+
+  const handleUpdateQuantity = (title, delta) => {
+    setCart((prev) => {
+      return prev
+        .map((item) => {
+          if (item.title === title) {
+            const newQty = item.quantity + delta;
+            return newQty > 0 ? { ...item, quantity: newQty } : null;
+          }
+          return item;
+        })
+        .filter(Boolean);
+    });
+  };
+
+  const handleClearCart = () => {
+    setCart([]);
+  };
 
   return (
     <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', background: '#ffffff' }}>
@@ -146,8 +193,8 @@ export default function ChooseUsPage() {
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         cart={cart}
-        onUpdateCart={setCart}
-        onOpenAuth={() => setAuthModalOpen(true)}
+        onUpdateQuantity={handleUpdateQuantity}
+        onClearCart={handleClearCart}
       />
 
       <TableReservationModal

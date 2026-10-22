@@ -34,9 +34,12 @@ export async function POST(request) {
     const db = getDb();
     
     // Find all verified orders for this table
-    const tableOrders = (db.orders || []).filter(
-      (o) => o.tables.includes(formattedTable) && o.status !== 'cancelled'
-    );
+    const tableOrders = (db.orders || []).filter((o) => {
+      const matchesTable = Array.isArray(o.tables)
+        ? o.tables.includes(formattedTable)
+        : String(o.tableNumber || '').padStart(2, '0') === formattedTable;
+      return matchesTable && o.status !== 'cancelled';
+    });
 
     if (tableOrders.length === 0) {
       return NextResponse.json(

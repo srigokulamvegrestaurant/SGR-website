@@ -97,21 +97,55 @@ const CATEGORIES = [
   { id: 'beverages', label: 'Beverages' },
 ];
 
-export default function MenuSection({ onAddToCart, activeCategoryFilter }) {
+export default function MenuSection({ onAddToCart, activeCategoryFilter, liveMenu, liveCategories }) {
   const [activeCategory, setActiveCategory] = useState(activeCategoryFilter || 'all');
   const [sortBy, setSortBy] = useState('popular');
 
+  useEffect(() => {
+    if (activeCategoryFilter) {
+      setActiveCategory(activeCategoryFilter);
+    }
+  }, [activeCategoryFilter]);
+
+  const categoriesList = useMemo(() => {
+    if (Array.isArray(liveCategories) && liveCategories.length > 0) {
+      const mapped = liveCategories.map((c) => ({
+        id: (c.name || '').toLowerCase(),
+        label: `${c.icon ? c.icon + ' ' : ''}${c.name}`,
+      }));
+      return [{ id: 'all', label: 'All Items' }, ...mapped];
+    }
+    return CATEGORIES;
+  }, [liveCategories]);
+
+  const itemsList = useMemo(() => {
+    if (Array.isArray(liveMenu) && liveMenu.length > 0) {
+      return liveMenu.map((item) => ({
+        id: item.id,
+        title: item.title,
+        taTitle: item.tamilTitle || item.taTitle || '',
+        category: (item.category || '').toLowerCase(),
+        price: Number(item.price) || 0,
+        popularity: item.displayOrder ? 10 - item.displayOrder : item.isBestseller ? 10 : 7,
+        desc: item.description || item.desc || '',
+        image: item.image || 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80',
+        available: item.available !== false && item.status !== '86' && item.status !== 'OUT_OF_STOCK',
+      }));
+    }
+    return MENU_DATA;
+  }, [liveMenu]);
+
   const filteredAndSortedItems = useMemo(() => {
-    let list = MENU_DATA;
+    let list = itemsList;
     if (activeCategory !== 'all') {
-      list = list.filter((item) => item.category === activeCategory);
+      list = list.filter((item) => (item.category || '').toLowerCase() === activeCategory.toLowerCase());
     }
     return [...list].sort((a, b) => {
       if (sortBy === 'price-low') return a.price - b.price;
       if (sortBy === 'price-high') return b.price - a.price;
       return b.popularity - a.popularity;
     });
-  }, [activeCategory, sortBy]);
+  }, [itemsList, activeCategory, sortBy]);
 
   return (
     <section className={styles.menuSection} id="menu">
@@ -124,10 +158,10 @@ export default function MenuSection({ onAddToCart, activeCategoryFilter }) {
       {/* Filter and Sort Bar */}
       <div className={styles.filterBar} data-reveal="up">
         <div className={styles.categoryButtons}>
-          {CATEGORIES.map((cat) => (
+          {categoriesList.map((cat) => (
             <button
               key={cat.id}
-              className={`${styles.catBtn} ${activeCategory === cat.id ? styles.catBtnActive : ''}`}
+              className={`${styles.catBtn} ${activeCategory.toLowerCase() === cat.id.toLowerCase() ? styles.catBtnActive : ''}`}
               onClick={() => setActiveCategory(cat.id)}
             >
               {cat.label}

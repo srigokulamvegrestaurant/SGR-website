@@ -518,7 +518,7 @@ export default function CustomerAccountPage() {
             ) : (
               activeOrders.map((ord) => {
                 const st = (ord.status || '').toLowerCase();
-                const isPendingOtp = st === 'pending_otp';
+                const isPendingOtp = st === 'pending_otp' || st === 'otp_pending';
                 const isCooking = st === 'cooking' || st === 'confirmed' || st === 'in_kitchen' || st === 'new';
                 const isPlating = st === 'plating';
                 const isServed = st === 'served' || st === 'completed';

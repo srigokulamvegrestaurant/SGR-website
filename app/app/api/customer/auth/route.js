@@ -112,7 +112,6 @@ export async function POST(request) {
         maskedEmail: maskEmailAddress(customer.email),
         expiresInSeconds: 600,
         message: `A 6-digit verification code has been dispatched to your registered email (${maskEmailAddress(customer.email)}).`,
-        devOtp: generatedOtp, // Development test convenience
       });
     }
 

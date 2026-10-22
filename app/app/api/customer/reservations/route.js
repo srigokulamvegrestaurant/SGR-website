@@ -9,33 +9,33 @@ import {
 
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
     const authHeader = request.headers.get('authorization') || '';
     const token = authHeader.replace(/^Bearer\s+/i, '').trim();
 
-    let targetPhone = searchParams.get('phone') || '';
-    let targetName = '';
-
-    if (token) {
-      const auth = validateCustomerSession(token);
-      if (auth && auth.customer) {
-        targetPhone = auth.customer.phone || targetPhone;
-        targetName = auth.customer.name || '';
-      }
+    if (!token) {
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized. Please sign in to view your reservations.' },
+        { status: 401 }
+      );
     }
 
-    const normTarget = normalizePhoneNumber(targetPhone);
+    const auth = validateCustomerSession(token);
+    if (!auth || !auth.customer) {
+      return NextResponse.json(
+        { success: false, error: 'Session expired or invalid. Please sign in again.' },
+        { status: 401 }
+      );
+    }
+
+    const targetPhone = normalizePhoneNumber(auth.customer.phone);
+    const targetName = (auth.customer.name || '').trim().toLowerCase();
     const db = getDb();
     const allReservations = db.reservations || [];
 
-    if (!normTarget && !targetName) {
-      return NextResponse.json({ success: true, reservations: [] });
-    }
-
     const filtered = allReservations.filter((r) => {
       const rPhone = normalizePhoneNumber(r.phone);
-      if (normTarget && rPhone && rPhone === normTarget) return true;
-      if (targetName && r.guestName && r.guestName.toLowerCase().includes(targetName.toLowerCase())) return true;
+      if (targetPhone && rPhone && rPhone === targetPhone) return true;
+      if (targetName && targetName.length >= 3 && r.guestName && r.guestName.toLowerCase().includes(targetName)) return true;
       return false;
     });
 

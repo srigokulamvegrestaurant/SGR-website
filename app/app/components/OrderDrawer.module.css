@@ -363,10 +363,28 @@
   background: #f8fafc;
 }
 
+.breakdownBox {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+
+.subtotalRow,
+.taxRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.84rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
 .totalRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: 4px;
   margin-bottom: 14px;
   font-weight: 800;
   color: var(--midnight-blue, #051B41);

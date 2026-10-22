@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import {
   getDb,
+  saveDb,
   validateCustomerSession,
   normalizePhoneNumber,
 } from '@/lib/db';
@@ -151,7 +152,8 @@ export async function GET(request) {
 
     allOrders.forEach(ord => {
       const st = (ord.status || '').toUpperCase();
-      const isFinished = st === 'PAID' || st === 'PAID_SETTLED' || st === 'COMPLETED' || st === 'CANCELLED' || st === 'SERVED';
+      const isPaid = ord.paymentStatus === 'PAID' || (ord.billNumber && (db.bills || []).some(b => b.billNumber === ord.billNumber && b.paymentStatus === 'PAID'));
+      const isFinished = st === 'PAID' || st === 'PAID_SETTLED' || st === 'COMPLETED' || st === 'CANCELLED' || (st === 'SERVED' && isPaid);
       if (!isFinished) {
         activeOrders.push(ord);
       } else {

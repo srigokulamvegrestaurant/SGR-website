@@ -41,11 +41,16 @@ export default function KotStatusModal({
   const [paymentSuccess, setPaymentSuccess] = useState(null);
   const [isPaying, setIsPaying] = useState(false);
 
+  const normStage = (stage || '').toLowerCase();
+  const isOtpPending = normStage === 'otp_pending' || normStage === 'pending_otp' || normStage === 'pending';
+
   // Sync state when new order arrives
   useEffect(() => {
     if (order) {
       setCurrentOrder(order);
-      setStage(order.status || 'otp_pending');
+      const rawStatus = (order.status || 'otp_pending').toLowerCase();
+      const normalizedStatus = (rawStatus === 'pending_otp' || rawStatus === 'pending') ? 'otp_pending' : rawStatus;
+      setStage(normalizedStatus);
       setSecondsRemaining(720);
       setBillData(null);
       setPaymentSuccess(null);
@@ -54,16 +59,17 @@ export default function KotStatusModal({
 
   // Periodic polling to check if the Waiter verified OTP on the waiter portal
   useEffect(() => {
-    if (!isOpen || !currentOrder?.orderId || stage !== 'otp_pending') return;
+    if (!isOpen || !currentOrder?.orderId || !isOtpPending) return;
 
     const interval = setInterval(async () => {
       try {
         const res = await fetch(`/api/orders/${currentOrder.orderId}`);
         const data = await res.json();
         if (data.success && data.order) {
-          if (data.order.status !== 'otp_pending') {
+          const fetchedStatus = (data.order.status || '').toLowerCase();
+          if (fetchedStatus !== 'otp_pending' && fetchedStatus !== 'pending_otp' && fetchedStatus !== 'pending') {
             setCurrentOrder(data.order);
-            setStage(data.order.status);
+            setStage(fetchedStatus);
             playSuccessChime();
           }
         }
@@ -73,11 +79,11 @@ export default function KotStatusModal({
     }, 2500);
 
     return () => clearInterval(interval);
-  }, [isOpen, currentOrder?.orderId, stage]);
+  }, [isOpen, currentOrder?.orderId, isOtpPending]);
 
   // Live countdown timer
   useEffect(() => {
-    if (!isOpen || stage === 'otp_pending') return;
+    if (!isOpen || isOtpPending) return;
 
     const timer = setInterval(() => {
       setSecondsRemaining((prev) => {
@@ -91,7 +97,7 @@ export default function KotStatusModal({
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [isOpen, stage]);
+  }, [isOpen, isOtpPending]);
 
   if (!isOpen || !currentOrder) return null;
 
@@ -134,12 +140,13 @@ export default function KotStatusModal({
 
   const handleCallWaiter = async (requestType = 'GENERAL') => {
     setWaiterCalled(true);
+    const tbl = currentOrder.tables?.[0] || currentOrder.tableNumber || '07';
     try {
       await fetch('/api/waiter/call', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          tableNumber: currentOrder.tables[0],
+          tableNumber: tbl,
           guestName: currentOrder.guestName,
           requestType,
         }),
@@ -151,12 +158,13 @@ export default function KotStatusModal({
   // Request Final Bill
   const handleRequestBill = async () => {
     setIsBillingLoading(true);
+    const tbl = currentOrder.tables?.[0] || currentOrder.tableNumber || '07';
     try {
       const res = await fetch('/api/bills', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          tableNumber: currentOrder.tables[0],
+          tableNumber: tbl,
         }),
       });
       const data = await res.json();
@@ -258,7 +266,7 @@ export default function KotStatusModal({
             </div>
 
             {/* Interactive Waiter OTP Verification */}
-            {stage === 'otp_pending' ? (
+            {isOtpPending ? (
               <button
                 className={styles.btnSimulateWaiter}
                 onClick={handleVerifyOtp}
@@ -283,7 +291,7 @@ export default function KotStatusModal({
                 <strong>Live Kitchen Preparation Tracker</strong>
               </div>
               <span className={styles.countdownBadge}>
-                {stage === 'otp_pending'
+                {isOtpPending
                   ? 'Awaiting OTP'
                   : stage === 'served'
                   ? 'Served Hot! 🥞'
@@ -297,7 +305,7 @@ export default function KotStatusModal({
                 className={styles.progressBarFill}
                 style={{
                   width:
-                    stage === 'otp_pending'
+                    isOtpPending
                       ? '20%'
                       : stage === 'cooking'
                       ? '60%'
@@ -310,10 +318,10 @@ export default function KotStatusModal({
 
             <div className={styles.stepLabelsRow}>
               <span className={styles.stepActive}>1. Order Placed</span>
-              <span className={stage !== 'otp_pending' ? styles.stepActive : styles.stepInactive}>
+              <span className={!isOtpPending ? styles.stepActive : styles.stepInactive}>
                 2. OTP Verified
               </span>
-              <span className={stage === 'cooking' ? styles.stepPulsing : stage !== 'otp_pending' ? styles.stepActive : styles.stepInactive}>
+              <span className={stage === 'cooking' ? styles.stepPulsing : !isOtpPending ? styles.stepActive : styles.stepInactive}>
                 3. On Iron Tawa
               </span>
               <span className={stage === 'plating' ? styles.stepPulsing : stage === 'served' ? styles.stepActive : styles.stepInactive}>
@@ -471,7 +479,7 @@ export default function KotStatusModal({
                 </button>
               </div>
             </div>
-          ) : stage !== 'otp_pending' ? (
+          ) : !isOtpPending ? (
             <div style={{ marginBottom: '16px' }}>
               <button
                 style={{

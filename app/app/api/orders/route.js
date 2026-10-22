@@ -13,7 +13,10 @@ export async function GET(request) {
     let orders = [...(db.orders || [])];
 
     if (table) {
-      orders = orders.filter((o) => o.tables.includes(String(table).padStart(2, '0')));
+      const formatted = String(table).padStart(2, '0');
+      orders = orders.filter((o) =>
+        Array.isArray(o.tables) ? o.tables.includes(formatted) : String(o.tableNumber || '').padStart(2, '0') === formatted
+      );
     }
 
     if (status) {
@@ -104,7 +107,7 @@ export async function POST(request) {
       sgst,
       totalAmount,
       stationRouting: stationItems,
-      status: 'PENDING_OTP', // 'PENDING_OTP' | 'cooking' | 'plating' | 'served' | 'completed'
+      status: 'otp_pending', // 'otp_pending' | 'cooking' | 'plating' | 'served' | 'completed'
       prepTimeMinutes: 12,
       createdAt: new Date().toISOString(),
       placedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
