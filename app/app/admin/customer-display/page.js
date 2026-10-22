@@ -314,7 +314,7 @@ export default function CustomerDisplay() {
         color: '#94a3b8',
       }}>
         <span>FSSAI: 12423018000456 • GSTIN: 33AABCS1234F1Z8</span>
-        <span>Technology Partner: AJ Tech Solutions</span>
+        <span>Technology Partner: AJ Nanjil Tech Solutions</span>
       </footer>
     </div>
   );

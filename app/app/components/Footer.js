@@ -19,9 +19,13 @@ export default function Footer({ content, design, pages, footerConfig }) {
     ? `${cfg.addressLine1}, ${cfg.addressLine2 || 'Karaikudi, Tamil Nadu'}`
     : 'Heritage High Street, Karaikudi, Sivaganga District, Tamil Nadu 630001';
   const social = cfg.social || {};
-  const complianceText = cfg.complianceText || 'All Rights Reserved © 2026 Sri Gokulam Veg Restaurant';
-  const developerCreditText = cfg.developerCreditText || 'Designed & Developed with excellence by';
-  const developerUrl = cfg.developerUrl || 'https://ajtechsolutions.netlify.app/';
+  const rawDevCredit = cfg.developerCreditText || 'Designed & Developed with excellence by';
+  const cleanDevCredit = rawDevCredit.replace(/\s*by\s+ajtechsolutions\s*/i, ' by').trim();
+  const developerCreditText = cleanDevCredit.endsWith('by') ? cleanDevCredit : `${cleanDevCredit} by`;
+  const developerName = cfg.developerName || 'AJ Nanjil Tech Solutions';
+  const developerUrl = (cfg.developerUrl && !cfg.developerUrl.includes('ajtechsolutions.netlify.app'))
+    ? cfg.developerUrl
+    : 'https://ajnanjiltechsolutions.com/';
 
   const footerLinks = (Array.isArray(cfg.quickLinks) && cfg.quickLinks.length > 0)
     ? cfg.quickLinks.filter((l) => l.isVisible !== false)
@@ -114,7 +118,7 @@ export default function Footer({ content, design, pages, footerConfig }) {
           rel="noopener noreferrer"
           className={styles.ajtechAnchor}
         >
-          ajtechsolutions
+          {developerName}
         </a>{' '}
         • {complianceText}
       </div>

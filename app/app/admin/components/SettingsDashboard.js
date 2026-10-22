@@ -3156,7 +3156,7 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
                       Developer Admin Technical Controls
                     </h2>
                     <p className={styles.cardSubtitle}>
-                      AJ Tech Solutions Architecture Console • Maintenance mode, system vitals, cache management &amp; factory resets
+                      AJ Nanjil Tech Solutions Architecture Console • Maintenance mode, system vitals, cache management &amp; factory resets
                     </p>
                   </div>
                 </div>

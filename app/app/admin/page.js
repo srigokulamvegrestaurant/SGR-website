@@ -16409,8 +16409,8 @@ Status: SHIFT CLOSED & VERIFIED
         Sri Gokulam Veg Restaurant • Authentic Chettinad Delicacies • Karaikudi
         <br />
         Designed &amp; Developed with excellence by{' '}
-        <a href="https://ajtechsolutions.netlify.app/" target="_blank" rel="noopener noreferrer">
-          AJ Tech Solutions
+        <a href="https://ajnanjiltechsolutions.com/" target="_blank" rel="noopener noreferrer">
+          AJ Nanjil Tech Solutions
         </a>
       </footer>
     </div>

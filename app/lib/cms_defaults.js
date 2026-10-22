@@ -670,8 +670,9 @@ export const DEFAULT_FOOTER_CONFIG = {
     maps: 'https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Karaikudi',
   },
   complianceText: 'All Rights Reserved © 2026 Sri Gokulam Veg Restaurant',
-  developerCreditText: 'Designed & Developed with excellence by ajtechsolutions',
-  developerUrl: 'https://ajtechsolutions.netlify.app/',
+  developerCreditText: 'Designed & Developed with excellence by',
+  developerName: 'AJ Nanjil Tech Solutions',
+  developerUrl: 'https://ajnanjiltechsolutions.com/',
   fssaiNumber: '12423011000456',
   gstinNumber: '33AABCS1429B1Z8',
   quickLinks: [

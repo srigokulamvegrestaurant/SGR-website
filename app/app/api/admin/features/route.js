@@ -10,8 +10,8 @@ export async function GET() {
       settings: db.settings,
       developerInfo: {
         developer: 'Aswin (Lead System Architect)',
-        agency: 'AJ Tech Solutions',
-        agencyUrl: 'https://ajtechsolutions.netlify.app/',
+        agency: 'AJ Nanjil Tech Solutions',
+        agencyUrl: 'https://ajnanjiltechsolutions.com/',
         environment: process.env.NODE_ENV || 'development',
         systemVersion: '2.4.0-enterprise',
       },

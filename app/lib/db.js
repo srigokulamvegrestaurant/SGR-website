@@ -890,7 +890,7 @@ const SEED_DATA = {
         googleMaps: 'https://maps.google.com/?q=Sri+Gokulam+Veg+Karaikudi',
         youtube: 'https://youtube.com/@srigokulamveg',
       },
-      footerCopyright: '© 2026 Sri Gokulam Veg Restaurant. Crafted by AJ Tech Solutions.',
+      footerCopyright: '© 2026 Sri Gokulam Veg Restaurant. Crafted by AJ Nanjil Tech Solutions.',
     },
 
     // 14. Integrations Settings (Truthful status: NOT_CONFIGURED by default until verified)
@@ -1496,6 +1496,25 @@ export function getWebsiteCms() {
       }
     }
   }
+
+  // Auto-migrate developer attribution and website url to AJ Nanjil Tech Solutions
+  ['draft', 'published'].forEach((target) => {
+    if (db.website_cms[target]?.footer) {
+      const f = db.website_cms[target].footer;
+      if (!f.developerUrl || f.developerUrl.includes('netlify') || f.developerUrl === 'https://ajtechsolutions.netlify.app/') {
+        f.developerUrl = 'https://ajnanjiltechsolutions.com/';
+        needsSave = true;
+      }
+      if (f.developerName !== 'AJ Nanjil Tech Solutions') {
+        f.developerName = 'AJ Nanjil Tech Solutions';
+        needsSave = true;
+      }
+      if (f.developerCreditText && f.developerCreditText.includes('ajtechsolutions')) {
+        f.developerCreditText = 'Designed & Developed with excellence by';
+        needsSave = true;
+      }
+    }
+  });
 
   if (needsSave) {
     saveDb(db);

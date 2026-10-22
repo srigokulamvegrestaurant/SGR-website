@@ -18,7 +18,7 @@ export const DEFAULT_BILL_SLIP_FORMAT = {
   footerGreetingTamil: 'நன்றி! மீண்டும் வருக!',
   footerGreetingEnglish: 'Thank You! Visit Again For Blissful Dining!',
   footerDisclaimer: 'Goods once sold cannot be returned. Pls check bill before leaving counter.',
-  techPartnerNote: 'Technology Partner: AJ Tech Solutions (https://ajtechsolutions.netlify.app/)',
+  techPartnerNote: 'Technology Partner: AJ Nanjil Tech Solutions (https://ajnanjiltechsolutions.com/)',
   showLogoArt: true,
   showTamilItemNames: true,
   showCashierName: true,
