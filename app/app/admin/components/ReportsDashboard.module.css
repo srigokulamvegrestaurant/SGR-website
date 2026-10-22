@@ -856,7 +856,7 @@
 }
 
 @media print {
-  body * {
+  .reportsContainer * {
     visibility: hidden;
   }
   .printSection,

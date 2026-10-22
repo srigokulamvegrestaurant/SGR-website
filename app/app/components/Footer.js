@@ -19,6 +19,7 @@ export default function Footer({ content, design, pages, footerConfig }) {
     ? `${cfg.addressLine1}, ${cfg.addressLine2 || 'Karaikudi, Tamil Nadu'}`
     : 'Heritage High Street, Karaikudi, Sivaganga District, Tamil Nadu 630001';
   const social = cfg.social || {};
+  const complianceText = cfg.complianceText || 'All Rights Reserved © 2026 Sri Gokulam Veg Restaurant';
   const rawDevCredit = cfg.developerCreditText || 'Designed & Developed with excellence by';
   const cleanDevCredit = rawDevCredit.replace(/\s*by\s+ajtechsolutions\s*/i, ' by').trim();
   const developerCreditText = cleanDevCredit.endsWith('by') ? cleanDevCredit : `${cleanDevCredit} by`;

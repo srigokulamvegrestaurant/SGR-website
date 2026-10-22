@@ -8,6 +8,8 @@ import {
 } from '@/lib/db';
 import { generateThermalReceiptText } from '@/lib/thermalSlipFormatter';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request) {
   try {
     const authHeader = request.headers.get('authorization') || '';

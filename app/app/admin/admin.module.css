@@ -822,7 +822,7 @@
 
 /* ─── Isolated @media print rules for TVSE RP3200 Plus 80mm Roll ────── */
 @media print {
-  body {
+  .adminContainer {
     background: #ffffff !important;
     color: #000000 !important;
     margin: 0 !important;
