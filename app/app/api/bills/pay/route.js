@@ -41,6 +41,16 @@ export async function POST(request) {
       table.activeOrderId = null;
     }
 
+    // Mark all linked orders as settled and paid
+    (db.orders || []).forEach((ord) => {
+      const ordId = ord.orderId || ord.id;
+      if (Array.isArray(bill.orderIds) && bill.orderIds.includes(ordId)) {
+        ord.status = 'PAID_SETTLED';
+        ord.paymentStatus = 'PAID';
+        ord.settledBillNumber = bill.billNumber;
+      }
+    });
+
     saveDb(db);
 
     return NextResponse.json({

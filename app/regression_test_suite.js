@@ -255,8 +255,8 @@ async function runRegressionSuite() {
     );
     assert(
       'REG-BILL-01',
-      'POST /api/bills generates bill successfully without 500 crash',
-      resBill.status === 200 && resBill.body.success === true && Boolean(resBill.body.bill),
+      'POST /api/bills aggregates only eligible active unpaid orders (Total: ₹336)',
+      resBill.status === 200 && resBill.body.success === true && resBill.body.bill?.totalAmount === 336,
       `Bill: ${resBill.body.bill?.billNumber}, Total: ₹${resBill.body.bill?.totalAmount}`
     );
     generatedBill = resBill.body.bill;

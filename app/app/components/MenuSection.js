@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import styles from './MenuSection.module.css';
 import AnimatedImage from './motion/AnimatedImage';
 import AnimatedButton from './motion/AnimatedButton';
