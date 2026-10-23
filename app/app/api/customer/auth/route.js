@@ -11,6 +11,7 @@ import {
   validateCustomerSession,
   destroyCustomerSession,
 } from '@/lib/db';
+import { sendOtpEmail } from '@/lib/emailDispatcher';
 
 export async function POST(request) {
   try {
@@ -103,6 +104,14 @@ export async function POST(request) {
       console.log(
         `[CUSTOMER-EMAIL-DISPATCH] Sent OTP ${generatedOtp} to registered email ${customer.email} for mobile ${normPhone} (${customer.name})`
       );
+
+      // Dispatch real email via Nodemailer Gmail SMTP
+      await sendOtpEmail({
+        to: customer.email,
+        otp: generatedOtp,
+        recipientName: customer.name,
+        type: 'CUSTOMER_LOGIN',
+      });
 
       return NextResponse.json({
         success: true,

@@ -39,7 +39,7 @@
       "tableNumber": "03",
       "section": "GROUND_FLOOR",
       "capacity": 4,
-      "status": "AVAILABLE",
+      "status": "RESERVED",
       "activeOrderId": null,
       "activeSessionId": "ses_tbl03_1792224200068",
       "occupiedAt": "2026-10-17T08:03:20.068Z",
@@ -50,7 +50,7 @@
       "tableNumber": "04",
       "section": "GROUND_FLOOR",
       "capacity": 6,
-      "status": "AVAILABLE",
+      "status": "CLEANING",
       "activeOrderId": null
     },
     {
@@ -58,15 +58,15 @@
       "tableNumber": "05",
       "section": "GROUND_FLOOR",
       "capacity": 2,
-      "status": "OCCUPIED",
-      "activeOrderId": "KOT-02-5860"
+      "status": "CLEANING",
+      "activeOrderId": null
     },
     {
       "id": "tbl_06",
       "tableNumber": "06",
       "section": "GROUND_FLOOR",
       "capacity": 4,
-      "status": "AVAILABLE",
+      "status": "RESERVED",
       "activeOrderId": null
     },
     {
@@ -74,8 +74,8 @@
       "tableNumber": "07",
       "section": "AC_HALL",
       "capacity": 4,
-      "status": "OCCUPIED",
-      "activeOrderId": "ord_qr_1792214014313"
+      "status": "CLEANING",
+      "activeOrderId": null
     },
     {
       "id": "tbl_08",
@@ -90,8 +90,8 @@
       "tableNumber": "09",
       "section": "AC_HALL",
       "capacity": 6,
-      "status": "AVAILABLE",
-      "activeOrderId": null
+      "status": "OCCUPIED",
+      "activeOrderId": "KOT-09-8240"
     },
     {
       "id": "tbl_10",
@@ -122,7 +122,7 @@
       "tableNumber": "13",
       "section": "VERANDA",
       "capacity": 2,
-      "status": "RESERVED",
+      "status": "AVAILABLE",
       "activeOrderId": null
     },
     {
@@ -112134,7 +112134,7 @@
       "guestName": "Karthik Raja",
       "customerPhone": "9443113114",
       "guestCount": 4,
-      "status": "IN_KITCHEN",
+      "status": "PAID_SETTLED",
       "items": [
         {
           "id": "dish_05",
@@ -112155,10 +112155,11 @@
       "servedBy": "Karthikeyan (Manager)",
       "verifiedBy": "Karthikeyan (Manager)",
       "paymentMode": "UPI",
-      "paymentStatus": "PENDING",
-      "billNumber": "SGR-2026-7379",
+      "paymentStatus": "PAID",
+      "billNumber": "SGR-2026-6695",
       "prepTimeMinutes": 8,
-      "cancellationReason": null
+      "cancellationReason": null,
+      "settledBillNumber": "SGR-2026-6695"
     },
     {
       "id": "KOT-13-9380",
@@ -112768,6 +112769,244 @@
       "station": "TIFFIN",
       "status": "NEW",
       "createdAt": "2026-10-18T12:46:25.900Z"
+    },
+    {
+      "id": "KOT-KOT-04-9280-BEVERAGES",
+      "orderId": "KOT-04-9280",
+      "table": "04",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 1
+        }
+      ],
+      "guestName": "Sundar Rajan QA",
+      "status": "SERVED",
+      "cookingNotes": "Extra crispy podi roast, less oil",
+      "timestamp": "2026-10-22T04:46:14.530Z"
+    },
+    {
+      "id": "KOT-KOT-07-5484-BEVERAGES",
+      "orderId": "KOT-07-5484",
+      "table": "07",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 2
+        }
+      ],
+      "guestName": "Sundar Rajan Regression",
+      "status": "PREPARING",
+      "cookingNotes": "Extra Ghee Podi",
+      "timestamp": "2026-10-22T06:12:49.412Z"
+    },
+    {
+      "id": "KOT-KOT-07-5139-BEVERAGES",
+      "orderId": "KOT-07-5139",
+      "table": "07",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 2
+        }
+      ],
+      "guestName": "Sundar Rajan Regression",
+      "status": "PREPARING",
+      "cookingNotes": "Extra Ghee Podi",
+      "timestamp": "2026-10-22T06:21:43.811Z"
+    },
+    {
+      "id": "KOT-KOT-07-5545-BEVERAGES",
+      "orderId": "KOT-07-5545",
+      "table": "07",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 2
+        }
+      ],
+      "guestName": "Sundar Rajan Regression",
+      "status": "PREPARING",
+      "cookingNotes": "Extra Ghee Podi",
+      "timestamp": "2026-10-22T06:23:35.532Z"
+    },
+    {
+      "id": "KOT-KOT-04-8834-BEVERAGES",
+      "orderId": "KOT-04-8834",
+      "table": "04",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 1
+        }
+      ],
+      "guestName": "Sundar Rajan QA",
+      "status": "SERVED",
+      "cookingNotes": "Extra crispy podi roast, less oil",
+      "timestamp": "2026-10-22T07:15:02.862Z"
+    },
+    {
+      "id": "KOT-KOT-07-6892-BEVERAGES",
+      "orderId": "KOT-07-6892",
+      "table": "07",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 2
+        }
+      ],
+      "guestName": "Sundar Rajan Regression",
+      "status": "PREPARING",
+      "cookingNotes": "Extra Ghee Podi",
+      "timestamp": "2026-10-22T07:16:53.225Z"
+    },
+    {
+      "id": "KOT-KOT-07-8147-BEVERAGES",
+      "orderId": "KOT-07-8147",
+      "table": "07",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 2
+        }
+      ],
+      "guestName": "Sundar Rajan Regression",
+      "status": "PREPARING",
+      "cookingNotes": "Extra Ghee Podi",
+      "timestamp": "2026-10-22T07:28:27.293Z"
+    },
+    {
+      "id": "KOT-KOT-07-2277-BEVERAGES",
+      "orderId": "KOT-07-2277",
+      "table": "07",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 2
+        }
+      ],
+      "guestName": "Sundar Rajan Regression",
+      "status": "PREPARING",
+      "cookingNotes": "Extra Ghee Podi",
+      "timestamp": "2026-10-22T07:56:58.113Z"
+    },
+    {
+      "id": "KOT-KOT-05-1472-BEVERAGES",
+      "orderId": "KOT-05-1472",
+      "table": "05",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 1
+        }
+      ],
+      "guestName": "PreProd Diner",
+      "status": "PREPARING",
+      "cookingNotes": "Standard Karaikudi Authentic Sattvic Prep",
+      "timestamp": "2026-10-22T08:00:42.236Z"
+    },
+    {
+      "id": "KOT-KOT-10-9015-BEVERAGES",
+      "orderId": "KOT-10-9015",
+      "table": "10",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 1
+        }
+      ],
+      "guestName": "PreProd Diner",
+      "status": "PREPARING",
+      "cookingNotes": "Standard Karaikudi Authentic Sattvic Prep",
+      "timestamp": "2026-10-22T08:07:12.365Z"
+    },
+    {
+      "id": "KOT-KOT-07-5531-BEVERAGES",
+      "orderId": "KOT-07-5531",
+      "table": "07",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 2
+        }
+      ],
+      "guestName": "Sundar Rajan Regression",
+      "status": "PREPARING",
+      "cookingNotes": "Extra Ghee Podi",
+      "timestamp": "2026-10-22T08:09:48.673Z"
+    },
+    {
+      "id": "KOT-KOT-10-9995-BEVERAGES",
+      "orderId": "KOT-10-9995",
+      "table": "10",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 1
+        }
+      ],
+      "guestName": "PreProd Diner",
+      "status": "PREPARING",
+      "cookingNotes": "Standard Karaikudi Authentic Sattvic Prep",
+      "timestamp": "2026-10-22T08:09:56.531Z"
+    },
+    {
+      "id": "KOT-KOT-07-5662-BEVERAGES",
+      "orderId": "KOT-07-5662",
+      "table": "07",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 2
+        }
+      ],
+      "guestName": "Sundar Rajan Regression",
+      "status": "PREPARING",
+      "cookingNotes": "Extra Ghee Podi",
+      "timestamp": "2026-10-22T10:52:43.508Z"
+    },
+    {
+      "id": "KOT-KOT-10-1250-BEVERAGES",
+      "orderId": "KOT-10-1250",
+      "table": "10",
+      "station": "BEVERAGES",
+      "items": [
+        {
+          "title": "Kumbakonam Degree Coffee",
+          "price": 40,
+          "quantity": 1
+        }
+      ],
+      "guestName": "PreProd Diner",
+      "status": "PREPARING",
+      "cookingNotes": "Standard Karaikudi Authentic Sattvic Prep",
+      "timestamp": "2026-10-22T10:53:04.209Z"
     }
   ],
   "bills": [
@@ -204615,6 +204854,62 @@
   ],
   "customers": [
     {
+      "id": "cust_1792644365311_odhw",
+      "name": "Sundar Rajan QA",
+      "phone": "9840123456",
+      "email": "sundar.qa@example.com",
+      "role": "CUSTOMER",
+      "status": "ACTIVE",
+      "totalOrders": 18,
+      "totalSpent": 209286.04,
+      "loyaltyPoints": 4185,
+      "gstin": "",
+      "address": "",
+      "dietaryPreferences": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false
+      },
+      "savedAddresses": [],
+      "createdAt": "2026-10-22T04:46:05.311Z",
+      "lastOrderDate": "2026-10-22T10:52:44.428Z",
+      "orderIds": [
+        "KOT-09-8240",
+        "KOT-07-5662",
+        "KOT-09-5709",
+        "KOT-07-5531",
+        "KOT-09-7376",
+        "KOT-07-2277",
+        "KOT-09-4211",
+        "KOT-07-8147",
+        "KOT-09-6729",
+        "KOT-07-6892",
+        "KOT-04-8834",
+        "KOT-09-6837",
+        "KOT-07-5545",
+        "KOT-09-2505",
+        "KOT-07-5139",
+        "KOT-09-5862",
+        "KOT-07-5484",
+        "KOT-04-9280"
+      ],
+      "billNumbers": [
+        "SGR-2026-4774",
+        "SGR-2026-2982",
+        "SGR-2026-7780",
+        "SGR-2026-4106",
+        "SGR-2026-1562",
+        "SGR-2026-3695",
+        "SGR-2026-4434",
+        "SGR-2026-1565",
+        "SGR-2026-8074"
+      ],
+      "otpHash": null,
+      "otpExpiresAt": null,
+      "otpLastRequestedAt": "2026-10-22T10:52:42.319Z"
+    },
+    {
       "id": "cust_01",
       "customerId": "CUST-1001",
       "name": "Sundaram Chettiar",
@@ -204628,7 +204923,7 @@
       "averageBillValue": 587.5,
       "segment": "VIP",
       "loyaltyTier": "PLATINUM",
-      "loyaltyPoints": 1645,
+      "loyaltyPoints": 1680,
       "pointsRedeemedTotal": 164,
       "birthday": "1968-11-24",
       "anniversary": "1992-05-18",
@@ -204725,6 +205020,20 @@
           "type": "FESTIVE",
           "status": "ACTIVE"
         }
+      ],
+      "totalOrders": 4,
+      "totalSpent": 1837.5,
+      "lastOrderDate": "2026-10-22T10:53:04.292Z",
+      "orderIds": [
+        "KOT-10-1250",
+        "KOT-10-9995",
+        "KOT-10-9015",
+        "KOT-05-1472"
+      ],
+      "billNumbers": [
+        "SGR-2026-4288",
+        "SGR-2026-7134",
+        "SGR-2026-1767"
       ]
     },
     {
@@ -205308,6 +205617,32 @@
     }
   ],
   "reservations": [
+    {
+      "id": "res_1792653303782",
+      "guestName": "Sundar Rajan QA",
+      "phone": "9840123456",
+      "partySize": 4,
+      "tableNumber": "06",
+      "section": "GROUND_FLOOR",
+      "date": "2026-10-25",
+      "timeSlot": "01:30 PM",
+      "status": "CONFIRMED",
+      "specialRequests": "Traditional plantain leaf feast",
+      "createdAt": "2026-10-22T07:15:03.782Z"
+    },
+    {
+      "id": "res_1792644394376",
+      "guestName": "Sundar Rajan QA",
+      "phone": "9840123456",
+      "partySize": 4,
+      "tableNumber": "03",
+      "section": "GROUND_FLOOR",
+      "date": "2026-10-25",
+      "timeSlot": "01:30 PM",
+      "status": "CONFIRMED",
+      "specialRequests": "Traditional plantain leaf feast",
+      "createdAt": "2026-10-22T04:46:34.376Z"
+    },
     {
       "id": "res_1792489338986",
       "guestName": "Aswin",
@@ -239049,8 +239384,8 @@
           "maps": "https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Karaikudi"
         },
         "complianceText": "All Rights Reserved © 2026 Sri Gokulam Veg Restaurant",
-        "developerCreditText": "Designed & Developed with excellence by ajtechsolutions",
-        "developerUrl": "https://ajtechsolutions.netlify.app/",
+        "developerCreditText": "Designed & Developed with excellence by",
+        "developerUrl": "https://ajnanjiltechsolutions.com/",
         "fssaiNumber": "12423011000456",
         "gstinNumber": "33AABCS1429B1Z8",
         "quickLinks": [
@@ -239090,7 +239425,8 @@
             "href": "/catering",
             "isVisible": true
           }
-        ]
+        ],
+        "developerName": "AJ Nanjil Tech Solutions"
       },
       "customerReviews": [
         {
@@ -239866,8 +240202,8 @@
           "maps": "https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Karaikudi"
         },
         "complianceText": "All Rights Reserved © 2026 Sri Gokulam Veg Restaurant",
-        "developerCreditText": "Designed & Developed with excellence by ajtechsolutions",
-        "developerUrl": "https://ajtechsolutions.netlify.app/",
+        "developerCreditText": "Designed & Developed with excellence by",
+        "developerUrl": "https://ajnanjiltechsolutions.com/",
         "fssaiNumber": "12423011000456",
         "gstinNumber": "33AABCS1429B1Z8",
         "quickLinks": [
@@ -239907,7 +240243,8 @@
             "href": "/catering",
             "isVisible": true
           }
-        ]
+        ],
+        "developerName": "AJ Nanjil Tech Solutions"
       },
       "customerReviews": [
         {
@@ -243206,6 +243543,105 @@
     ]
   },
   "customer_sessions": [
+    {
+      "token": "66b0492997c2647d4f0031f5fb89a38a10c8edac7c1a9129b868e42ddb5622fa",
+      "customerId": "cust_1792644365311_odhw",
+      "phone": "9840123456",
+      "email": "sundar.qa@example.com",
+      "name": "Sundar Rajan QA",
+      "createdAt": "2026-10-22T10:52:42.597Z",
+      "expiresAt": "2026-11-21T10:52:42.597Z",
+      "device": "Customer Web Browser",
+      "ip": "127.0.0.1"
+    },
+    {
+      "token": "08e1694aa35aa430201d5f3136fc49a3a08546be94124f0b4977c9ef96ab5290",
+      "customerId": "cust_1792644365311_odhw",
+      "phone": "9840123456",
+      "email": "sundar.qa@example.com",
+      "name": "Sundar Rajan QA",
+      "createdAt": "2026-10-22T08:09:48.327Z",
+      "expiresAt": "2026-11-21T08:09:48.327Z",
+      "device": "Customer Web Browser",
+      "ip": "127.0.0.1"
+    },
+    {
+      "token": "1fa30fd461dc32067a9d83ec3930a5fac827ff4d26c06ea31a55eae7d059f00c",
+      "customerId": "cust_1792644365311_odhw",
+      "phone": "9840123456",
+      "email": "sundar.qa@example.com",
+      "name": "Sundar Rajan QA",
+      "createdAt": "2026-10-22T07:56:57.466Z",
+      "expiresAt": "2026-11-21T07:56:57.466Z",
+      "device": "Customer Web Browser",
+      "ip": "127.0.0.1"
+    },
+    {
+      "token": "80e660f2139a7cec761f304ad4f379660e333424e72b0dc54ebda8919cbe6639",
+      "customerId": "cust_1792644365311_odhw",
+      "phone": "9840123456",
+      "email": "sundar.qa@example.com",
+      "name": "Sundar Rajan QA",
+      "createdAt": "2026-10-22T07:28:26.215Z",
+      "expiresAt": "2026-11-21T07:28:26.215Z",
+      "device": "Customer Web Browser",
+      "ip": "127.0.0.1"
+    },
+    {
+      "token": "19fce3a0e5f0a0a1f4ed613e512c446855c15b345a7b59a29bf82af7f689374f",
+      "customerId": "cust_1792644365311_odhw",
+      "phone": "9840123456",
+      "email": "sundar.qa@example.com",
+      "name": "Sundar Rajan QA",
+      "createdAt": "2026-10-22T07:16:52.804Z",
+      "expiresAt": "2026-11-21T07:16:52.804Z",
+      "device": "Customer Web Browser",
+      "ip": "127.0.0.1"
+    },
+    {
+      "token": "e6786919d305f97746a5fb8bcdabaf38f89eff33c839b42f54596356d740df8f",
+      "customerId": "cust_1792644365311_odhw",
+      "phone": "9840123456",
+      "email": "sundar.qa@example.com",
+      "name": "Sundar Rajan QA",
+      "createdAt": "2026-10-22T06:23:35.101Z",
+      "expiresAt": "2026-11-21T06:23:35.101Z",
+      "device": "Customer Web Browser",
+      "ip": "127.0.0.1"
+    },
+    {
+      "token": "af623feb10ae830a50e5f825b60f8ec30d4f0a956824d84ec07ad917cae63cca",
+      "customerId": "cust_1792644365311_odhw",
+      "phone": "9840123456",
+      "email": "sundar.qa@example.com",
+      "name": "Sundar Rajan QA",
+      "createdAt": "2026-10-22T06:21:43.487Z",
+      "expiresAt": "2026-11-21T06:21:43.487Z",
+      "device": "Customer Web Browser",
+      "ip": "127.0.0.1"
+    },
+    {
+      "token": "8cd515fb372bc5ccb40617e9aeca80e1e3b3915becf60cff781802f44e8da36b",
+      "customerId": "cust_1792644365311_odhw",
+      "phone": "9840123456",
+      "email": "sundar.qa@example.com",
+      "name": "Sundar Rajan QA",
+      "createdAt": "2026-10-22T06:12:48.827Z",
+      "expiresAt": "2026-11-21T06:12:48.827Z",
+      "device": "Customer Web Browser",
+      "ip": "127.0.0.1"
+    },
+    {
+      "token": "17c96cf111dd18ee583bac7cac9345be9f73c264fd644f9353b4d98f26fe86bb",
+      "customerId": "cust_1792644365311_odhw",
+      "phone": "9840123456",
+      "email": "sundar.qa@example.com",
+      "name": "Sundar Rajan QA",
+      "createdAt": "2026-10-22T04:46:30.360Z",
+      "expiresAt": "2026-11-21T04:46:30.360Z",
+      "device": "Customer Web Browser",
+      "ip": "127.0.0.1"
+    },
     {
       "token": "9be0bda3f7eab7855e204ca70b88f2b321af8513f160ef2a863511224c013f5b",
       "customerId": "cust_1792482233587_k6c2",

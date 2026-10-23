@@ -10,6 +10,7 @@ import {
   recordAuditLog,
   isProtectedDeveloperEmail
 } from '@/lib/db';
+import { sendOtpEmail } from '@/lib/emailDispatcher';
 
 // Granular permissions map matching Master Plan section 7.1
 export const ROLE_PERMISSIONS = {
@@ -286,6 +287,17 @@ export async function POST(request) {
 
       console.log(`[AUTH-EMAIL-DISPATCH] Sent OTP ${generatedOtp} to ${user.email} (Role: ${user.role}, Expires in 5 min)`);
 
+      // Dispatch real email via Nodemailer Gmail SMTP
+      const emailResult = await sendOtpEmail({
+        to: user.email,
+        otp: generatedOtp,
+        recipientName: user.fullName,
+        type: 'ADMIN_LOGIN',
+        role: user.role,
+      });
+
+      const isDev = process.env.NODE_ENV !== 'production';
+
       return NextResponse.json({
         success: true,
         message: `A secure 6-digit verification code has been dispatched to ${user.email}. It expires in 5 minutes.`,
@@ -293,7 +305,8 @@ export async function POST(request) {
         role: user.role,
         expiresInSeconds: 300,
         resendsRemaining: Math.max(0, 3 - user.otpResendCount),
-        devOtp: generatedOtp, // Security preview for local test convenience
+        emailDispatched: emailResult.success && !emailResult.simulated,
+        ...(isDev && { devOtp: generatedOtp }), // Only expose in non-production
       });
     }
 
@@ -338,7 +351,8 @@ export async function POST(request) {
 
       // Validate OTP
       const cleanOtp = otp.toString().trim();
-      const isMatch = (user.otpHash && user.otpHash === cleanOtp) || cleanOtp === '123456';
+      const isDev = process.env.NODE_ENV !== 'production';
+      const isMatch = (user.otpHash && user.otpHash === cleanOtp) || (isDev && cleanOtp === '123456');
 
       if (!isMatch) {
         user.otpAttempts = (user.otpAttempts || 0) + 1;
