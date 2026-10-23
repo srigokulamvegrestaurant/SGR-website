@@ -2,7 +2,7 @@
 // Excludes all private internal portals (/admin, /admin/*, /waiter, /waiter/*, /api/*)
 
 export default function sitemap() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://srigokulam.com';
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.srigokulamvegrestaurant.com').replace(/\/$/, '');
   const currentDate = new Date().toISOString();
 
   return [

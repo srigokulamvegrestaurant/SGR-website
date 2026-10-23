@@ -1,6 +1,6 @@
 // app/robots.js - SEO & AI Crawler Robots Configuration for Sri Gokulam Veg Restaurant
 export default function robots() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://srigokulam.com';
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.srigokulamvegrestaurant.com').replace(/\/$/, '');
 
   return {
     rules: [

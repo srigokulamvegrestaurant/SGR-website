@@ -17,6 +17,7 @@
 - **Geo Coordinates**: Latitude: 10.0682° N, Longitude: 78.7808° E
 - **Primary Phone**: +91 94431 23456 / +91 98765 43210
 - **Email**: contact@srigokulam.com / support@srigokulam.com
+- **Official Website**: https://www.srigokulamvegrestaurant.com
 - **Google Maps**: https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Mudiyarasan+Salai+Near+Bharat+Petroleum+Karaikudi
 
 ## Service Hours

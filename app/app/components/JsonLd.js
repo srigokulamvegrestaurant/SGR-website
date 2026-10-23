@@ -1,6 +1,6 @@
 // app/components/JsonLd.js - Structured Data Schema for Search Engines & AI Answer Engines
 export default function JsonLd() {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://srigokulam.com';
+  const baseUrl = (process.env.NEXT_PUBLIC_APP_URL || 'https://www.srigokulamvegrestaurant.com').replace(/\/$/, '');
 
   // 1. Local Business & Vegetarian Restaurant Schema (SEO + GEO)
   const restaurantSchema = {

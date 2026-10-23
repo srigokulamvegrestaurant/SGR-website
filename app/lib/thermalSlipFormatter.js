@@ -10,7 +10,7 @@ export const DEFAULT_BILL_SLIP_FORMAT = {
   phonePrimary: '+91 94431 23456',
   phoneSecondary: '+91 98765 43210',
   email: 'contact@srigokulam.com',
-  website: 'https://srigokulam.com',
+  website: 'https://www.srigokulamvegrestaurant.com',
   gstin: '33AABCS1234F1Z8',
   fssaiNumber: '12423018000456',
   paperWidth: '80MM', // '80MM' | '58MM'

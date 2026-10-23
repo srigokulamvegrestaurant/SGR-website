@@ -762,7 +762,7 @@ const SEED_DATA = {
       autoCloseDelayMinutes: 5,
       sessionAlertThresholdMinutes: 90,
       allowTableMerge: true,
-      qrBaseUrl: 'https://srigokulam.com',
+      qrBaseUrl: 'https://www.srigokulamvegrestaurant.com',
       qrCardTemplate: 'CLASSIC_GOLD',
       tableSections: [
         { id: 'GROUND_FLOOR', label: 'Ground Floor Family Hall', icon: '🏛️' },
