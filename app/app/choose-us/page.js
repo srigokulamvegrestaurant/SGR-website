@@ -112,7 +112,7 @@ export default function ChooseUsPage() {
           padding: '48px 24px 40px',
           textAlign: 'center',
           color: '#ffffff',
-          borderBottom: '2px solid #D4A33D',
+          borderBottom: '1px solid rgba(0, 89, 179, 0.35)',
         }}
       >
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>

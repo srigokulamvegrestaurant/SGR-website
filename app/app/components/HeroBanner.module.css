@@ -10,7 +10,7 @@
   max-width: 100vw;
   /* contain:paint was clipping the banner during page fade — use layout+style instead */
   contain: layout style;
-  border-bottom: 3px solid var(--gold-temple, #c59b27);
+  border-bottom: 1px solid rgba(0, 89, 179, 0.4);
   user-select: none;
 }
 

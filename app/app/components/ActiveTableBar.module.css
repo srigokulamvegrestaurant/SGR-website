@@ -6,7 +6,7 @@
   background: linear-gradient(90deg, #071f4a 0%, #0c2b60 100%);
   color: #ffffff;
   padding: 8px 16px;
-  border-bottom: 1.5px solid var(--gold-temple, #c59b27);
+  border-bottom: 1px solid rgba(0, 89, 179, 0.35);
   box-shadow: 0 2px 10px rgba(5, 27, 65, 0.2);
 }
 

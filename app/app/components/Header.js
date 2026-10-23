@@ -190,7 +190,6 @@ export default function Header({
 
         {/* Main Royal Blue Restaurant Branding Bar */}
         <header className={styles.header}>
-          <div className={styles.headerTrim}></div>
           <div className={styles.headerInner}>
 
             {/* Brand Logo & Name */}
