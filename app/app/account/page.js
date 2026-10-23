@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import styles from './page.module.css';
 import TableReservationModal from '../components/TableReservationModal';
+import Header from '../components/Header';
 
 export default function CustomerAccountPage() {
   const [token, setToken] = useState(null);
@@ -270,20 +271,7 @@ export default function CustomerAccountPage() {
   if (!token && !loading) {
     return (
       <div className={styles.pageWrapper}>
-        <header className={styles.topBar}>
-          <div className={styles.topBarInner}>
-            <a href="/" className={styles.brandGroup}>
-              <img src="/restaurant_logo.jpg" alt="Logo" className={styles.brandLogo} />
-              <div>
-                <div className={styles.brandTitle}>SRI GOKULAM</div>
-                <div className={styles.brandSubtitle}>VEG RESTAURANT • KARAIKUDI</div>
-              </div>
-            </a>
-            <a href="/" className={styles.btnSecondary}>
-              ← Back to Dining Menu
-            </a>
-          </div>
-        </header>
+        <Header />
 
         <div style={{ maxWidth: 440, margin: '60px auto', padding: '0 20px', width: '100%' }}>
           <div style={{ background: '#ffffff', borderRadius: 20, padding: 32, boxShadow: '0 20px 40px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0' }}>
@@ -411,27 +399,8 @@ export default function CustomerAccountPage() {
 
   return (
     <div className={styles.pageWrapper}>
-      {/* Top Bar */}
-      <header className={styles.topBar}>
-        <div className={styles.topBarInner}>
-          <a href="/" className={styles.brandGroup}>
-            <img src="/restaurant_logo.jpg" alt="Logo" className={styles.brandLogo} />
-            <div>
-              <div className={styles.brandTitle}>SRI GOKULAM</div>
-              <div className={styles.brandSubtitle}>VEG RESTAURANT • KARAIKUDI</div>
-            </div>
-          </a>
-
-          <div className={styles.topBarActions}>
-            <a href="/" className={styles.btnSecondary}>
-              🍽️ Order Food / Menu
-            </a>
-            <button onClick={handleSignOut} className={styles.btnSignOut}>
-              Sign Out ⎋
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Standard Fixed Restaurant Branding Header */}
+      <Header />
 
       {/* Hero Profile Banner */}
       <section className={styles.profileHero}>
@@ -450,9 +419,14 @@ export default function CustomerAccountPage() {
             </div>
           </div>
 
-          <div className={styles.loyaltyBadge}>
-            <div className={styles.loyaltyPoints}>{customer?.loyaltyPoints || 0}</div>
-            <div className={styles.loyaltyLabel}>Gokulam Reward Coins</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+            <div className={styles.loyaltyBadge}>
+              <div className={styles.loyaltyPoints}>{customer?.loyaltyPoints || 0}</div>
+              <div className={styles.loyaltyLabel}>Gokulam Reward Coins</div>
+            </div>
+            <button onClick={handleSignOut} className={styles.btnSignOut} style={{ height: 42, padding: '0 18px', borderRadius: 20 }}>
+              Sign Out ⎋
+            </button>
           </div>
         </div>
       </section>

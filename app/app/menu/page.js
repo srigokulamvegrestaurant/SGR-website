@@ -127,14 +127,14 @@ export default function MenuPage() {
         onOpenQrModal={() => setQrModalOpen(true)}
         onOpenCustomerAuth={() => setAuthModalOpen(true)}
         onOpenReservationModal={() => setReservationModalOpen(true)}
-        brand={cms?.brand}
-        buttons={cms?.headerButtons}
-        announcement={cms?.announcement}
-        navLinks={cms?.navLinks}
+        brand={cms?.header || cms?.design}
+        buttons={cms?.buttons}
+        announcement={cms?.header || cms?.content}
+        navLinks={cms?.header?.navLinks || cms?.pages}
       />
 
       {/* Hero Banner for Menu */}
-      <section style={{ paddingTop: '100px', paddingBottom: '30px', textAlign: 'center', background: 'linear-gradient(180deg, #1c1917 0%, #0a0908 100%)', borderBottom: '1px solid #292524' }}>
+      <section style={{ paddingTop: '36px', paddingBottom: '30px', textAlign: 'center', background: 'linear-gradient(180deg, #1c1917 0%, #0a0908 100%)', borderBottom: '1px solid #292524' }}>
         <div style={{ maxWidth: '800px', margin: '0 auto', padding: '0 20px' }}>
           <span style={{ color: '#fbbf24', fontSize: '13px', letterSpacing: '0.15em', textTransform: 'uppercase', fontWeight: 700 }}>
             🌿 100% Pure Sattvic Chettinad

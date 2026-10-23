@@ -4,12 +4,13 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './Header.module.css';
 
 const NAV_LINKS = [
-  { label: 'Home', href: '#', active: true },
-  { label: 'Our Specials', href: '#specials' },
-  { label: 'Signature Dishes', href: '#signature' },
-  { label: 'Full Menu', href: '#menu' },
-  { label: 'Why Choose Us', href: '#choose-us' },
-  { label: 'Contact', href: '#contact' },
+  { label: 'Home', href: '/', active: true },
+  { label: 'Our Specials', href: '/#specials' },
+  { label: 'Signature Dishes', href: '/#signature' },
+  { label: 'Full Menu', href: '/menu' },
+  { label: 'Why Choose Us', href: '/choose-us' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
 ];
 
 export default function Header({
@@ -24,23 +25,24 @@ export default function Header({
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [customer, setCustomer] = useState(null);
-  const headerRef = useRef(null);
-  const [drawerTop, setDrawerTop] = useState(76);
+  const headerWrapperRef = useRef(null);
+  const [drawerTop, setDrawerTop] = useState(64);
 
-  // Measure header bottom position for mobile drawer alignment
+  // Measure fixed header height for layout spacer and mobile drawer positioning
   useEffect(() => {
     const updateHeaderHeight = () => {
-      if (headerRef.current) {
-        const rect = headerRef.current.getBoundingClientRect();
-        setDrawerTop(Math.round(rect.bottom));
+      if (headerWrapperRef.current) {
+        const height = Math.round(headerWrapperRef.current.getBoundingClientRect().height || headerWrapperRef.current.offsetHeight || 64);
+        setDrawerTop(height);
       }
     };
     updateHeaderHeight();
     window.addEventListener('resize', updateHeaderHeight);
-    window.addEventListener('scroll', updateHeaderHeight, { passive: true });
+    // Slight delay to catch web fonts loading
+    const timer = setTimeout(updateHeaderHeight, 150);
     return () => {
       window.removeEventListener('resize', updateHeaderHeight);
-      window.removeEventListener('scroll', updateHeaderHeight);
+      clearTimeout(timer);
     };
   }, []);
 
@@ -169,111 +171,121 @@ export default function Header({
 
   return (
     <>
-      {/* Top Announcement Strip */}
-      {announcement?.topAnnouncementEnabled !== false && (
-        <div className={styles.topAnnouncement}>
-          <div className={styles.announcementLeft}>
-            <span className={styles.announcementBadge}>{announcement?.announcementBadge || '100% PURE VEG'}</span>
-            <span className={styles.announcementText}>
-              {announcement?.announcementText || 'Authentic Chettinad Sattvic Culinary Heritage • Karaikudi, Tamil Nadu'}
-            </span>
-          </div>
-          <div className={styles.announcementRight}>
-            <span>📞 Table Reservations &amp; Orders: <strong>{announcement?.announcementPhone || announcement?.primaryPhone || '+91 98765 43210'}</strong></span>
-          </div>
-        </div>
-      )}
-
-      {/* Main Header */}
-      <header ref={headerRef} className={styles.header}>
-        <div className={styles.headerTrim}></div>
-        <div className={styles.headerInner}>
-
-          {/* Brand Logo & Name */}
-          <a href="#" className={styles.brandLink}>
-            <div className={styles.brandLogoFrame}>
-              <img src={brand?.logoUrl || '/restaurant_logo.jpg'} alt="Sri Gokulam Veg Restaurant Logo" />
+      {/* Fixed Top Restaurant Branding & Navigation Bar */}
+      <div ref={headerWrapperRef} className={styles.headerWrapper}>
+        {/* Top Announcement Strip (Desktop only, hidden on mobile) */}
+        {announcement?.topAnnouncementEnabled !== false && (
+          <div className={styles.topAnnouncement}>
+            <div className={styles.announcementLeft}>
+              <span className={styles.announcementBadge}>{announcement?.announcementBadge || '100% PURE VEG'}</span>
+              <span className={styles.announcementText}>
+                {announcement?.announcementText || 'Authentic Chettinad Sattvic Culinary Heritage • Karaikudi, Tamil Nadu'}
+              </span>
             </div>
-            <div className={styles.brandTextBlock}>
-              <div className={styles.brandTa}>{brand?.brandTa || 'ஸ்ரீ கோகுலம்'}</div>
-              <div className={styles.brandEn}>{brand?.brandEn || 'SRI GOKULAM'}</div>
-              <div className={styles.brandSub}>
-                <span className={styles.leafIcon}>🍃</span> {brand?.brandSub || 'VEG RESTAURANT'} <span className={styles.leafIcon}>🍃</span>
+            <div className={styles.announcementRight}>
+              <span>📞 Table Reservations &amp; Orders: <strong>{announcement?.announcementPhone || announcement?.primaryPhone || '+91 98765 43210'}</strong></span>
+            </div>
+          </div>
+        )}
+
+        {/* Main Royal Blue Restaurant Branding Bar */}
+        <header className={styles.header}>
+          <div className={styles.headerTrim}></div>
+          <div className={styles.headerInner}>
+
+            {/* Brand Logo & Name */}
+            <a href="/" className={styles.brandLink}>
+              <div className={styles.brandLogoFrame}>
+                <img src={brand?.logoUrl || '/restaurant_logo.jpg'} alt="Sri Gokulam Veg Restaurant Logo" />
               </div>
-            </div>
-          </a>
+              <div className={styles.brandTextBlock}>
+                <div className={styles.brandTa}>{brand?.brandTa || 'ஸ்ரீ கோகுலம்'}</div>
+                <div className={styles.brandEn}>{brand?.brandEn || 'SRI GOKULAM'}</div>
+                <div className={styles.brandSub}>
+                  <span className={styles.leafIcon}>🍃</span> {brand?.brandSub || 'VEG RESTAURANT'} <span className={styles.leafIcon}>🍃</span>
+                </div>
+              </div>
+            </a>
 
-          {/* Desktop Navigation Links */}
-          <ul className={styles.navLinksList}>
-            {activeNavLinks.map((link) => (
-              <li key={link.label}>
-                <a
-                  href={link.href}
-                  className={link.active ? styles.activeLink : ''}
-                  onClick={(e) => {
-                    const label = (link.label || '').toLowerCase();
-                    const href = (link.href || '').toLowerCase();
-                    if (label.includes('qr') || href.includes('table-qr')) {
-                      if (e && e.preventDefault) e.preventDefault();
-                      if (onOpenQrModal) onOpenQrModal();
-                    }
+            {/* Desktop Navigation Links */}
+            <ul className={styles.navLinksList}>
+              {activeNavLinks.map((link) => (
+                <li key={link.label}>
+                  <a
+                    href={link.href}
+                    className={link.active ? styles.activeLink : ''}
+                    onClick={(e) => {
+                      const label = (link.label || '').toLowerCase();
+                      const href = (link.href || '').toLowerCase();
+                      if (label.includes('qr') || href.includes('table-qr')) {
+                        if (e && e.preventDefault) e.preventDefault();
+                        if (onOpenQrModal) onOpenQrModal();
+                      }
+                    }}
+                  >
+                    {link.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+
+            {/* Action Buttons */}
+            <div className={styles.headerActions}>
+              {headerButtons.map((btn) => (
+                <button
+                  key={btn.id || btn.key || btn.name}
+                  type="button"
+                  className={btn.key === 'qrDineIn' ? styles.btnQrCta : styles.btnGoldCta}
+                  style={{
+                    backgroundColor: btn.bgColor || undefined,
+                    color: btn.textColor || undefined,
                   }}
+                  onClick={(e) => handleButtonClick(btn, e)}
                 >
-                  {link.label}
+                  {btn.icon && <span>{btn.icon}</span>} {btn.text}
+                </button>
+              ))}
+            </div>
+
+            {/* Customer Account / Login CTA & Mobile Hamburger (Grouped on right) */}
+            <div className={styles.headerRightGroup}>
+              {customer ? (
+                <a href="/account" className={styles.btnAccountCta} title="View Profile, Orders & Bills">
+                  <span>👤</span> <span className={styles.accountText}>{customer.name ? customer.name.split(' ')[0] : 'My Account'}</span>
                 </a>
-              </li>
-            ))}
-          </ul>
+              ) : (
+                <button
+                  type="button"
+                  className={styles.btnAccountCta}
+                  onClick={onOpenCustomerAuth || (() => { window.location.href = '/account'; })}
+                  title="Customer Sign In & Orders"
+                >
+                  <span>👤</span> <span className={styles.accountText}>Login / Account</span>
+                </button>
+              )}
 
-          {/* Action Buttons */}
-          <div className={styles.headerActions}>
-            {headerButtons.map((btn) => (
+              {/* Mobile Hamburger */}
               <button
-                key={btn.id || btn.key || btn.name}
-                type="button"
-                className={btn.key === 'qrDineIn' ? styles.btnQrCta : styles.btnGoldCta}
-                style={{
-                  backgroundColor: btn.bgColor || undefined,
-                  color: btn.textColor || undefined,
-                }}
-                onClick={(e) => handleButtonClick(btn, e)}
+                className={`${styles.hamburger} ${mobileMenuOpen ? styles.hamburgerOpen : ''}`}
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                aria-label="Toggle menu"
+                aria-expanded={mobileMenuOpen}
               >
-                {btn.icon && <span>{btn.icon}</span>} {btn.text}
+                <span></span>
+                <span></span>
+                <span></span>
               </button>
-            ))}
+            </div>
           </div>
+        </header>
+      </div>
 
-          {/* Customer Account / Login CTA & Mobile Hamburger (Grouped on right) */}
-          <div className={styles.headerRightGroup}>
-            {customer ? (
-              <a href="/account" className={styles.btnAccountCta} title="View Profile, Orders & Bills">
-                <span>👤</span> <span className={styles.accountText}>{customer.name ? customer.name.split(' ')[0] : 'My Account'}</span>
-              </a>
-            ) : (
-              <button
-                type="button"
-                className={styles.btnAccountCta}
-                onClick={onOpenCustomerAuth || (() => { window.location.href = '/account'; })}
-                title="Customer Sign In & Orders"
-              >
-                <span>👤</span> <span className={styles.accountText}>Login / Account</span>
-              </button>
-            )}
-
-            {/* Mobile Hamburger */}
-            <button
-              className={`${styles.hamburger} ${mobileMenuOpen ? styles.hamburgerOpen : ''}`}
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label="Toggle menu"
-              aria-expanded={mobileMenuOpen}
-            >
-              <span></span>
-              <span></span>
-              <span></span>
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Spacer to prevent page content from being obscured behind fixed header */}
+      <div
+        className={styles.headerSpacer}
+        style={{ height: `${drawerTop}px` }}
+        aria-hidden="true"
+      />
 
       {/* Mobile Drawer Backdrop */}
       {mobileMenuOpen && (

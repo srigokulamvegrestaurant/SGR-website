@@ -95,7 +95,7 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
+  overflow-x: clip;
   overflow-y: auto;
   max-width: 100%;
   width: 100%;
@@ -106,7 +106,7 @@ body {
   font-family: 'Plus Jakarta Sans', sans-serif;
   background-color: var(--white-layer);
   color: var(--text-dark);
-  overflow-x: hidden;
+  overflow-x: clip;
   overflow-y: auto;
   max-width: 100%;
   width: 100%;
@@ -116,12 +116,12 @@ body {
 }
 
 /* App Router template.js wrapper — must be layout-transparent
-   so it doesn't clip the hero, break sticky header, or add scroll containers */
+   so it doesn't clip the hero, break sticky/fixed header, or add scroll containers */
 body > div:first-child,
 body > main {
   min-height: 100vh;
   width: 100%;
-  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 a {

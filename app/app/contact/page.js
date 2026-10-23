@@ -33,13 +33,13 @@ export default function ContactPage() {
         onOpenQrModal={() => setQrModalOpen(true)}
         onOpenCustomerAuth={() => setAuthModalOpen(true)}
         onOpenReservationModal={() => setReservationModalOpen(true)}
-        brand={cms?.brand}
-        buttons={cms?.headerButtons}
-        announcement={cms?.announcement}
-        navLinks={cms?.navLinks}
+        brand={cms?.header || cms?.design}
+        buttons={cms?.buttons}
+        announcement={cms?.header || cms?.content}
+        navLinks={cms?.header?.navLinks || cms?.pages}
       />
 
-      <main style={{ flex: 1, paddingTop: '100px', paddingBottom: '60px' }}>
+      <main style={{ flex: 1, paddingTop: '36px', paddingBottom: '60px' }}>
         <div style={{ maxWidth: '1100px', margin: '0 auto', padding: '0 20px' }}>
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: '40px' }}>

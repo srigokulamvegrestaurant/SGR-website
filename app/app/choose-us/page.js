@@ -99,9 +99,10 @@ export default function ChooseUsPage() {
         onOpenQrModal={() => setQrModalOpen(true)}
         onOpenCustomerAuth={() => setAuthModalOpen(true)}
         onOpenReservationModal={() => setReservationModalOpen(true)}
+        brand={cms?.header || cms?.design}
         buttons={cms?.buttons}
-        announcement={cms?.content?.announcement}
-        brand={cms?.design}
+        announcement={cms?.header || cms?.content}
+        navLinks={cms?.header?.navLinks || cms?.pages}
       />
 
       {/* 2. Choose Us Hero Breadcrumb Header */}
