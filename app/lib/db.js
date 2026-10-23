@@ -551,7 +551,7 @@ const SEED_DATA = {
     serviceChargePercent: 0,
     gstin: '33AABCS1234F1Z8',
     fssai: '12423018000456',
-    address: 'No. 42, Subramaniapuram Main Road, Karaikudi, Tamil Nadu - 630002',
+    address: 'Mudiyarasan Salai, Near Bharat Petroleum Bunk and Thevar Silai, Karaikudi - 630003',
     phone: '+91 94431 23456',
 
     // 1. Restaurant Profile
@@ -560,11 +560,11 @@ const SEED_DATA = {
       restaurantNameTamil: 'ஸ்ரீ கோகுலம் சைவ உணவகம்',
       tagline: 'Authentic Chettinad Sattvic Culinary Heritage',
       logoUrl: '/restaurant_logo.jpg',
-      address: 'No. 42, Subramaniapuram Main Road, Karaikudi, Tamil Nadu - 630002',
+      address: 'Mudiyarasan Salai, Near Bharat Petroleum Bunk and Thevar Silai, Karaikudi, Tamil Nadu - 630003',
       city: 'Karaikudi',
       district: 'Sivaganga District',
       state: 'Tamil Nadu',
-      pincode: '630002',
+      pincode: '630003',
       primaryPhone: '+91 94431 23456',
       secondaryPhone: '+91 98765 43210',
       whatsappPhone: '+91 94431 23456',
@@ -887,7 +887,7 @@ const SEED_DATA = {
       socialLinks: {
         instagram: 'https://instagram.com/srigokulam_veg',
         facebook: 'https://facebook.com/srigokulamveg',
-        googleMaps: 'https://maps.google.com/?q=Sri+Gokulam+Veg+Karaikudi',
+        googleMaps: 'https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Mudiyarasan+Salai+Near+Bharat+Petroleum+Karaikudi',
         youtube: 'https://youtube.com/@srigokulamveg',
       },
       footerCopyright: '© 2026 Sri Gokulam Veg Restaurant. Crafted by AJ Nanjil Tech Solutions.',

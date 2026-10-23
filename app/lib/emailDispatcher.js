@@ -109,7 +109,7 @@ function renderOtpHtml({ otp, recipientName = 'Valued Guest', type = 'LOGIN', ro
           <tr>
             <td style="background: #141210; padding: 20px 24px; text-align: center; border-top: 1px solid #292524;">
               <p style="margin: 0 0 4px 0; color: #78716c; font-size: 12px;">
-                Sri Gokulam Veg Restaurant — Karaikudi, Tamil Nadu - 630002
+                Sri Gokulam Veg Restaurant — Mudiyarasan Salai, Karaikudi, Tamil Nadu - 630003
               </p>
               <p style="margin: 0; color: #57534e; font-size: 11px;">
                 © ${new Date().getFullYear()} Sri Gokulam Veg Restaurant. Crafted by AJ Tech Solutions.

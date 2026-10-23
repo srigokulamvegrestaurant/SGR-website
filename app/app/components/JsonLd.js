@@ -33,19 +33,19 @@ export default function JsonLd() {
     ],
     acceptsReservations: 'True',
     menu: `${baseUrl}/#menu`,
-    hasMap: 'https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Karaikudi',
+    hasMap: 'https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Mudiyarasan+Salai+Near+Bharat+Petroleum+Karaikudi',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'No. 42, Subramaniapuram Main Road',
+      streetAddress: 'Mudiyarasan Salai, Near Bharat Petroleum Bunk and Thevar Silai',
       addressLocality: 'Karaikudi',
       addressRegion: 'Tamil Nadu',
-      postalCode: '630002',
+      postalCode: '630003',
       addressCountry: 'IN',
     },
     geo: {
       '@type': 'GeoCoordinates',
-      latitude: 10.0735,
-      longitude: 78.7845,
+      latitude: 10.0682,
+      longitude: 78.7808,
     },
     openingHoursSpecification: [
       {
@@ -117,7 +117,7 @@ export default function JsonLd() {
         name: 'Where is Sri Gokulam Veg Restaurant located in Karaikudi?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Sri Gokulam Veg Restaurant is centrally located at No. 42, Subramaniapuram Main Road, Karaikudi, Tamil Nadu - 630002, India, easily accessible from Karaikudi New Bus Stand and Railway Station.',
+          text: 'Sri Gokulam Veg Restaurant is located on Mudiyarasan Salai, Near Bharat Petroleum Bunk and Thevar Silai, Karaikudi, Tamil Nadu - 630003, India.',
         },
       },
       {
@@ -157,7 +157,7 @@ export default function JsonLd() {
         name: 'Is parking available at the restaurant?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Yes, dedicated two-wheeler and four-wheeler parking spaces are available for dining guests along Subramaniapuram Main Road.',
+          text: 'Yes, convenient two-wheeler and four-wheeler parking spaces are available for dining guests along Mudiyarasan Salai near Bharat Petroleum Bunk.',
         },
       },
     ],

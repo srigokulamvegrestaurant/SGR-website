@@ -100,7 +100,7 @@ const PROMISE_TABS = [
       'Spacious Air-Conditioned Royal Family Dining Hall and breezy Heritage Veranda.',
       'Warm and attentive traditional South Indian hospitality where guests are welcomed like family.',
       'Swift contactless QR table ordering or attentive table captain service.',
-      'Hassle-free parking with dedicated valet assistance on Subramaniapuram Main Road.',
+      'Hassle-free parking with dedicated assistance on Mudiyarasan Salai (near Bharat Petroleum Bunk).',
     ],
   },
 ];

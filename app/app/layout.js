@@ -17,8 +17,9 @@ export const metadata = {
     "Karaikudi veg restaurant",
     "Chettinad vegetarian meals",
     "pure veg restaurant in Karaikudi",
-    "best veg restaurant Karaikudi",
-    "Karaikudi Subramaniapuram restaurant",
+    "Mudiyarasan Salai restaurant Karaikudi",
+    "Near Bharat Petroleum Bunk Karaikudi food",
+    "Thevar Silai Karaikudi veg restaurant",
     "Raja Chettinad full meals",
     "Ghee roast dosa Karaikudi",
     "Chettinad kuzhi paniyaram",
@@ -45,7 +46,7 @@ export const metadata = {
   openGraph: {
     title: "Sri Gokulam Veg Restaurant | Karaikudi Chettinad Heritage",
     description:
-      "Handcrafted with pure cow ghee, freshly stone-ground Karaikudi spices & timeless heritage recipes. 100% Pure Vegetarian dining in Subramaniapuram, Karaikudi.",
+      "Handcrafted with pure cow ghee, freshly stone-ground Karaikudi spices & timeless heritage recipes. 100% Pure Vegetarian dining on Mudiyarasan Salai (near Bharat Petroleum & Thevar Silai), Karaikudi.",
     url: "/",
     siteName: "Sri Gokulam Veg Restaurant",
     locale: "en_IN",
@@ -103,8 +104,8 @@ export default function RootLayout({ children }) {
         {/* GEO-Targeting & Local SEO Tags (Karaikudi, Tamil Nadu) */}
         <meta name="geo.region" content="IN-TN" />
         <meta name="geo.placename" content="Karaikudi" />
-        <meta name="geo.position" content="10.0735;78.7845" />
-        <meta name="ICBM" content="10.0735, 78.7845" />
+        <meta name="geo.position" content="10.0682;78.7808" />
+        <meta name="ICBM" content="10.0682, 78.7808" />
 
         {/* Fonts Preconnect */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
