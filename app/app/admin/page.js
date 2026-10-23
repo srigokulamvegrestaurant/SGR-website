@@ -249,6 +249,27 @@ export default function AdminPage() {
 
   // Current logged in user & role
   const [currentUser, setCurrentUser] = useState(STAFF_PRESETS[0]);
+
+  // Synchronize with verified admin session
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('sgr_admin_user');
+      if (stored) {
+        try {
+          const parsed = JSON.parse(stored);
+          if (parsed && parsed.email) {
+            setCurrentUser({
+              name: parsed.fullName || parsed.name || 'Admin',
+              email: parsed.email,
+              role: parsed.role || 'DEVELOPER_ADMIN',
+              badge: parsed.role === 'DEVELOPER_ADMIN' ? '#7c3aed' : (parsed.role === 'SUPER_ADMIN' ? '#dc2626' : '#ea580c'),
+            });
+          }
+        } catch (e) {}
+      }
+    }
+  }, []);
+
   const [activeTab, setActiveTabState] = useState('overview');
 
   const setActiveTab = useCallback((tab) => {
