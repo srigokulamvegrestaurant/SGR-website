@@ -1056,8 +1056,8 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                 titleAccent: 'of Karaikudi Chettinad',
                 description: 'Authentic pure vegetarian culinary treasures prepared fresh with generational mastery.',
                 priceText: 'From ₹90',
-                desktopImage: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=1920&q=85',
-                mobileImage: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=720&q=85',
+                desktopImage: '',
+                mobileImage: '',
                 primaryBtn: { icon: '📅', text: 'Table Reservation →', action: 'reservation', bgColor: '#f59e0b', textColor: '#051B41', isVisible: true },
                 secondaryBtn: { icon: '📲', text: 'QR Table Order', action: 'qr', bgColor: 'transparent', textColor: '#ffffff', isVisible: true },
                 alt: 'Sri Gokulam Signature Feast',
@@ -1287,7 +1287,7 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                 date: 'Recent Visit',
                 quote: '',
                 dish: 'Pure Ghee Roast Dosa',
-                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80',
+                avatar: '',
                 isVisible: true,
                 isVerified: true,
               })}
@@ -1303,7 +1303,7 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
                       <img
-                        src={rev.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80'}
+                        src={rev.avatar || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Ccircle cx='20' cy='20' r='20' fill='%23374151'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='18'%3E👤%3C/text%3E%3C/svg%3E"}
                         alt={rev.name}
                         style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }}
                       />
@@ -1397,7 +1397,7 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                 title: 'Sri Gokulam Crispy Roast & Vadai Platter Review',
                 videoUrl: 'https://www.instagram.com/reel/',
                 embedUrl: '',
-                thumbnailUrl: 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=720&q=80',
+                thumbnailUrl: '',
                 views: '15.4K views',
                 likes: '1.2K likes',
                 duration: '0:45',
@@ -1441,7 +1441,7 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                 <div key={vid.id} className={styles.videoCard}>
                   <div className={styles.videoThumbWrap}>
                     <img
-                      src={vid.thumbnailUrl || 'https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=720&q=80'}
+                      src={vid.thumbnailUrl || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='32'%3E🎬%3C/text%3E%3C/svg%3E"}
                       alt={vid.title}
                       className={styles.videoThumbImg}
                     />
@@ -2268,7 +2268,7 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                 tamilTitle: '',
                 category: 'Tiffin',
                 price: 100,
-                image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=400&q=80',
+                image: '',
                 description: '',
                 available: true,
                 station: 'TIFFIN',
@@ -3436,7 +3436,7 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                 <label className={styles.formLabel}>Avatar / Profile Photo URL</label>
                 <input
                   type="text"
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="https://example.com/avatar.jpg"
                   value={editingReview.avatar || ''}
                   onChange={(e) => setEditingReview({ ...editingReview, avatar: e.target.value })}
                   className={styles.formInput}
@@ -3578,7 +3578,7 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                 <label className={styles.formLabel}>Thumbnail Poster Image URL *</label>
                 <input
                   type="text"
-                  placeholder="https://images.unsplash.com/... or /dishes/dosa.jpg"
+                  placeholder="https://example.com/thumbnail.jpg or /dishes/dosa.jpg"
                   value={editingVideo.thumbnailUrl || ''}
                   onChange={(e) => setEditingVideo({ ...editingVideo, thumbnailUrl: e.target.value })}
                   className={styles.formInput}
@@ -4075,7 +4075,7 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                   type="text"
                   value={newMediaData.desktopUrl}
                   onChange={(e) => setNewMediaData({ ...newMediaData, desktopUrl: e.target.value })}
-                  placeholder="https://images.unsplash.com/..."
+                  placeholder="https://example.com/banner.jpg"
                   className={styles.formInput}
                 />
               </div>

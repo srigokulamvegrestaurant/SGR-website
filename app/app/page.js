@@ -274,7 +274,13 @@ export default function Home() {
               />
             );
           case 'sensory':
-            return <SensoryDishes key="sensory" onAddToCart={handleAddToCart} />;
+            return (
+              <SensoryDishes
+                key="sensory"
+                onAddToCart={handleAddToCart}
+                items={cms?.sensoryDishes || (Array.isArray(liveMenu) ? liveMenu.filter(i => (i.isBestseller || i.featured) && i.image) : [])}
+              />
+            );
           case 'menu':
             return (
               <MenuSection

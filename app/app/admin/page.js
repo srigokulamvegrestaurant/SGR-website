@@ -23,198 +23,7 @@ const STAFF_PRESETS = [
   { role: 'KITCHEN', name: 'Selvam (Head Cook)', email: 'kitchen@srigokulam.com', badge: '#d97706' },
 ];
 
-const DEFAULT_POS_MENU = [
-  {
-    id: 'dish_01',
-    title: 'Special Ghee Podi Roast',
-    tamilTitle: 'நெய் பொடி ரோஸ்ட்',
-    category: 'Tiffin',
-    price: 120,
-    image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=400&q=80',
-    description: 'Crispy golden dosa roasted in pure cow ghee with fiery podi.',
-    variants: [
-      { name: 'Regular Crispy', priceDiff: 0 },
-      { name: 'Extra Ghee Roast', priceDiff: 20 },
-      { name: 'Butter Podi Roast', priceDiff: 25 },
-    ],
-    addOns: [
-      { name: 'Extra Gunpowder Podi Cup', price: 15 },
-      { name: 'Extra Ghee 25ml', price: 20 },
-      { name: 'Extra Trio Chutneys', price: 15 },
-    ],
-    station: 'TIFFIN',
-    available: true,
-  },
-  {
-    id: 'dish_02',
-    title: 'Gokulam Button Sambar Idli (14 pcs)',
-    tamilTitle: 'மினி சாம்பார் இட்லி',
-    category: 'Tiffin',
-    price: 85,
-    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80',
-    description: '14 bite-sized button idlis soaked in piping hot shallot sambar with ghee.',
-    variants: [
-      { name: 'Standard (14 pcs)', priceDiff: 0 },
-      { name: 'Podi Button Idli', priceDiff: 15 },
-    ],
-    addOns: [
-      { name: 'Extra Sambar Bowl', price: 20 },
-      { name: 'Cow Ghee Drizzle', price: 15 },
-    ],
-    station: 'TIFFIN',
-    available: true,
-  },
-  {
-    id: 'dish_03',
-    title: 'Crispy Medhu Vadai (2 pcs)',
-    tamilTitle: 'மொறு மொறு மெது வடை',
-    category: 'Tiffin',
-    price: 60,
-    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80',
-    description: 'Crisp golden-fried urad dal vadas studded with crushed black pepper & ginger.',
-    variants: [
-      { name: 'Dry Crispy', priceDiff: 0 },
-      { name: 'Sambar Vadai (Soaked)', priceDiff: 15 },
-      { name: 'Curd Vadai (Thayir Vadai)', priceDiff: 20 },
-    ],
-    addOns: [
-      { name: 'Extra Coconut Chutney', price: 10 },
-    ],
-    station: 'TIFFIN',
-    available: true,
-  },
-  {
-    id: 'dish_04',
-    title: 'Chettinad Kuzhi Paniyaram (6 pcs)',
-    tamilTitle: 'குழி பணியாரம்',
-    category: 'Chettinad',
-    price: 90,
-    image: 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=400&q=80',
-    description: 'Cast-iron cooked crisp shallot dumplings with spicy tomato chutney.',
-    variants: [
-      { name: 'Kara Paniyaram (Spicy)', priceDiff: 0 },
-      { name: 'Vella Paniyaram (Sweet Jaggery)', priceDiff: 10 },
-      { name: 'Mixed Combo (3+3)', priceDiff: 10 },
-    ],
-    addOns: [
-      { name: 'Kara Chutney Cup', price: 10 },
-    ],
-    station: 'TIFFIN',
-    available: true,
-  },
-  {
-    id: 'dish_05',
-    title: 'Raja Chettinad Full Meals (Leaf)',
-    tamilTitle: 'செட்டிநாடு ராஜா சாப்பாடு',
-    category: 'Meals',
-    price: 210,
-    image: 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=400&q=80',
-    description: '14-item royal feast served on traditional plantain leaf with unlimited rice.',
-    variants: [
-      { name: 'Standard Raja Thali', priceDiff: 0 },
-      { name: 'Royal Special (with Paneer & Sweet)', priceDiff: 40 },
-    ],
-    addOns: [
-      { name: 'Special Appalam Pack', price: 10 },
-      { name: 'Fresh Curd Cup', price: 20 },
-      { name: 'Ghee Paruppu Cup', price: 25 },
-    ],
-    station: 'MEALS_GRAVY',
-    available: true,
-  },
-  {
-    id: 'dish_06',
-    title: 'Ennai Kathirikai Kuzhambu',
-    tamilTitle: 'எண்ணெய் கத்திரிக்காய் குழம்பு',
-    category: 'Chettinad',
-    price: 140,
-    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=400&q=80',
-    description: 'Baby brinjals cooked with freshly ground Chettinad spices in cold-pressed sesame oil.',
-    variants: [
-      { name: 'Standard Portion', priceDiff: 0 },
-      { name: 'Large Family Pack', priceDiff: 90 },
-    ],
-    addOns: [
-      { name: 'Steamed Ponni Rice Plate', price: 40 },
-    ],
-    station: 'MEALS_GRAVY',
-    available: true,
-  },
-  {
-    id: 'dish_07',
-    title: 'Kumbakonam Degree Filter Coffee',
-    tamilTitle: 'டிகிரி ஃபில்டர் காபி',
-    category: 'Beverages',
-    price: 40,
-    image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80',
-    description: 'First decoction coffee brewed with golden frothy milk in brass dabarah-tumbler.',
-    variants: [
-      { name: 'Strong Degree Brew', priceDiff: 0 },
-      { name: 'Medium Decoction', priceDiff: 0 },
-      { name: 'Karupatti Coffee (Palm Jaggery)', priceDiff: 15 },
-      { name: 'Sugarless Pure Black', priceDiff: 0 },
-    ],
-    addOns: [
-      { name: 'Extra Decoction Shot', price: 15 },
-    ],
-    station: 'BEVERAGES',
-    available: true,
-  },
-  {
-    id: 'dish_08',
-    title: 'Traditional Elaneer Payasam',
-    tamilTitle: 'இளநீர் பாயாசம்',
-    category: 'Dessert',
-    price: 75,
-    image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80',
-    description: 'Chilled tender coconut cream with condensed coconut milk, cardamom and roasted cashews.',
-    variants: [
-      { name: 'Standard Cup (200ml)', priceDiff: 0 },
-      { name: 'Large Bowl (350ml)', priceDiff: 40 },
-    ],
-    addOns: [
-      { name: 'Extra Toasted Cashews', price: 20 },
-    ],
-    station: 'BEVERAGES',
-    available: true,
-  },
-  {
-    id: 'dish_09',
-    title: 'Karaikudi Special Poori Masala (3 pcs)',
-    tamilTitle: 'பூரி மசாலா (3 pcs)',
-    category: 'Tiffin',
-    price: 80,
-    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80',
-    description: 'Puffed whole-wheat pooris served with spiced potato masala and coconut chutney.',
-    variants: [
-      { name: 'Standard (3 pcs)', priceDiff: 0 },
-    ],
-    addOns: [
-      { name: 'Extra Potato Masala Bowl', price: 25 },
-      { name: 'Extra 1 Poori', price: 20 },
-    ],
-    station: 'TIFFIN',
-    available: true,
-  },
-  {
-    id: 'dish_10',
-    title: 'Madurai Famous Special Jigarthanda',
-    tamilTitle: 'ஸ்பெஷல் ஜிகர்தண்டா',
-    category: 'Beverages',
-    price: 95,
-    image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80',
-    description: 'Rich almond gum (badam pisin), nannari syrup, reduced basundi milk & ice cream.',
-    variants: [
-      { name: 'Regular Jigarthanda', priceDiff: 0 },
-      { name: 'Special Double Basundi', priceDiff: 30 },
-    ],
-    addOns: [
-      { name: 'Extra Ice Cream Scoop', price: 25 },
-    ],
-    station: 'BEVERAGES',
-    available: true,
-  },
-];
+const DEFAULT_POS_MENU = [];
 
 export default function AdminPage() {
   // Theme State (Light / Dark) — Scoped strictly to Admin Container!
@@ -595,7 +404,7 @@ export default function AdminPage() {
     price: '',
     portionSize: 'Standard (1 Person)',
     prepTime: 10,
-    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80',
+    image: '',
     description: '',
     station: 'TIFFIN',
     available: true,
@@ -2523,7 +2332,7 @@ Status: SHIFT CLOSED & VERIFIED
         price: dish.price || '',
         portionSize: dish.portionSize || 'Standard (1 Person)',
         prepTime: dish.prepTime || 10,
-        image: dish.image || 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80',
+        image: dish.image || '',
         description: dish.description || '',
         station: dish.station || 'TIFFIN',
         available: dish.available !== false,
@@ -2548,7 +2357,7 @@ Status: SHIFT CLOSED & VERIFIED
         price: '',
         portionSize: 'Standard (1 Person)',
         prepTime: 10,
-        image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80',
+        image: '',
         description: '',
         station: 'TIFFIN',
         available: true,
@@ -6757,7 +6566,7 @@ Status: SHIFT CLOSED & VERIFIED
                       {/* Photo Header */}
                       <div className={styles.menuCardImgWrap}>
                         <img
-                          src={dish.image || 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80'}
+                          src={dish.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='28'%3E🍲%3C/text%3E%3C/svg%3E"}
                           alt={dish.title}
                           className={styles.menuCardImg}
                           loading="lazy"
@@ -7007,7 +6816,7 @@ Status: SHIFT CLOSED & VERIFIED
                           </td>
                           <td>
                             <img
-                              src={dish.image || 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80'}
+                              src={dish.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='18'%3E🍲%3C/text%3E%3C/svg%3E"}
                               alt={dish.title}
                               className={styles.menuImgThumb}
                             />
@@ -13656,7 +13465,7 @@ Status: SHIFT CLOSED & VERIFIED
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
                     <div style={{ width: '120px', height: '120px', borderRadius: '10px', overflow: 'hidden', border: '2px solid var(--border-subtle)', background: '#111', flexShrink: 0 }}>
                       <img
-                        src={dishFormData.image || 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80'}
+                        src={dishFormData.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='32'%3E📷%3C/text%3E%3C/svg%3E"}
                         alt="Preview"
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
@@ -13699,11 +13508,11 @@ Status: SHIFT CLOSED & VERIFIED
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.35rem' }}>
                       {[
-                        { name: 'Ghee Podi Roast', url: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=400&q=80' },
-                        { name: 'Button Idli Sambar', url: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=400&q=80' },
-                        { name: 'Raja Meals Leaf', url: 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=400&q=80' },
-                        { name: 'Degree Coffee Brass', url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=400&q=80' },
-                        { name: 'Ennai Kathirikai', url: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=400&q=80' },
+
+
+
+
+
                       ].map((preset, idx) => (
                         <div
                           key={idx}

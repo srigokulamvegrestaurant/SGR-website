@@ -5,40 +5,15 @@ import AnimatedImage from './motion/AnimatedImage';
 import AnimatedButton from './motion/AnimatedButton';
 import motionStyles from './motion/motion.module.css';
 
-const SENSORY_ITEMS = [
-  {
-    id: 'ghee-podi-roast',
-    title: 'Gokulam Ghee Podi Roast',
-    price: 120,
-    desc: 'Roasted golden-crisp on iron tawa in pure cow ghee, seasoned with spicy Gunpowder Podi and trio stone-ground chutneys.',
-    image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=700&q=80',
-    badge: '🔥 Freshly Sizzled in Pure Ghee',
-    badgeStyle: 'fire',
-    featured: true, // Enables floating bob animation
-  },
-  {
-    id: 'sambar-idli',
-    title: 'Thattu Vadai Sambar Idli',
-    price: 85,
-    desc: 'Fluffy steamed button idlis submerged under a generous cascade of piping-hot shallot and drumstick Chettinad sambar.',
-    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=700&q=80',
-    badge: '🥣 Cascading Hot Sambar',
-    badgeStyle: 'sambar',
-    featured: false,
-  },
-  {
-    id: 'degree-coffee',
-    title: 'Kumbakonam Degree Coffee',
-    price: 40,
-    desc: 'First decoction brewed in traditional brass filters, combined with thick frothed milk in an antique brass dabarah set.',
-    image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=700&q=80',
-    badge: '☕ Rich Golden Crema Froth',
-    badgeStyle: 'coffee',
-    featured: false,
-  },
-];
+const SENSORY_ITEMS = [];
 
-export default function SensoryDishes({ onAddToCart }) {
+export default function SensoryDishes({ onAddToCart, items }) {
+  const activeItems = Array.isArray(items) && items.length > 0 ? items : SENSORY_ITEMS;
+
+  if (activeItems.length === 0) {
+    return null;
+  }
+
   return (
     <section className={styles.sensorySection} id="signature">
       <div className={styles.headerBox} data-reveal="up">
@@ -48,7 +23,7 @@ export default function SensoryDishes({ onAddToCart }) {
       </div>
 
       <div className={`${styles.motionGrid} reveal-stagger`}>
-        {SENSORY_ITEMS.map((item) => (
+        {activeItems.map((item) => (
           <div
             key={item.id}
             className={`${styles.sensoryCard} ${motionStyles.cardHover}`}

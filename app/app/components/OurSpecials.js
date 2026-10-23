@@ -4,38 +4,17 @@ import styles from './OurSpecials.module.css';
 import AnimatedImage from './motion/AnimatedImage';
 import motionStyles from './motion/motion.module.css';
 
-const SPECIAL_CATEGORIES = [
-  {
-    id: 'tiffin',
-    name: 'Tiffin',
-    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=700&q=80',
-    alt: 'South Indian Tiffin Steamed Idli and Sambar',
-  },
-  {
-    id: 'south-indian',
-    name: 'South Indian',
-    image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=700&q=80',
-    alt: 'Crispy Dosa with Chutneys',
-  },
-  {
-    id: 'north-indian',
-    name: 'North Indian',
-    image: 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=700&q=80',
-    alt: 'North Indian Vegetarian Curries and Roti',
-  },
-  {
-    id: 'chettinad',
-    name: 'Chettinad Special',
-    image: 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=700&q=80',
-    alt: 'Authentic Chettinad Banana Leaf Feast',
-  },
-];
+const SPECIAL_CATEGORIES = [];
 
 export default function OurSpecials({ onSelectCategory, categories }) {
   const activeCategories =
     Array.isArray(categories) && categories.length > 0
       ? categories
       : SPECIAL_CATEGORIES;
+
+  if (activeCategories.length === 0) {
+    return null;
+  }
 
   return (
     <section className={styles.specialsSection} id="specials">

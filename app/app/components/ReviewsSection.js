@@ -3,170 +3,9 @@
 import { useState, useRef, useEffect } from 'react';
 import styles from './ReviewsSection.module.css';
 
-const INITIAL_REVIEWS = [
-  {
-    id: 1,
-    name: 'Dr. Senthil Nathan',
-    city: 'Karaikudi',
-    tag: 'Verified Diner • Table #04',
-    rating: 5,
-    dish: 'Gokulam Ghee Podi Roast',
-    review: 'The crispness of the ghee roast dosa on pure iron tawa is unbeatable in Karaikudi! The aroma of pure cow ghee with shallot sambar was pure heaven.',
-    avatar: 'SN',
-    avatarBg: '#0E2954',
-    date: '2 hours ago',
-  },
-  {
-    id: 2,
-    name: 'Ananya Sundaram',
-    city: 'Chennai',
-    tag: 'Heritage Traveler',
-    rating: 5,
-    dish: '14-Item Chettinad Raja Meals',
-    review: 'Best banana leaf feast in Tamil Nadu. The Ennai Kathirikai, Poondu Kuzhambu and warm Elaneer Payasam brought tears of joy. True sattvic cooking!',
-    avatar: 'AS',
-    avatarBg: '#0059B3',
-    date: 'Yesterday',
-  },
-  {
-    id: 3,
-    name: 'Karthik Subramanian',
-    city: 'Bangalore',
-    tag: 'Verified Dine-In • Table #08',
-    rating: 5,
-    dish: 'Kumbakonam Brass Degree Coffee',
-    review: 'Rich golden crema froth in traditional brass dabarah. Thick frothed cow milk and first decoction aroma. Don’t leave Karaikudi without trying this!',
-    avatar: 'KS',
-    avatarBg: '#c59b27',
-    date: '2 days ago',
-  },
-  {
-    id: 4,
-    name: 'Priya Vijayakumar',
-    city: 'Madurai',
-    tag: 'Family Dine-In • Table #12',
-    rating: 5,
-    dish: 'Thattu Vadai Sambar Idli',
-    review: 'Pillowy soft button idlis submerged in piping hot shallot sambar with a spoonful of pure ghee. Kids and elders in our family absolutely loved it.',
-    avatar: 'PV',
-    avatarBg: '#16a34a',
-    date: '3 days ago',
-  },
-  {
-    id: 5,
-    name: 'Ramesh Balakrishnan',
-    city: 'Coimbatore',
-    tag: 'Frequent Traveler',
-    rating: 5,
-    dish: 'Crispy Medhu Vadai & Chutneys',
-    review: 'The contactless QR ordering with 4-digit OTP is super fast. Food arrived piping hot within 5 minutes. The trio stone-ground chutneys are so fresh!',
-    avatar: 'RB',
-    avatarBg: '#b45309',
-    date: '4 days ago',
-  },
-  {
-    id: 6,
-    name: 'Meenakshi Sundaram',
-    city: 'Trichy',
-    tag: 'Devotee & Food Connoisseur',
-    rating: 5,
-    dish: 'Lord Krishna Ghee Special',
-    review: 'Authentic 100% pure vegetarian without onion-garlic overload on auspicious days. Divine taste and spotlessly clean AC heritage dining hall.',
-    avatar: 'MS',
-    avatarBg: '#0E2954',
-    date: '5 days ago',
-  },
-];
-
-const INSTAGRAM_REELS = [
-  {
-    id: 'reel-1',
-    creator: '@karaikudi_foodie',
-    creatorName: 'Karaikudi Food Trails',
-    views: '48.2K',
-    likes: '4.1K',
-    title: 'That satisfying Ghee Podi Roast crunch! 🔥🥞',
-    caption: 'Listen to that crunch! Sri Gokulam in Karaikudi makes the crispest pure cow ghee dosa with 3 varieties of homestyle chutneys. Must visit!',
-    image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=600&q=80',
-    audioTrack: 'Original Audio • Sri Gokulam Dosa Sizzle',
-    dishTag: 'Ghee Podi Roast',
-  },
-  {
-    id: 'reel-2',
-    creator: '@tamilnadueats',
-    creatorName: 'Tamil Nadu Eats',
-    views: '85.4K',
-    likes: '7.8K',
-    title: '14-Course Chettinad Raja Banana Leaf Feast! 🍱👑',
-    caption: 'Unlimited Ponni rice, Ennai Kathirikai, drumstick sambar, appalam, and Elaneer Payasam for just ₹180! Supreme sattvic pure veg.',
-    image: 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=600&q=80',
-    audioTrack: 'Traditional Nadaswaram Beats',
-    dishTag: 'Raja Meals Feast',
-  },
-  {
-    id: 'reel-3',
-    creator: '@filtercoffee_lovers',
-    creatorName: 'Filter Coffee Diaries',
-    views: '36.9K',
-    likes: '3.2K',
-    title: 'Meter Coffee froth in authentic Brass Dabarah ☕✨',
-    caption: 'First decoction brass brew with thick frothed milk at Sri Gokulam. The golden crema froth is unreal!',
-    image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=600&q=80',
-    audioTrack: 'Morning Suprabhatam Vibe',
-    dishTag: 'Brass Filter Coffee',
-  },
-  {
-    id: 'reel-4',
-    creator: '@chettinad_bites',
-    creatorName: 'Chettinad Bites',
-    views: '52.1K',
-    likes: '5.0K',
-    title: 'Cascading Hot Sambar over Button Idlis 🥣🥟',
-    caption: 'Dunking crispy hot Medhu Vadai and button idlis into shallot sambar. Morning breakfast bliss in Karaikudi!',
-    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=600&q=80',
-    audioTrack: 'Sattvic Kitchen Sounds',
-    dishTag: 'Sambar Idli Platter',
-  },
-];
-
-const YOUTUBE_REVIEWS = [
-  {
-    id: 'yt-1',
-    channel: 'Chettinad Food Vlog',
-    subscribers: '180K subscribers',
-    duration: '11:45',
-    views: '92K views',
-    date: '2 weeks ago',
-    title: 'Sri Gokulam Veg Restaurant Karaikudi Review | Best Pure Ghee Tiffin & Meals in Town',
-    description: 'Full food tour exploring Karaikudi’s highest rated pure vegetarian spot. We try their signature Ghee Podi Roast, 14-item Raja Meals, and Kumbakonam Degree Coffee!',
-    image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=900&q=80',
-    rating: '5/5 Stars Recommended',
-  },
-  {
-    id: 'yt-2',
-    channel: 'Tamil Nadu Heritage Travels',
-    subscribers: '320K subscribers',
-    duration: '14:20',
-    views: '145K views',
-    date: '1 month ago',
-    title: 'Unbelievable ₹180 Unlimited Banana Leaf Feast! Karaikudi Sri Gokulam Pure Veg',
-    description: 'Visiting the famous Sri Gokulam near Karaikudi heritage mansions. Witness the hygienic kitchen, pure cow ghee roasting, and contactless QR table ordering.',
-    image: 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=900&q=80',
-    rating: 'Must-Visit Spot',
-  },
-  {
-    id: 'yt-3',
-    channel: 'South Indian Food Hunters',
-    subscribers: '95K subscribers',
-    duration: '08:35',
-    views: '54K views',
-    date: '3 weeks ago',
-    title: 'World Famous Kumbakonam Brass Filter Coffee & Ghee Roast in Karaikudi',
-    description: 'Early morning breakfast vlog at Sri Gokulam. Watch how they pull the meter coffee and roast crispy dosas in pure cow ghee.',
-    image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=900&q=80',
-    rating: 'Chef Verified',
-  },
-];
+const INITIAL_REVIEWS = [];
+const INSTAGRAM_REELS = [];
+const YOUTUBE_REVIEWS = [];
 
 export default function ReviewsSection({ customerReviews, videoReviews }) {
   // Dynamic reviews from CMS with fallback to initial seed
@@ -177,15 +16,15 @@ export default function ReviewsSection({ customerReviews, videoReviews }) {
   const [reviews, setReviews] = useState(initialData);
 
   useEffect(() => {
-    if (Array.isArray(customerReviews) && customerReviews.length > 0) {
+    if (Array.isArray(customerReviews)) {
       setReviews(customerReviews.filter((r) => r.isVisible !== false));
     }
   }, [customerReviews]);
 
   // Compute dynamic reels and youtube videos from CMS
-  const allVideos = (Array.isArray(videoReviews) && videoReviews.length > 0)
+  const allVideos = Array.isArray(videoReviews)
     ? videoReviews.filter((v) => v.isVisible !== false)
-    : [...INSTAGRAM_REELS.map(r => ({ ...r, type: 'reel' })), ...YOUTUBE_REVIEWS.map(y => ({ ...y, type: 'youtube' }))];
+    : [];
 
   const reelsList = allVideos.filter((v) => v.type === 'reel' || (v.id && String(v.id).startsWith('reel')));
   const youtubeList = allVideos.filter((v) => v.type === 'youtube' || (v.id && String(v.id).startsWith('yt')));
@@ -298,22 +137,26 @@ export default function ReviewsSection({ customerReviews, videoReviews }) {
               <span className={styles.tabFullText}>Moving Reviews ({reviews.length})</span>
               <span className={styles.tabShortText}>Reviews ({reviews.length})</span>
             </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'reels' ? styles.tabActive : ''}`}
-              onClick={() => setActiveTab('reels')}
-            >
-              <span>📸</span>
-              <span className={styles.tabFullText}>Instagram Reels ({reelsList.length})</span>
-              <span className={styles.tabShortText}>Reels ({reelsList.length})</span>
-            </button>
-            <button
-              className={`${styles.tabBtn} ${activeTab === 'youtube' ? styles.tabActive : ''}`}
-              onClick={() => setActiveTab('youtube')}
-            >
-              <span>🎥</span>
-              <span className={styles.tabFullText}>YouTube Reviews ({youtubeList.length})</span>
-              <span className={styles.tabShortText}>YouTube ({youtubeList.length})</span>
-            </button>
+            {reelsList.length > 0 && (
+              <button
+                className={`${styles.tabBtn} ${activeTab === 'reels' ? styles.tabActive : ''}`}
+                onClick={() => setActiveTab('reels')}
+              >
+                <span>📸</span>
+                <span className={styles.tabFullText}>Instagram Reels ({reelsList.length})</span>
+                <span className={styles.tabShortText}>Reels ({reelsList.length})</span>
+              </button>
+            )}
+            {youtubeList.length > 0 && (
+              <button
+                className={`${styles.tabBtn} ${activeTab === 'youtube' ? styles.tabActive : ''}`}
+                onClick={() => setActiveTab('youtube')}
+              >
+                <span>🎥</span>
+                <span className={styles.tabFullText}>YouTube Reviews ({youtubeList.length})</span>
+                <span className={styles.tabShortText}>YouTube ({youtubeList.length})</span>
+              </button>
+            )}
           </div>
 
           <button className={styles.btnWriteReview} onClick={handleOpenAddReview}>
@@ -339,40 +182,53 @@ export default function ReviewsSection({ customerReviews, videoReviews }) {
             </div>
 
             {/* Moving Customer Review Marquee Bar */}
-            <div className={styles.marqueeOuter}>
-              <div className={styles.marqueeTrack} ref={movingTrackRef}>
-                {/* Render reviews twice for seamless infinite moving loop */}
-                {[...reviews, ...reviews].map((rev, idx) => (
-                  <div key={`${rev.id}-${idx}`} className={styles.reviewCard}>
-                    <div className={styles.cardTop}>
-                      <div className={styles.avatarWrap} style={{ background: rev.avatarBg }}>
-                        {rev.avatar}
-                      </div>
-                      <div className={styles.nameMeta}>
-                        <h4 className={styles.reviewerName}>{rev.name}</h4>
-                        <span className={styles.reviewerCity}>{rev.city} • <strong className={styles.greenVerified}>{rev.tag}</strong></span>
-                      </div>
-                      <div className={styles.cardDate}>{rev.date}</div>
-                    </div>
-
-                    <div className={styles.ratingRow}>
-                      <div className={styles.stars}>
-                        {'★'.repeat(rev.rating)}
-                        {'☆'.repeat(5 - rev.rating)}
-                      </div>
-                      <span className={styles.dishPill}>{rev.dish}</span>
-                    </div>
-
-                    <p className={styles.reviewQuote}>“{rev.review}”</p>
-                  </div>
-                ))}
+            {reviews.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '1rem', border: '1px dashed rgba(212, 175, 55, 0.25)', maxWidth: '650px', margin: '1rem auto' }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>✨</div>
+                <h4 style={{ fontSize: '1.2rem', color: 'var(--text-primary)', marginBottom: '0.5rem', fontWeight: 700 }}>Be the First to Review Sri Gokulam</h4>
+                <p style={{ maxWidth: '480px', margin: '0 auto 1.5rem', fontSize: '0.92rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                  Every dish is crafted with sacred culinary devotion in Karaikudi. Share your dining experience with us.
+                </p>
+                <button className={styles.btnWriteReview} onClick={handleOpenAddReview} style={{ margin: '0 auto' }}>
+                  <span>✍️</span> Write a Review
+                </button>
               </div>
-            </div>
+            ) : (
+              <div className={styles.marqueeOuter}>
+                <div className={styles.marqueeTrack} ref={movingTrackRef}>
+                  {/* Render reviews twice for seamless infinite moving loop */}
+                  {[...reviews, ...reviews].map((rev, idx) => (
+                    <div key={`${rev.id}-${idx}`} className={styles.reviewCard}>
+                      <div className={styles.cardTop}>
+                        <div className={styles.avatarWrap} style={{ background: rev.avatarBg }}>
+                          {rev.avatar}
+                        </div>
+                        <div className={styles.nameMeta}>
+                          <h4 className={styles.reviewerName}>{rev.name}</h4>
+                          <span className={styles.reviewerCity}>{rev.city} • <strong className={styles.greenVerified}>{rev.tag}</strong></span>
+                        </div>
+                        <div className={styles.cardDate}>{rev.date}</div>
+                      </div>
+
+                      <div className={styles.ratingRow}>
+                        <div className={styles.stars}>
+                          {'★'.repeat(rev.rating)}
+                          {'☆'.repeat(5 - rev.rating)}
+                        </div>
+                        <span className={styles.dishPill}>{rev.dish}</span>
+                      </div>
+
+                      <p className={styles.reviewQuote}>“{rev.review}”</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
 
         {/* TAB 2: INSTAGRAM REELS REVIEW SHOWCASE */}
-        {(activeTab === 'all' || activeTab === 'reels') && (
+        {(activeTab === 'all' || activeTab === 'reels') && reelsList.length > 0 && (
           <div className={styles.socialMediaSection}>
             <div className={styles.subHeaderWrap}>
               <h3 className={styles.trackTitle}>

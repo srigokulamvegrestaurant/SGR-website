@@ -4,60 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import FloatingParticles from './FloatingParticles';
 import styles from './HeroBanner.module.css';
 
-const BANNER_SLIDES = [
-  {
-    id: 1,
-    tagIcon: '🦚',
-    tagText: 'Lord Krishna Pure Ghee Special',
-    titleLine1: 'The Food Tradition',
-    titleAccent: 'of Chettinad & Tamil Nadu',
-    description: 'Experience authentic vegetarian flavors in Karaikudi — crisp golden dosas roasted in pure cow ghee, served with shallot sambar and trio homestyle chutneys.',
-    primaryBtn: { icon: '📅', text: 'Table Reservation →', action: 'reservation' },
-    secondaryBtn: { icon: '📲', text: 'QR Table Order', action: 'qr' },
-    priceText: 'Special: ₹120 • Pure Cow Ghee',
-    image: 'https://images.unsplash.com/photo-1668236543090-82eba5ee5976?auto=format&fit=crop&w=1920&q=85',
-    alt: 'Crispy Golden Ghee Roast Dosa',
-  },
-  {
-    id: 2,
-    tagIcon: '👑',
-    tagText: 'Unlimited Karaikudi Heritage Feast',
-    titleLine1: 'Authentic Chettinad',
-    titleAccent: 'Raja Banana Leaf Feast',
-    description: 'A grand symphony of 14 sattvic delicacies: fragrant Ponni rice, Ennai Kathirikai, Poondu Kuzhambu, Medhu Vadai, Appalam, Mor Kuzhambu, and Elaneer Payasam.',
-    primaryBtn: { icon: '🍱', text: 'Reserve Meal Plate →', action: 'drawer' },
-    secondaryBtn: { icon: '📲', text: 'QR Table Order', action: 'qr' },
-    priceText: 'Unlimited ₹180',
-    image: 'https://images.unsplash.com/photo-1610192244261-3f33de3f55e4?auto=format&fit=crop&w=1920&q=85',
-    alt: 'Chettinad Raja Meals on Banana Leaf',
-  },
-  {
-    id: 3,
-    tagIcon: '☕',
-    tagText: '100% First Decoction Brass Brew',
-    titleLine1: 'Kumbakonam Degree',
-    titleAccent: 'Brass Filter Coffee',
-    description: 'Freshly brewed Robusta & Peaberry blend with thick frothed cow milk, served piping hot in an authentic South Indian brass dabarah-tumbler set.',
-    primaryBtn: { icon: '☕', text: 'View Beverages →', action: 'menu' },
-    secondaryBtn: { icon: '📅', text: 'Table Reservation', action: 'reservation' },
-    priceText: 'Fresh Brew ₹40',
-    image: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?auto=format&fit=crop&w=1920&q=85',
-    alt: 'Kumbakonam Degree Filter Coffee',
-  },
-  {
-    id: 4,
-    tagIcon: '🥟',
-    tagText: 'Morning & Evening Specials',
-    titleLine1: 'Karaikudi Tiffin &',
-    titleAccent: 'Hot Sambar Idli Platter',
-    description: 'Pillowy soft button idlis submerged in shallot sambar with pure ghee, served alongside crispy golden Medhu Vadai and fresh coconut chutneys.',
-    primaryBtn: { icon: '🌿', text: 'View Tiffin Specials →', action: 'specials' },
-    secondaryBtn: { icon: '📲', text: 'QR Table Order', action: 'qr' },
-    priceText: 'Combo ₹110',
-    image: 'https://images.unsplash.com/photo-1589301760014-d929f3979dbc?auto=format&fit=crop&w=1920&q=85',
-    alt: 'Hot Sambar Idli and Vada',
-  },
-];
+const BANNER_SLIDES = [];
 
 const BANNER_DURATION = 5500; // 5.5s smooth, readable autoplay
 
@@ -179,6 +126,45 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
       if (el) el.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  if (activeSlides.length === 0) {
+    return (
+      <section className={styles.heroBanner} id="heroBanner">
+        <div className={styles.sliderViewport} style={{ minHeight: '520px', display: 'flex', alignItems: 'center' }}>
+          <FloatingParticles count={16} />
+          <div className={styles.innerContainer} style={{ position: 'relative', zIndex: 10, width: '100%' }}>
+            <div className={styles.contentBox} style={{ maxWidth: '820px', margin: '0 auto', textAlign: 'center' }}>
+              <div className={styles.tagPill} style={{ margin: '0 auto 1.25rem' }}>
+                <span>🦚</span> SRI GOKULAM VEG RESTAURANT
+              </div>
+              <h1 className={styles.titleText} style={{ fontSize: 'clamp(2rem, 5vw, 3.5rem)', lineHeight: 1.2 }}>
+                Authentic Chettinad <span className={styles.goldAccent}>Sattvic Culinary Heritage</span>
+              </h1>
+              <p className={styles.descText} style={{ margin: '1rem auto 2rem', maxWidth: '640px', fontSize: '1.05rem', lineHeight: 1.6 }}>
+                Handcrafted with pure cow ghee, freshly stone-ground Karaikudi spices &amp; timeless heritage recipes in every bite. 100% Pure Vegetarian dining on Mudiyarasan Salai, Karaikudi.
+              </p>
+              <div className={styles.btnGroup} style={{ justifyContent: 'center' }}>
+                <button
+                  type="button"
+                  className={styles.ctaPrimary}
+                  onClick={() => onOpenReservationModal && onOpenReservationModal()}
+                >
+                  <span>📅</span> Table Reservation →
+                </button>
+                <button
+                  type="button"
+                  className={styles.ctaSecondary}
+                  onClick={() => onOpenQrModal && onOpenQrModal()}
+                >
+                  <span>📲</span> QR Table Order
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section

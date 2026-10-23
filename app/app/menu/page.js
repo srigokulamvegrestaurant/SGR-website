@@ -38,8 +38,8 @@ export default function MenuPage() {
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          if (Array.isArray(data.items) && data.items.length > 0) setLiveMenu(data.items);
-          if (Array.isArray(data.categories) && data.categories.length > 0) setLiveCategories(data.categories);
+          if (Array.isArray(data.items)) setLiveMenu(data.items);
+          if (Array.isArray(data.categories)) setLiveCategories(data.categories);
         }
       })
       .catch(() => {});
