@@ -6,10 +6,26 @@ export default function robots() {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/choose-us', '/account'],
-        disallow: ['/admin', '/admin/*', '/api', '/api/*', '/waiter', '/waiter/*'],
+        allow: [
+          '/',
+          '/menu',
+          '/choose-us',
+          '/about',
+          '/reservation',
+          '/contact',
+          '/catering',
+          '/account',
+        ],
+        disallow: [
+          '/admin',
+          '/admin/*',
+          '/waiter',
+          '/waiter/*',
+          '/api',
+          '/api/*',
+        ],
       },
-      // Explicit rules for AI Answer Engines (Perplexity, ChatGPT, Claude, Gemini)
+      // Explicit rules for AI Answer Engines (Perplexity, ChatGPT, Claude, Gemini, Apple Intelligence)
       {
         userAgent: [
           'GPTBot',
@@ -18,10 +34,27 @@ export default function robots() {
           'ClaudeBot',
           'Google-Extended',
           'Applebot-Extended',
-          'cohere-ai'
+          'cohere-ai',
         ],
-        allow: ['/', '/choose-us', '/llms.txt'],
-        disallow: ['/admin', '/admin/*', '/api', '/api/*', '/waiter', '/waiter/*'],
+        allow: [
+          '/',
+          '/menu',
+          '/choose-us',
+          '/about',
+          '/reservation',
+          '/contact',
+          '/catering',
+          '/account',
+          '/llms.txt',
+        ],
+        disallow: [
+          '/admin',
+          '/admin/*',
+          '/waiter',
+          '/waiter/*',
+          '/api',
+          '/api/*',
+        ],
       },
     ],
     sitemap: `${baseUrl}/sitemap.xml`,
