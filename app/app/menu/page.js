@@ -19,11 +19,26 @@ export default function MenuPage() {
   const [reservationModalOpen, setReservationModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [selectedTables, setSelectedTables] = useState([]);
   const [liveMenu, setLiveMenu] = useState([]);
   const [liveCategories, setLiveCategories] = useState([]);
   const [liveMealSections, setLiveMealSections] = useState([]);
 
   useEffect(() => {
+    // Ingest table from URL query (?table=XX) or stored active table
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const tbl = params.get('table');
+      if (tbl) {
+        const formatted = tbl.replace(/[^0-9a-zA-Z]/g, '').padStart(2, '0');
+        setSelectedTables([formatted]);
+        sessionStorage.setItem('sgr_active_table', formatted);
+      } else {
+        const saved = sessionStorage.getItem('sgr_active_table') || localStorage.getItem('sgr_active_table');
+        if (saved) setSelectedTables([saved]);
+      }
+    } catch (e) {}
+
     // Load CMS data
     fetch('/api/admin/cms?mode=published')
       .then((res) => res.json())
@@ -62,33 +77,57 @@ export default function MenuPage() {
           setCart(Array.isArray(updated) ? updated : []);
         } catch {}
       }
+      if (e.key === 'sgr_active_table') {
+        if (e.newValue) setSelectedTables([e.newValue]);
+      }
     };
     window.addEventListener('storage', handleStorageChange);
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  const handleAddToCart = (dish, variant, addOns, qty) => {
-    const unitPrice = (dish.price || 0) + (variant?.priceDiff || 0) + (addOns || []).reduce((acc, a) => acc + (a.price || 0), 0);
-    const cartItemId = `${dish.id}_${variant?.name || 'def'}_${(addOns || []).map(a => a.name).sort().join('_')}`;
+  const handleAddToCart = (dishOrTitle, priceOrVariant, addOns, qty) => {
+    let newItem;
+    let targetKey;
+
+    if (typeof dishOrTitle === 'string') {
+      const title = dishOrTitle;
+      const price = Number(priceOrVariant) || 0;
+      targetKey = title;
+      newItem = {
+        title,
+        price,
+        quantity: 1,
+        cartItemId: title,
+      };
+    } else {
+      const dish = dishOrTitle || {};
+      const variant = priceOrVariant;
+      const quantity = typeof qty === 'number' ? qty : 1;
+      const unitPrice = (dish.price || 0) + (variant?.priceDiff || 0) + (addOns || []).reduce((acc, a) => acc + (a.price || 0), 0);
+      targetKey = `${dish.id || dish.title}_${variant?.name || 'def'}_${(addOns || []).map(a => a.name).sort().join('_')}`;
+      newItem = {
+        ...dish,
+        title: dish.title || dish.name,
+        price: unitPrice,
+        cartItemId: targetKey,
+        selectedVariant: variant,
+        selectedAddOns: addOns,
+        finalPrice: unitPrice,
+        quantity,
+      };
+    }
     
     setCart((prev) => {
-      const existingIdx = prev.findIndex(item => item.cartItemId === cartItemId);
+      const existingIdx = prev.findIndex(item => (item.cartItemId || item.title) === targetKey);
       let updated;
       if (existingIdx > -1) {
         updated = [...prev];
-        updated[existingIdx].quantity += qty;
+        updated[existingIdx] = {
+          ...updated[existingIdx],
+          quantity: updated[existingIdx].quantity + (newItem.quantity || 1),
+        };
       } else {
-        updated = [
-          ...prev,
-          {
-            ...dish,
-            cartItemId,
-            selectedVariant: variant,
-            selectedAddOns: addOns,
-            finalPrice: unitPrice,
-            quantity: qty,
-          },
-        ];
+        updated = [...prev, newItem];
       }
       try {
         localStorage.setItem('sgr_cart', JSON.stringify(updated));
@@ -173,6 +212,8 @@ export default function MenuPage() {
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         cart={cart}
+        selectedTables={selectedTables}
+        onOpenQrModal={() => setQrModalOpen(true)}
         onUpdateQuantity={handleUpdateQuantity}
         onClearCart={handleClearCart}
       />
@@ -190,6 +231,16 @@ export default function MenuPage() {
       <QrModal
         isOpen={qrModalOpen}
         onClose={() => setQrModalOpen(false)}
+        initialTables={selectedTables}
+        onConfirmTables={(tables) => {
+          setSelectedTables(tables);
+          if (tables && tables.length > 0) {
+            try {
+              sessionStorage.setItem('sgr_active_table', tables[0]);
+              localStorage.setItem('sgr_active_table', tables[0]);
+            } catch (e) {}
+          }
+        }}
       />
     </div>
   );

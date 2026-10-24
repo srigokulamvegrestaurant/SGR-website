@@ -7,6 +7,9 @@ const nextConfig = {
     'localhost:3000',
     '*.local',
   ],
+  experimental: {
+    cpus: 2,
+  },
 };
 
 export default nextConfig;

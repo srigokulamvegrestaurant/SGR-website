@@ -334,6 +334,7 @@ export default function Home() {
         onClose={() => setDrawerOpen(false)}
         cart={cart}
         selectedTables={selectedTables}
+        onOpenQrModal={() => setQrModalOpen(true)}
         onUpdateQuantity={handleUpdateQuantity}
         onClearCart={handleClearCart}
         onOrderPlaced={(orderData) => {

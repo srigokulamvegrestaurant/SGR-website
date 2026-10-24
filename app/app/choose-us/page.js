@@ -19,8 +19,15 @@ export default function ChooseUsPage() {
   const [reservationModalOpen, setReservationModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
+  const [selectedTables, setSelectedTables] = useState([]);
 
   useEffect(() => {
+    // Ingest table from storage
+    try {
+      const saved = sessionStorage.getItem('sgr_active_table') || localStorage.getItem('sgr_active_table');
+      if (saved) setSelectedTables([saved]);
+    } catch (e) {}
+
     // Load CMS data
     fetch('/api/admin/cms?mode=published')
       .then((res) => res.json())
@@ -194,6 +201,8 @@ export default function ChooseUsPage() {
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
         cart={cart}
+        selectedTables={selectedTables}
+        onOpenQrModal={() => setQrModalOpen(true)}
         onUpdateQuantity={handleUpdateQuantity}
         onClearCart={handleClearCart}
       />
@@ -211,6 +220,16 @@ export default function ChooseUsPage() {
       <QrModal
         isOpen={qrModalOpen}
         onClose={() => setQrModalOpen(false)}
+        initialTables={selectedTables}
+        onConfirmTables={(tables) => {
+          setSelectedTables(tables);
+          if (tables && tables.length > 0) {
+            try {
+              sessionStorage.setItem('sgr_active_table', tables[0]);
+              localStorage.setItem('sgr_active_table', tables[0]);
+            } catch (e) {}
+          }
+        }}
       />
     </div>
   );

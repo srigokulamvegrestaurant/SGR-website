@@ -381,32 +381,21 @@ export default function MenuSection({
                   {/* Price & Action Row */}
                   <div className={styles.bottomRow}>
                     {item.price > 0 ? (
-                      <>
-                        <span className={styles.priceTag}>₹{item.price}</span>
-                        <AnimatedButton
-                          variant="gold"
-                          icon="+"
-                          onClick={() => onAddToCart && onAddToCart(item.title, item.price)}
-                          className={styles.btnAdd}
-                        >
-                          Add
-                        </AnimatedButton>
-                      </>
+                      <span className={styles.priceTag}>₹{item.price}</span>
                     ) : (
-                      <>
-                        <span className={styles.unpricedBadge}>
-                          ✨ Heritage Recipe
-                        </span>
-                        <button
-                          type="button"
-                          className={styles.catBtn}
-                          style={{ fontSize: '0.75rem', padding: '5px 12px', borderColor: '#e2a829', color: '#051B41' }}
-                          onClick={() => onAddToCart && onAddToCart(item.title, 0)}
-                        >
-                          Order at Counter
-                        </button>
-                      </>
+                      <span className={styles.unpricedBadge}>
+                        ✨ Heritage Recipe
+                      </span>
                     )}
+                    <AnimatedButton
+                      variant="gold"
+                      icon="+"
+                      onClick={() => onAddToCart && onAddToCart(item.title, item.price || 0)}
+                      className={styles.btnAdd}
+                      ariaLabel={`Add ${item.title} to cart`}
+                    >
+                      Add
+                    </AnimatedButton>
                   </div>
                 </div>
               </div>

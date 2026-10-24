@@ -122,6 +122,97 @@
   color: #15803d;
 }
 
+.btnChangeTable {
+  background: rgba(22, 101, 52, 0.1);
+  border: 1px solid rgba(22, 101, 52, 0.25);
+  color: #166534;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.btnChangeTable:hover {
+  background: #166534;
+  color: #ffffff;
+}
+
+/* QR Code Required Banner in Cart */
+.qrPromptBox {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1.5px dashed #f59e0b;
+  border-radius: 16px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.12);
+}
+
+.qrPromptIcon {
+  font-size: 1.8rem;
+  background: rgba(245, 158, 11, 0.15);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.qrPromptContent {
+  flex: 1;
+}
+
+.qrPromptTitle {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #92400e;
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.qrPromptText {
+  font-size: 0.78rem;
+  color: #78350f;
+  line-height: 1.45;
+  margin: 0 0 10px;
+}
+
+.btnScanTableQr {
+  background: linear-gradient(135deg, #051B41 0%, #004080 100%);
+  color: #fbe08e;
+  border: 1.5px solid #c59b27;
+  border-radius: 20px;
+  padding: 7px 14px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 3px 10px rgba(5, 27, 65, 0.25);
+  transition: all 0.2s ease;
+}
+
+.btnScanTableQr:hover {
+  transform: translateY(-1px);
+  background: linear-gradient(135deg, #0a275e 0%, #0059b3 100%);
+  box-shadow: 0 5px 15px rgba(5, 27, 65, 0.35);
+}
+
+.btnScanTableQr:active {
+  transform: scale(0.96);
+}
+
 /* Empty State */
 .emptyBox {
   display: flex;
@@ -423,6 +514,47 @@
 .btnProceedBuy:active {
   transform: scale(0.92) !important;
   box-shadow: 0 0 35px #ffdf00, 0 0 50px rgba(220, 162, 37, 0.9) !important;
+}
+
+.btnScanToProceed {
+  width: 100%;
+  background: linear-gradient(135deg, #051B41 0%, #0E2954 60%, #004080 100%);
+  color: #fbe08e;
+  font-weight: 900;
+  font-size: 0.96rem;
+  padding: 14px;
+  border-radius: 28px;
+  border: 1.5px solid #c59b27;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  box-shadow: 0 8px 25px rgba(5, 27, 65, 0.35), 0 0 15px rgba(245, 158, 11, 0.3);
+  transition: all 0.2s ease;
+}
+
+.btnScanToProceed:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #0d2856 0%, #153970 60%, #0052a3 100%);
+  box-shadow: 0 10px 30px rgba(5, 27, 65, 0.45), 0 0 25px rgba(245, 158, 11, 0.5);
+}
+
+.btnScanToProceed:active {
+  transform: scale(0.94) !important;
+  box-shadow: 0 0 35px #ffdf00 !important;
+}
+
+.qrNotice {
+  text-align: center;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: #b45309;
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
 }
 
 .detailsActions {
