@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { getDb, getWebsiteCms } from '@/lib/db';
 import { DEFAULT_WEBSITE_CMS } from '@/lib/cms_defaults';
+import { getEvaluatedMealSections, DEFAULT_MEAL_SECTIONS } from '@/lib/meal_sections';
 
 
 export async function GET() {
@@ -44,6 +45,7 @@ export async function GET() {
         cms: published,
         menu: db.menu || [],
         categories: db.categories || [],
+        mealSections: getEvaluatedMealSections(db.meal_sections || DEFAULT_MEAL_SECTIONS),
       },
       {
         headers: {

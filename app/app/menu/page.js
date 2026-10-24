@@ -21,6 +21,7 @@ export default function MenuPage() {
   const [qrModalOpen, setQrModalOpen] = useState(false);
   const [liveMenu, setLiveMenu] = useState([]);
   const [liveCategories, setLiveCategories] = useState([]);
+  const [liveMealSections, setLiveMealSections] = useState([]);
 
   useEffect(() => {
     // Load CMS data
@@ -33,13 +34,14 @@ export default function MenuPage() {
       })
       .catch(() => {});
 
-    // Load Live Menu
+    // Load Live Menu & Meal Sections
     fetch('/api/admin/menu')
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          if (Array.isArray(data.items)) setLiveMenu(data.items);
+          if (Array.isArray(data.allMenu || data.menu || data.items)) setLiveMenu(data.allMenu || data.menu || data.items);
           if (Array.isArray(data.categories)) setLiveCategories(data.categories);
+          if (Array.isArray(data.mealSections)) setLiveMealSections(data.mealSections);
         }
       })
       .catch(() => {});
@@ -154,6 +156,7 @@ export default function MenuPage() {
           onAddToCart={handleAddToCart}
           liveMenu={liveMenu}
           liveCategories={liveCategories}
+          liveMealSections={liveMealSections}
         />
       </main>
 

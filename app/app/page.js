@@ -28,6 +28,7 @@ export default function Home() {
   const [cms, setCms] = useState(null);
   const [liveMenu, setLiveMenu] = useState([]);
   const [liveCategories, setLiveCategories] = useState([]);
+  const [liveMealSections, setLiveMealSections] = useState([]);
 
   // Restore cart from localStorage or sessionStorage
   useEffect(() => {
@@ -109,6 +110,7 @@ export default function Home() {
           if (data.cms) setCms(data.cms);
           if (Array.isArray(data.menu)) setLiveMenu(data.menu);
           if (Array.isArray(data.categories)) setLiveCategories(data.categories);
+          if (Array.isArray(data.mealSections)) setLiveMealSections(data.mealSections);
         }
       } catch (e) {
         console.error('Failed to load dynamic CMS data:', e);
@@ -289,6 +291,7 @@ export default function Home() {
                 activeCategoryFilter={activeCategoryFilter}
                 liveMenu={liveMenu}
                 liveCategories={liveCategories}
+                liveMealSections={liveMealSections}
               />
             );
           case 'chooseUs':

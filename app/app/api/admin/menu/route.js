@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { getDb, saveDb, categorizeStation } from '@/lib/db';
 import { broadcast } from '@/app/api/events/route';
+import { getEvaluatedMealSections, DEFAULT_MEAL_SECTIONS } from '@/lib/meal_sections';
 
 // Helper to log audit changes
 function logMenuAudit(db, { dishId, dishName, action, details, changedBy = 'Admin', role = 'STORE_MANAGER' }) {
@@ -59,10 +60,14 @@ export async function GET(request) {
       recipeLinkedCount: (db.menu || []).filter(it => !!it.recipeId).length,
     };
 
+    const rawMealSections = db.meal_sections || DEFAULT_MEAL_SECTIONS;
+    const mealSections = getEvaluatedMealSections(rawMealSections);
+
     return NextResponse.json({
       success: true,
       menu,
       allMenu: db.menu || [],
+      mealSections,
       categories,
       inventory,
       recipes,
@@ -101,13 +106,13 @@ export async function POST(request) {
 
     // ─── 1. ADD MENU ITEM ───────────────────────────────────────────────────
     if (action === 'ADD_ITEM') {
-      if (!item || !item.title || !item.price) {
-        return NextResponse.json({ success: false, error: 'Dish title and price are required' }, { status: 400 });
+      if (!item || !item.title) {
+        return NextResponse.json({ success: false, error: 'Dish title is required' }, { status: 400 });
       }
 
-      const numPrice = Number(item.price);
-      if (isNaN(numPrice) || numPrice <= 0) {
-        return NextResponse.json({ success: false, error: 'Price must be a valid positive number' }, { status: 400 });
+      const numPrice = item.price !== undefined && item.price !== '' ? Number(item.price) : 0;
+      if (isNaN(numPrice) || numPrice < 0) {
+        return NextResponse.json({ success: false, error: 'Price must be a valid number (or 0 for unpriced draft)' }, { status: 400 });
       }
 
       const defaultCategory = item.category || 'Tiffin';
@@ -116,6 +121,7 @@ export async function POST(request) {
         title: item.title.trim(),
         tamilTitle: (item.tamilTitle || '').trim(),
         category: defaultCategory,
+        mealSection: item.mealSection ? String(item.mealSection).toUpperCase() : 'BREAKFAST',
         price: numPrice,
         portionSize: item.portionSize || 'Standard (1 Person)',
         prepTime: Number(item.prepTime) || 10,
@@ -206,7 +212,8 @@ export async function POST(request) {
       const updated = {
         ...existing,
         ...item,
-        price: Number(item.price) || existing.price,
+        price: item.price !== undefined && item.price !== '' ? Number(item.price) : (existing.price || 0),
+        mealSection: item.mealSection ? String(item.mealSection).toUpperCase() : (existing.mealSection || 'BREAKFAST'),
         prepTime: Number(item.prepTime) || existing.prepTime || 10,
         available: item.status === 'AVAILABLE' ? true : (item.status === 'SOLD_OUT' || item.status === 'UNAVAILABLE' ? false : (item.available !== undefined ? item.available : existing.available)),
         updatedAt: new Date().toISOString(),
@@ -230,6 +237,36 @@ export async function POST(request) {
         success: true,
         message: `Updated ${updated.title}`,
         item: updated,
+      });
+    }
+
+    // ─── 2B. MEAL TIMINGS & SECTIONS SCHEDULING (AUTO & ADMIN OVERRIDES) ────
+    if (action === 'UPDATE_MEAL_SECTIONS') {
+      const incomingSections = payload || body.mealSections;
+      if (!Array.isArray(incomingSections)) {
+        return NextResponse.json({ success: false, error: 'Valid mealSections array required' }, { status: 400 });
+      }
+
+      db.meal_sections = incomingSections;
+
+      logMenuAudit(db, {
+        dishId: 'MEAL_SECTIONS',
+        dishName: 'Meal Timing Schedule',
+        action: 'SCHEDULE_UPDATED',
+        details: `Updated meal sections: ${incomingSections.map(s => `${s.name} (${s.overrideStatus || 'AUTO'})`).join(', ')}`,
+        changedBy: authorizedBy,
+        role,
+      });
+
+      saveDb(db);
+
+      const evaluated = getEvaluatedMealSections(db.meal_sections);
+      broadcast({ type: 'MEAL_SECTIONS_UPDATED', mealSections: evaluated });
+
+      return NextResponse.json({
+        success: true,
+        message: 'Meal section schedules and override controls updated successfully',
+        mealSections: evaluated,
       });
     }
 

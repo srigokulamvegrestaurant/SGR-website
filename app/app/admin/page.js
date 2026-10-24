@@ -382,6 +382,9 @@ export default function AdminPage() {
     recipeLinkedCount: 0,
   });
   const [menuLoading, setMenuLoading] = useState(false);
+  const [mealSections, setMealSections] = useState([]);
+  const [savingMealSectionId, setSavingMealSectionId] = useState(null);
+  const [menuMealSectionFilter, setMenuMealSectionFilter] = useState('ALL');
   const [menuSearchQuery, setMenuSearchQuery] = useState('');
   const [menuSelectedCategory, setMenuSelectedCategory] = useState('ALL');
   const [menuAvailabilityFilter, setMenuAvailabilityFilter] = useState('ALL');
@@ -400,6 +403,7 @@ export default function AdminPage() {
     id: '',
     title: '',
     tamilTitle: '',
+    mealSection: 'BREAKFAST',
     category: 'Tiffin',
     price: '',
     portionSize: 'Standard (1 Person)',
@@ -697,6 +701,7 @@ export default function AdminPage() {
         setMenuItems(data.allMenu || data.menu || []);
         setCategoriesList(data.categories || []);
         setMenuAuditLogs(data.auditLogs || []);
+        if (Array.isArray(data.mealSections)) setMealSections(data.mealSections);
         if (data.summary) setMenuSummary(data.summary);
       }
     } catch (e) {
@@ -2197,6 +2202,12 @@ Status: SHIFT CLOSED & VERIFIED
       if (!showArchivedDishes && dish.status === 'ARCHIVED') return false;
       if (showArchivedDishes && dish.status !== 'ARCHIVED') return false;
 
+      // Meal Section filter
+      if (menuMealSectionFilter !== 'ALL') {
+        const dishSec = String(dish.mealSection || '').toUpperCase();
+        if (dishSec !== menuMealSectionFilter) return false;
+      }
+
       // Category filter
       if (menuSelectedCategory !== 'ALL') {
         const catName = menuSelectedCategory.toLowerCase();
@@ -2245,9 +2256,46 @@ Status: SHIFT CLOSED & VERIFIED
     });
 
     return result;
-  }, [menuItems, showArchivedDishes, menuSelectedCategory, menuAvailabilityFilter, menuStationFilter, menuDietaryFilter, menuSearchQuery, menuSortBy]);
+  }, [menuItems, showArchivedDishes, menuMealSectionFilter, menuSelectedCategory, menuAvailabilityFilter, menuStationFilter, menuDietaryFilter, menuSearchQuery, menuSortBy]);
 
-  // ─── Menu Action Handlers (18 Requirements) ──────────────────────────────
+  // ─── Menu Action Handlers (18 Requirements + Meal Scheduling) ─────────────
+  const handleUpdateMealSection = async (sectionId, updates) => {
+    setSavingMealSectionId(sectionId);
+    const updated = mealSections.map(sec => {
+      if (sec.id === sectionId) {
+        return { ...sec, ...updates };
+      }
+      return sec;
+    });
+    setMealSections(updated);
+    try {
+      const res = await fetch('/api/admin/menu', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'UPDATE_MEAL_SECTIONS',
+          mealSections: updated,
+          authorizedBy: currentUser.name,
+          role: currentUser.role,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        playChime('notification');
+        showNotice(data.message || 'Meal section updated');
+        if (Array.isArray(data.mealSections)) setMealSections(data.mealSections);
+      } else {
+        showNotice(data.error || 'Failed to update meal section', true);
+        fetchMenu();
+      }
+    } catch (err) {
+      showNotice('Network error updating meal section', true);
+      fetchMenu();
+    } finally {
+      setSavingMealSectionId(null);
+    }
+  };
+
   const handleToggleDishAvailability = async (dishId, currentStatus) => {
     const nextStatus = currentStatus === 'AVAILABLE' ? 'SOLD_OUT' : 'AVAILABLE';
     try {
@@ -2328,8 +2376,9 @@ Status: SHIFT CLOSED & VERIFIED
         id: dish.id,
         title: dish.title || '',
         tamilTitle: dish.tamilTitle || '',
+        mealSection: dish.mealSection ? String(dish.mealSection).toUpperCase() : 'BREAKFAST',
         category: dish.category || 'Tiffin',
-        price: dish.price || '',
+        price: dish.price !== undefined && dish.price !== null ? dish.price : '',
         portionSize: dish.portionSize || 'Standard (1 Person)',
         prepTime: dish.prepTime || 10,
         image: dish.image || '',
@@ -2353,6 +2402,7 @@ Status: SHIFT CLOSED & VERIFIED
         id: '',
         title: '',
         tamilTitle: '',
+        mealSection: menuMealSectionFilter !== 'ALL' ? menuMealSectionFilter : 'BREAKFAST',
         category: categoriesList[0]?.name || 'Tiffin',
         price: '',
         portionSize: 'Standard (1 Person)',
@@ -2379,20 +2429,25 @@ Status: SHIFT CLOSED & VERIFIED
 
   const handleSaveDish = async (e) => {
     if (e) e.preventDefault();
-    if (!dishFormData.title || !dishFormData.price) {
-      showNotice('Dish title and price are required', true);
+    if (!dishFormData.title) {
+      showNotice('Dish title is required', true);
       return;
     }
 
     try {
       setLoading(true);
       const action = dishModalMode === 'ADD' ? 'ADD_ITEM' : 'UPDATE_ITEM';
+      const itemToSave = {
+        ...dishFormData,
+        price: dishFormData.price !== '' && dishFormData.price !== undefined ? Number(dishFormData.price) : 0,
+        mealSection: dishFormData.mealSection ? String(dishFormData.mealSection).toUpperCase() : 'BREAKFAST',
+      };
       const res = await fetch('/api/admin/menu', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action,
-          item: dishFormData,
+          item: itemToSave,
           authorizedBy: currentUser.name,
           role: currentUser.role,
         }),
@@ -6314,6 +6369,227 @@ Status: SHIFT CLOSED & VERIFIED
               </div>
             </div>
 
+            {/* ─── 1.5 Meal Timing Schedules & Availability Automation Panel ─── */}
+            <div style={{
+              background: 'var(--bg-card)',
+              border: '1px solid var(--border-subtle)',
+              borderRadius: '16px',
+              padding: '1.25rem',
+              marginBottom: '1rem',
+              boxShadow: '0 4px 16px rgba(0, 0, 0, 0.05)',
+            }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.75rem' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span style={{ fontSize: '1.35rem' }}>🕒</span>
+                    <h3 style={{ margin: 0, fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                      Meal Timing Schedules &amp; Auto-Availability Controls
+                    </h3>
+                    <span style={{ fontSize: '0.75rem', background: '#e2a829', color: '#051B41', padding: '0.15rem 0.5rem', borderRadius: '4px', fontWeight: 800 }}>
+                      உணவு நேர அட்டவணை
+                    </span>
+                  </div>
+                  <p style={{ margin: '0.35rem 0 0', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+                    Delicacies automatically appear on customer menu during scheduled IST hours. Use admin controls below to manually enable/disable or override availability anytime.
+                  </p>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <button
+                    type="button"
+                    onClick={fetchMenu}
+                    disabled={menuLoading}
+                    className={styles.btnNavAlt}
+                    style={{ height: '32px', fontSize: '0.75rem' }}
+                  >
+                    🔄 Refresh Status
+                  </button>
+                </div>
+              </div>
+
+              {/* 4 Scheduled Meal Section Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '0.85rem' }}>
+                {(mealSections.length > 0 ? mealSections : [
+                  { id: 'BREAKFAST', name: 'Breakfast', tamilName: 'காலை உணவு', icon: '🌅', startTime: '07:00', endTime: '11:30', timeLabel: '7:00 AM – 11:30 AM', isEnabled: true, overrideStatus: 'AUTO' },
+                  { id: 'LUNCH', name: 'Lunch', tamilName: 'மதிய உணவு', icon: '☀️', startTime: '11:30', endTime: '15:00', timeLabel: '11:30 AM – 3:00 PM', isEnabled: true, overrideStatus: 'AUTO' },
+                  { id: 'EVENING_SNACKS', name: 'Evening Snacks', tamilName: 'செட்டிநாடு பலகாரம்', icon: '☕', startTime: '16:00', endTime: '18:00', timeLabel: '4:00 PM – 6:00 PM', isEnabled: true, overrideStatus: 'AUTO' },
+                  { id: 'DINNER', name: 'Dinner', tamilName: 'இரவு உணவு', icon: '🌙', startTime: '18:00', endTime: '22:30', timeLabel: '6:00 PM – 10:30 PM', isEnabled: true, overrideStatus: 'AUTO' },
+                ]).map(sec => {
+                  const secId = String(sec.id).toUpperCase();
+                  const isSaving = savingMealSectionId === sec.id;
+                  const count = menuItems.filter(d => String(d.mealSection || '').toUpperCase() === secId).length;
+                  const isEnabled = sec.isEnabled !== false;
+                  const override = sec.overrideStatus || 'AUTO';
+                  const isActiveNow = sec.isActive;
+
+                  // Border & background accent according to state
+                  let statusBadgeBg = '#f59e0b';
+                  let statusBadgeText = '#ffffff';
+                  let statusLabel = `⏰ Scheduled (${sec.startTime} - ${sec.endTime})`;
+                  let cardBorder = 'rgba(245, 158, 11, 0.3)';
+
+                  if (!isEnabled) {
+                    statusBadgeBg = '#64748b';
+                    statusLabel = '⚪ Section Disabled';
+                    cardBorder = 'rgba(100, 116, 139, 0.3)';
+                  } else if (override === 'FORCE_ACTIVE') {
+                    statusBadgeBg = '#2563eb';
+                    statusLabel = '🟢 Force Active (Override)';
+                    cardBorder = 'rgba(37, 99, 235, 0.5)';
+                  } else if (override === 'FORCE_INACTIVE') {
+                    statusBadgeBg = '#ef4444';
+                    statusLabel = '🔴 Force Closed (Override)';
+                    cardBorder = 'rgba(239, 68, 68, 0.5)';
+                  } else if (isActiveNow) {
+                    statusBadgeBg = '#10b981';
+                    statusLabel = '🟢 Live Now (By Schedule)';
+                    cardBorder = 'rgba(16, 185, 129, 0.5)';
+                  }
+
+                  return (
+                    <div
+                      key={sec.id}
+                      style={{
+                        background: 'var(--bg-card-subtle, rgba(255, 255, 255, 0.03))',
+                        border: `1.5px solid ${cardBorder}`,
+                        borderRadius: '12px',
+                        padding: '0.85rem',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.65rem',
+                        position: 'relative',
+                        transition: 'all 0.2s ease',
+                      }}
+                    >
+                      {/* Section Card Top */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                          <span style={{ fontSize: '1.25rem' }}>{sec.icon}</span>
+                          <div>
+                            <div style={{ fontWeight: 800, fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                              {sec.name}
+                            </div>
+                            <div style={{ fontSize: '0.7rem', color: '#e2a829', fontWeight: 600 }}>
+                              {sec.tamilName}
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Master On/Off Switch */}
+                        <button
+                          type="button"
+                          onClick={() => handleUpdateMealSection(sec.id, { isEnabled: !isEnabled })}
+                          disabled={isSaving}
+                          title={isEnabled ? 'Click to Disable this Section' : 'Click to Enable this Section'}
+                          style={{
+                            border: 'none',
+                            background: isEnabled ? 'rgba(16, 185, 129, 0.15)' : 'rgba(239, 68, 68, 0.15)',
+                            color: isEnabled ? '#10b981' : '#ef4444',
+                            fontWeight: 800,
+                            fontSize: '0.7rem',
+                            padding: '0.25rem 0.55rem',
+                            borderRadius: '20px',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.3rem',
+                          }}
+                        >
+                          <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: isEnabled ? '#10b981' : '#ef4444' }} />
+                          {isEnabled ? 'Enabled' : 'Disabled'}
+                        </button>
+                      </div>
+
+                      {/* Live Status Pill */}
+                      <div style={{
+                        background: statusBadgeBg,
+                        color: statusBadgeText,
+                        fontSize: '0.68rem',
+                        fontWeight: 800,
+                        padding: '0.25rem 0.5rem',
+                        borderRadius: '6px',
+                        textAlign: 'center',
+                        letterSpacing: '0.02em',
+                      }}>
+                        {statusLabel}
+                      </div>
+
+                      {/* Timings Schedule Editor */}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                        <div>
+                          <label style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-secondary)', display: 'block', marginBottom: '0.2rem' }}>
+                            START TIME (IST)
+                          </label>
+                          <input
+                            type="time"
+                            value={sec.startTime}
+                            disabled={isSaving}
+                            onChange={(e) => handleUpdateMealSection(sec.id, { startTime: e.target.value })}
+                            className={styles.posDiscountInput}
+                            style={{ width: '100%', height: '30px', fontSize: '0.78rem', padding: '0 0.4rem', textAlign: 'center' }}
+                          />
+                        </div>
+                        <div>
+                          <label style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-secondary)', display: 'block', marginBottom: '0.2rem' }}>
+                            END TIME (IST)
+                          </label>
+                          <input
+                            type="time"
+                            value={sec.endTime}
+                            disabled={isSaving}
+                            onChange={(e) => handleUpdateMealSection(sec.id, { endTime: e.target.value })}
+                            className={styles.posDiscountInput}
+                            style={{ width: '100%', height: '30px', fontSize: '0.78rem', padding: '0 0.4rem', textAlign: 'center' }}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Override Availability Select */}
+                      <div>
+                        <label style={{ fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-secondary)', display: 'block', marginBottom: '0.2rem' }}>
+                          AVAILABILITY OVERRIDE CONTROL
+                        </label>
+                        <select
+                          value={override}
+                          disabled={isSaving}
+                          onChange={(e) => handleUpdateMealSection(sec.id, { overrideStatus: e.target.value })}
+                          className={styles.posSelectField}
+                          style={{ width: '100%', height: '30px', fontSize: '0.75rem', fontWeight: 700 }}
+                        >
+                          <option value="AUTO">🕒 Automatic (Follows Schedule)</option>
+                          <option value="FORCE_ACTIVE">🟢 Force Active (Always Show Now)</option>
+                          <option value="FORCE_INACTIVE">🔴 Force Inactive (Hide / Closed)</option>
+                        </select>
+                      </div>
+
+                      {/* Card Footer: Items Count & Quick Filter Button */}
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.4rem', borderTop: '1px solid var(--border-subtle)', marginTop: 'auto' }}>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', fontWeight: 700 }}>
+                          🍽️ {count} Delicacies
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => setMenuMealSectionFilter(secId)}
+                          style={{
+                            background: menuMealSectionFilter === secId ? '#2563eb' : 'transparent',
+                            color: menuMealSectionFilter === secId ? '#ffffff' : '#38bdf8',
+                            border: '1px solid #38bdf8',
+                            borderRadius: '6px',
+                            fontSize: '0.7rem',
+                            fontWeight: 700,
+                            padding: '0.2rem 0.5rem',
+                            cursor: 'pointer',
+                          }}
+                        >
+                          {menuMealSectionFilter === secId ? '✓ Filtered' : 'Filter Menu'}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* ─── 2. Controls, Search, Filter & Action Toolbar (Requirements 3, 6, 11, 16) ─── */}
             <div className={styles.menuToolbar}>
               <div className={styles.menuToolbarRow1}>
@@ -6416,6 +6692,50 @@ Status: SHIFT CLOSED & VERIFIED
                     </button>
                   </div>
                 </div>
+              </div>
+
+              {/* Meal Section Filter Row */}
+              <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center', margin: '0.6rem 0 0.4rem', paddingBottom: '0.6rem', borderBottom: '1px solid var(--border-subtle)' }}>
+                <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em', marginRight: '0.25rem' }}>
+                  Meal Schedule:
+                </span>
+                <button
+                  type="button"
+                  className={`${styles.menuCatPill} ${menuMealSectionFilter === 'ALL' ? styles.menuCatPillActive : ''}`}
+                  onClick={() => setMenuMealSectionFilter('ALL')}
+                >
+                  🍽️ All Sections
+                  <span className={styles.menuCatPillCount}>
+                    {menuItems.filter(d => !showArchivedDishes ? d.status !== 'ARCHIVED' : d.status === 'ARCHIVED').length}
+                  </span>
+                </button>
+                {[
+                  { id: 'BREAKFAST', icon: '🌅', name: 'Breakfast', ta: 'காலை உணவு' },
+                  { id: 'LUNCH', icon: '☀️', name: 'Lunch', ta: 'மதிய உணவு' },
+                  { id: 'EVENING_SNACKS', icon: '☕', name: 'Snacks', ta: 'செட்டிநாடு பலகாரம்' },
+                  { id: 'DINNER', icon: '🌙', name: 'Dinner', ta: 'இரவு உணவு' },
+                ].map(sec => {
+                  const secState = mealSections.find(s => String(s.id).toUpperCase() === sec.id);
+                  const count = menuItems.filter(d => (!showArchivedDishes ? d.status !== 'ARCHIVED' : d.status === 'ARCHIVED') && String(d.mealSection || '').toUpperCase() === sec.id).length;
+                  const isActiveNow = secState?.isActive;
+                  return (
+                    <button
+                      key={sec.id}
+                      type="button"
+                      className={`${styles.menuCatPill} ${menuMealSectionFilter === sec.id ? styles.menuCatPillActive : ''}`}
+                      onClick={() => setMenuMealSectionFilter(sec.id)}
+                      style={{
+                        borderColor: isActiveNow ? '#10b981' : undefined,
+                      }}
+                    >
+                      <span>{sec.icon}</span>
+                      <span>{sec.name}</span>
+                      <span style={{ opacity: 0.75, fontSize: '0.68rem' }}>({sec.ta})</span>
+                      {isActiveNow && <span style={{ background: '#10b981', color: '#fff', borderRadius: '4px', fontSize: '0.6rem', padding: '0.1rem 0.3rem', fontWeight: 800 }}>LIVE</span>}
+                      <span className={styles.menuCatPillCount}>{count}</span>
+                    </button>
+                  );
+                })}
               </div>
 
               {/* Category Pills Scroller (Requirement 6) */}
@@ -6627,9 +6947,14 @@ Status: SHIFT CLOSED & VERIFIED
                               <div className={styles.menuCardTamilTitle}>{dish.tamilTitle}</div>
                             )}
                           </div>
-                          <span style={{ fontSize: '0.72rem', background: 'var(--bg-card-subtle)', padding: '0.15rem 0.45rem', borderRadius: '4px', color: 'var(--text-secondary)', fontWeight: 700 }}>
-                            {dish.category}
-                          </span>
+                          <div style={{ display: 'flex', gap: '0.3rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '0.68rem', background: '#051B41', color: '#e2a829', padding: '0.15rem 0.4rem', borderRadius: '4px', fontWeight: 800 }}>
+                              {dish.mealSection === 'BREAKFAST' ? '🌅 Breakfast' : dish.mealSection === 'LUNCH' ? '☀️ Lunch' : dish.mealSection === 'EVENING_SNACKS' ? '☕ Snacks' : dish.mealSection === 'DINNER' ? '🌙 Dinner' : dish.mealSection}
+                            </span>
+                            <span style={{ fontSize: '0.72rem', background: 'var(--bg-card-subtle)', padding: '0.15rem 0.45rem', borderRadius: '4px', color: 'var(--text-secondary)', fontWeight: 700 }}>
+                              {dish.category}
+                            </span>
+                          </div>
                         </div>
 
                         {/* Description */}
@@ -6655,10 +6980,10 @@ Status: SHIFT CLOSED & VERIFIED
                         {/* Price & Prep Time Row */}
                         <div className={styles.menuCardMetaRow}>
                           <div className={styles.menuCardPriceBox}>
-                            <span className={styles.menuCardPrice}>
-                              ₹{hasDiscount ? dish.discount.discountedPrice : dish.price}
+                            <span className={styles.menuCardPrice} style={{ color: dish.price > 0 ? undefined : '#a1a1aa', fontSize: dish.price > 0 ? undefined : '0.82rem' }}>
+                              {dish.price > 0 ? (hasDiscount ? `₹${dish.discount.discountedPrice}` : `₹${dish.price}`) : 'Price Pending'}
                             </span>
-                            {hasDiscount && (
+                            {hasDiscount && dish.price > 0 && (
                               <span className={styles.menuCardPriceOrig}>₹{dish.price}</span>
                             )}
                             <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
@@ -6832,9 +7157,14 @@ Status: SHIFT CLOSED & VERIFIED
                             )}
                           </td>
                           <td>
-                            <span style={{ fontSize: '0.72rem', background: 'var(--bg-card-subtle)', padding: '0.2rem 0.5rem', borderRadius: '4px', fontWeight: 700 }}>
-                              {dish.category}
-                            </span>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                              <span style={{ fontSize: '0.65rem', background: '#051B41', color: '#e2a829', padding: '0.1rem 0.35rem', borderRadius: '4px', fontWeight: 800, width: 'fit-content' }}>
+                                {dish.mealSection === 'BREAKFAST' ? '🌅 Breakfast' : dish.mealSection === 'LUNCH' ? '☀️ Lunch' : dish.mealSection === 'EVENING_SNACKS' ? '☕ Snacks' : dish.mealSection === 'DINNER' ? '🌙 Dinner' : dish.mealSection}
+                              </span>
+                              <span style={{ fontSize: '0.72rem', background: 'var(--bg-card-subtle)', padding: '0.15rem 0.4rem', borderRadius: '4px', fontWeight: 700, width: 'fit-content' }}>
+                                {dish.category}
+                              </span>
+                            </div>
                           </td>
                           <td>
                             <span style={{ fontSize: '0.7rem', color: '#38bdf8', fontWeight: 800 }}>
@@ -6843,10 +7173,10 @@ Status: SHIFT CLOSED & VERIFIED
                           </td>
                           <td>
                             <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.3rem' }}>
-                              <span style={{ fontWeight: 900, fontSize: '0.95rem' }}>
-                                ₹{hasDiscount ? dish.discount.discountedPrice : dish.price}
+                              <span style={{ fontWeight: 900, fontSize: dish.price > 0 ? '0.95rem' : '0.8rem', color: dish.price > 0 ? undefined : '#a1a1aa' }}>
+                                {dish.price > 0 ? (hasDiscount ? `₹${dish.discount.discountedPrice}` : `₹${dish.price}`) : 'Price Pending'}
                               </span>
-                              {hasDiscount && (
+                              {hasDiscount && dish.price > 0 && (
                                 <span style={{ fontSize: '0.72rem', textDecoration: 'line-through', color: 'var(--text-muted)' }}>
                                   ₹{dish.price}
                                 </span>
@@ -12884,7 +13214,24 @@ Status: SHIFT CLOSED & VERIFIED
                     </div>
                   </div>
 
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+                    <div>
+                      <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>
+                        MEAL SECTION (SCHEDULE) *
+                      </label>
+                      <select
+                        value={dishFormData.mealSection || 'BREAKFAST'}
+                        onChange={e => setDishFormData({ ...dishFormData, mealSection: e.target.value })}
+                        className={styles.posSelectField}
+                        style={{ width: '100%', height: '36px' }}
+                      >
+                        <option value="BREAKFAST">🌅 Breakfast (7:00 AM–11:30 AM)</option>
+                        <option value="LUNCH">☀️ Lunch (11:30 AM–3:00 PM)</option>
+                        <option value="EVENING_SNACKS">☕ Evening Snacks (4:00 PM–6:00 PM)</option>
+                        <option value="DINNER">🌙 Dinner (6:00 PM–10:30 PM)</option>
+                      </select>
+                    </div>
+
                     <div>
                       <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>
                         CATEGORY *
@@ -12976,13 +13323,12 @@ Status: SHIFT CLOSED & VERIFIED
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
                     <div>
                       <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>
-                        BASE PRICE (₹ INR) *
+                        BASE PRICE (₹ INR) (0 if unpriced draft)
                       </label>
                       <input
                         type="number"
-                        required
-                        min="5"
-                        placeholder="e.g. 120"
+                        min="0"
+                        placeholder="0 (Unpriced draft)"
                         value={dishFormData.price}
                         onChange={e => setDishFormData({ ...dishFormData, price: e.target.value })}
                         className={styles.posDiscountInput}

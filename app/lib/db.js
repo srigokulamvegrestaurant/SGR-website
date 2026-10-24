@@ -6,6 +6,8 @@ import path from 'path';
 import crypto from 'crypto';
 import { DEFAULT_WEBSITE_CMS, createInitialContentSnapshot } from './cms_defaults.js';
 import { DEFAULT_BILL_SLIP_FORMAT } from './thermalSlipFormatter.js';
+import { DEFAULT_MEAL_SECTIONS } from './meal_sections.js';
+import { OFFICIAL_MENU_ITEMS } from './menu_pdf_items.js';
 
 // Default protected Developer Admin email addresses (Permanently protected from modification, demotion, deactivation, or deletion)
 export const PROTECTED_DEVELOPER_EMAILS = [
@@ -86,7 +88,8 @@ const SEED_DATA = {
   sessions: [],
   inventory: [],
   recipes: [],
-  menu: [],
+  meal_sections: DEFAULT_MEAL_SECTIONS,
+  menu: OFFICIAL_MENU_ITEMS,
   categories: [
     { id: 'cat_breakfast', name: 'Breakfast', tamilName: 'காலை சிற்றுண்டி', icon: '🌅', description: 'Fresh morning idlis, pongal, and crispy vadas', displayOrder: 1, isActive: true, station: 'TIFFIN' },
     { id: 'cat_tiffin', name: 'Tiffin', tamilName: 'டிபன் வகைகள்', icon: '🥞', description: 'All-day hot tiffin, paniyaram, poori, and snacks', displayOrder: 2, isActive: true, station: 'TIFFIN' },
