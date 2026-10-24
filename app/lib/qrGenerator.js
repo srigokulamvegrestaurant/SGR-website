@@ -33,7 +33,7 @@ export function generateQrSvg(text, pixelSize = 240) {
 }
 
 // Generate 4"x6" Printable Standee Tent Card HTML
-export function generateStandeeCardHtml({ tableNumber, section = 'GROUND_FLOOR', capacity = 4, baseUrl = 'http://localhost:3000' }) {
+export function generateStandeeCardHtml({ tableNumber, section = 'GROUND_FLOOR', capacity = 4, baseUrl = 'https://srigokulamvegrestaurant.com' }) {
   const qrUrl = `${baseUrl}/?table=${tableNumber}&section=${section}`;
   const qrSvg = generateQrSvg(qrUrl, 260);
 

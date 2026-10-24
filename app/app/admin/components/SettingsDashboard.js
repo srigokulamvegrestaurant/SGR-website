@@ -520,6 +520,24 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
     });
   };
 
+  // Helper to ensure table QR codes always resolve to the public production website
+  // (Prevents localhost/127.0.0.1 from breaking mobile phone scanners on cellular 4G/5G/WiFi)
+  const getQrBaseUrl = () => {
+    const PROD_URL = 'https://srigokulamvegrestaurant.com';
+    if (typeof window === 'undefined') return PROD_URL;
+    const hostname = window.location.hostname;
+    if (
+      hostname === 'localhost' ||
+      hostname === '127.0.0.1' ||
+      hostname.startsWith('192.168.') ||
+      hostname.startsWith('10.') ||
+      hostname === ''
+    ) {
+      return PROD_URL;
+    }
+    return window.location.origin || PROD_URL;
+  };
+
   // Print Standee Tent Card
   const handlePrintStandee = (tableNum) => {
     const tableObj = tables.find((t) => t.tableNumber === tableNum) || { tableNumber: tableNum, section: 'GROUND_FLOOR', capacity: 4 };
@@ -527,7 +545,7 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
       tableNumber: tableObj.tableNumber,
       section: tableObj.section,
       capacity: tableObj.capacity,
-      baseUrl: typeof window !== 'undefined' ? window.location.origin : 'https://srigokulam.com',
+      baseUrl: getQrBaseUrl(),
     });
 
     const printWin = window.open('', '_blank', 'width=700,height=900');
@@ -543,7 +561,7 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
 
   // SVG QR Download
   const handleDownloadQrSvg = (tableNum) => {
-    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://srigokulam.com';
+    const origin = getQrBaseUrl();
     const qrUrl = `${origin}/?table=${tableNum}`;
     const svgString = generateQrSvg(qrUrl, 400);
     const blob = new Blob([svgString], { type: 'image/svg+xml' });
@@ -1724,7 +1742,7 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
                     <div
                       dangerouslySetInnerHTML={{
                         __html: generateQrSvg(
-                          `${typeof window !== 'undefined' ? window.location.origin : 'https://srigokulam.com'}/?table=${qrSelectedTable}`,
+                          `${getQrBaseUrl()}/?table=${qrSelectedTable}`,
                           200
                         ),
                       }}

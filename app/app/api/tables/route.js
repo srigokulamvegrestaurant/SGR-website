@@ -1,20 +1,31 @@
 // app/api/tables/route.js - Table Management & Status Endpoint
 import { NextResponse } from 'next/server';
-import { getDb, saveDb } from '@/lib/db';
+import { getDbAsync, saveDbAsync } from '@/lib/db';
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
   try {
-    const db = getDb();
-    return NextResponse.json({
-      success: true,
-      tables: db.tables,
-      summary: {
-        total: db.tables.length,
-        available: db.tables.filter((t) => t.status === 'AVAILABLE').length,
-        occupied: db.tables.filter((t) => t.status === 'OCCUPIED').length,
-        cleaning: db.tables.filter((t) => t.status === 'CLEANING').length,
+    const db = await getDbAsync();
+    const tables = Array.isArray(db.tables) ? db.tables : [];
+    return NextResponse.json(
+      {
+        success: true,
+        tables,
+        summary: {
+          total: tables.length,
+          available: tables.filter((t) => t.status === 'AVAILABLE').length,
+          occupied: tables.filter((t) => t.status === 'OCCUPIED').length,
+          cleaning: tables.filter((t) => t.status === 'CLEANING').length,
+        },
       },
-    });
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        },
+      }
+    );
   } catch (error) {
     return NextResponse.json(
       { success: false, error: error.message },
@@ -35,8 +46,13 @@ export async function POST(request) {
       );
     }
 
-    const db = getDb();
-    const tableIndex = db.tables.findIndex((t) => t.tableNumber === String(tableNumber).padStart(2, '0'));
+    const db = await getDbAsync();
+    const tables = Array.isArray(db.tables) ? db.tables : [];
+    const targetPadded = String(tableNumber).padStart(2, '0');
+    const targetRaw = String(tableNumber);
+    const tableIndex = tables.findIndex(
+      (t) => t.tableNumber === targetPadded || t.tableNumber === targetRaw
+    );
 
     if (tableIndex === -1) {
       return NextResponse.json(
@@ -46,14 +62,16 @@ export async function POST(request) {
     }
 
     if (status) {
-      db.tables[tableIndex].status = status;
+      tables[tableIndex].status = status;
+      tables[tableIndex].updatedAt = new Date().toISOString();
     }
 
-    saveDb(db);
+    db.tables = tables;
+    await saveDbAsync(db);
 
     return NextResponse.json({
       success: true,
-      table: db.tables[tableIndex],
+      table: tables[tableIndex],
     });
   } catch (error) {
     return NextResponse.json(
@@ -62,3 +80,4 @@ export async function POST(request) {
     );
   }
 }
+

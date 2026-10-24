@@ -53,9 +53,55 @@ function getDataFilePath() {
   }
 }
 
+// Default Floor Plans / Dining Zones for Sri Gokulam
+export const DEFAULT_FLOOR_PLANS = [
+  {
+    id: 'GROUND_FLOOR',
+    name: 'Ground Floor Dining',
+    tamilName: 'தரைத்தளம் சாப்பாட்டு கூடம்',
+    icon: '🏛️',
+    description: 'Main traditional Chettinad dining area with open counter',
+    floorLevel: 0,
+    isDefault: true,
+  },
+  {
+    id: 'AC_HALL',
+    name: 'AC Royal Hall',
+    tamilName: 'ஏசி ராயல் ஹால்',
+    icon: '❄️',
+    description: 'Air-conditioned premium family dining hall',
+    floorLevel: 1,
+    isDefault: true,
+  },
+  {
+    id: 'VERANDA',
+    name: 'Chettinad Veranda',
+    tamilName: 'செட்டிநாடு வராண்டா',
+    icon: '🌿',
+    description: 'Traditional open-air courtyard and breezy garden seating',
+    floorLevel: 0,
+    isDefault: true,
+  },
+];
+
+// Initial default dining tables mapped across floor plans
+export const DEFAULT_TABLES = [
+  { id: 'tbl_01', tableNumber: '01', capacity: 4, section: 'GROUND_FLOOR', shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)' },
+  { id: 'tbl_02', tableNumber: '02', capacity: 4, section: 'GROUND_FLOOR', shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)' },
+  { id: 'tbl_03', tableNumber: '03', capacity: 2, section: 'GROUND_FLOOR', shape: 'ROUND', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)' },
+  { id: 'tbl_04', tableNumber: '04', capacity: 6, section: 'GROUND_FLOOR', shape: 'RECTANGLE', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)' },
+  { id: 'tbl_05', tableNumber: '05', capacity: 4, section: 'AC_HALL', shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Rajan (POS Cashier)' },
+  { id: 'tbl_06', tableNumber: '06', capacity: 4, section: 'AC_HALL', shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Rajan (POS Cashier)' },
+  { id: 'tbl_07', tableNumber: '07', capacity: 6, section: 'AC_HALL', shape: 'RECTANGLE', status: 'AVAILABLE', assignedWaiter: 'Rajan (POS Cashier)' },
+  { id: 'tbl_08', tableNumber: '08', capacity: 2, section: 'VERANDA', shape: 'ROUND', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)' },
+  { id: 'tbl_09', tableNumber: '09', capacity: 4, section: 'VERANDA', shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)' },
+  { id: 'tbl_10', tableNumber: '10', capacity: 4, section: 'VERANDA', shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)' },
+];
+
 // Initial seed data matching Sri Gokulam Master Plan
 const SEED_DATA = {
-  tables: [],
+  floor_plans: DEFAULT_FLOOR_PLANS,
+  tables: DEFAULT_TABLES,
   reservations: [],
   waitlist: [],
   session_logs: [],
@@ -866,6 +912,18 @@ export function getDb() {
         }
       }
 
+      // Auto-migrate: populate floor_plans if missing
+      if (!Array.isArray(loaded.floor_plans) || loaded.floor_plans.length === 0) {
+        loaded.floor_plans = JSON.parse(JSON.stringify(DEFAULT_FLOOR_PLANS));
+        needsSave = true;
+      }
+
+      // Auto-migrate: populate default dining tables if missing
+      if (!Array.isArray(loaded.tables) || loaded.tables.length === 0) {
+        loaded.tables = JSON.parse(JSON.stringify(DEFAULT_TABLES));
+        needsSave = true;
+      }
+
       // Ensure menu dishes have default values for portion, prepTime, dietary, and status
       if (Array.isArray(loaded.menu)) {
         loaded.menu = loaded.menu.map((dish, idx) => {
@@ -961,6 +1019,12 @@ export async function getDbAsync() {
     const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 2500));
     const pgData = await Promise.race([pgPromise, timeoutPromise]);
     if (pgData && Array.isArray(pgData.menu) && pgData.menu.length > 0) {
+      if (!Array.isArray(pgData.floor_plans) || pgData.floor_plans.length === 0) {
+        pgData.floor_plans = JSON.parse(JSON.stringify(DEFAULT_FLOOR_PLANS));
+      }
+      if (!Array.isArray(pgData.tables) || pgData.tables.length === 0) {
+        pgData.tables = JSON.parse(JSON.stringify(DEFAULT_TABLES));
+      }
       memoryStore = pgData;
       try {
         const targetFile = getDataFilePath();

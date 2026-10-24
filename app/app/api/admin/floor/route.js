@@ -1,13 +1,39 @@
 // app/api/admin/floor/route.js - Comprehensive Table Management, Digital Floor Plan & Session API
 import { NextResponse } from 'next/server';
-import { getDb, saveDb, categorizeStation, generateKotReceiptText } from '@/lib/db';
+import {
+  getDb,
+  getDbAsync,
+  saveDb,
+  saveDbAsync,
+  categorizeStation,
+  generateKotReceiptText,
+  DEFAULT_FLOOR_PLANS,
+  DEFAULT_TABLES,
+} from '@/lib/db';
 import { broadcast } from '@/app/api/events/route';
 import { generateQrSvg, generateStandeeCardHtml } from '@/lib/qrGenerator';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
+// Resolve production base URL so QR codes work across mobile devices on any network
+export function getBaseUrl(request) {
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '');
+  if (request) {
+    const host = request.headers.get('x-forwarded-host') || request.headers.get('host');
+    if (host && !host.includes('localhost') && !host.includes('127.0.0.1')) {
+      const proto = request.headers.get('x-forwarded-proto') || 'https';
+      return `${proto}://${host}`;
+    }
+  }
+  return 'https://srigokulamvegrestaurant.com';
+}
+
 export async function GET(request) {
   try {
-    const db = getDb();
-    const tables = db.tables || [];
+    const db = await getDbAsync();
+    const tables = (Array.isArray(db.tables) && db.tables.length > 0) ? db.tables : DEFAULT_TABLES;
+    const floorPlans = (Array.isArray(db.floor_plans) && db.floor_plans.length > 0) ? db.floor_plans : DEFAULT_FLOOR_PLANS;
     const orders = db.orders || [];
     const kots = db.kots || [];
     const reservations = db.reservations || [];
@@ -15,6 +41,7 @@ export async function GET(request) {
     const sessionLogs = db.session_logs || [];
 
     const now = Date.now();
+    const baseUrl = getBaseUrl(request);
 
     // Augment tables with active orders, multi-customer sessions, and live cooking states
     const augmented = tables.map(tbl => {
@@ -79,16 +106,20 @@ export async function GET(request) {
         preparingCount,
         readyCount,
         billRequested: tbl.status === 'BILL_REQUESTED' || tbl.billRequested === true,
-        qrUrl: `http://localhost:3000/?table=${tbl.tableNumber}&section=${tbl.section}`,
+        qrUrl: `${baseUrl}/?table=${tbl.tableNumber}&section=${tbl.section || 'GROUND_FLOOR'}`,
       };
     });
 
-    const sections = {
-      GROUND_FLOOR: augmented.filter(t => t.section === 'GROUND_FLOOR'),
-      AC_HALL: augmented.filter(t => t.section === 'AC_HALL'),
-      VERANDA: augmented.filter(t => t.section === 'VERANDA'),
-      ROOFTOP: augmented.filter(t => t.section === 'ROOFTOP'),
-    };
+    const sections = {};
+    floorPlans.forEach(fp => {
+      sections[fp.id] = augmented.filter(t => t.section === fp.id);
+    });
+    // Ensure legacy fallback sections are populated if tables exist
+    augmented.forEach(t => {
+      if (t.section && !sections[t.section]) {
+        sections[t.section] = augmented.filter(tbl => tbl.section === t.section);
+      }
+    });
 
     const stats = {
       totalTables: tables.length,
@@ -107,16 +138,26 @@ export async function GET(request) {
       .map(u => u.fullName || u.name);
     const waiters = staffWaiters.length > 0 ? staffWaiters : ['Murugan (Floor Captain)', 'Rajan (POS Cashier)', 'Karthikeyan (Manager)'];
 
-    return NextResponse.json({
-      success: true,
-      stats,
-      sections,
-      tables: augmented,
-      reservations,
-      waitlist,
-      sessionLogs,
-      waiters,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        stats,
+        sections,
+        floorPlans,
+        tables: augmented,
+        reservations,
+        waitlist,
+        sessionLogs,
+        waiters,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+      }
+    );
   } catch (error) {
     console.error('Floor GET error:', error);
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -127,12 +168,90 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const { action } = body;
-    const db = getDb();
-    db.tables = db.tables || [];
+    const db = await getDbAsync();
+    db.floor_plans = (Array.isArray(db.floor_plans) && db.floor_plans.length > 0) ? db.floor_plans : JSON.parse(JSON.stringify(DEFAULT_FLOOR_PLANS));
+    db.tables = (Array.isArray(db.tables) && db.tables.length > 0) ? db.tables : JSON.parse(JSON.stringify(DEFAULT_TABLES));
     db.reservations = db.reservations || [];
     db.waitlist = db.waitlist || [];
     db.session_logs = db.session_logs || [];
     db.kots = db.kots || [];
+
+    // ─── 0A. Create New Floor Plan (Zone / Section) ───
+    if (action === 'ADD_FLOOR_PLAN') {
+      const { id, name, tamilName, icon, description, floorLevel } = body;
+      if (!name || !name.trim()) {
+        return NextResponse.json({ success: false, error: 'Floor plan name is required' }, { status: 400 });
+      }
+      const cleanName = name.trim();
+      const planId = (id || cleanName.toUpperCase().replace(/[^A-Z0-9]/g, '_')).trim();
+
+      if (db.floor_plans.some(fp => fp.id === planId)) {
+        return NextResponse.json({ success: false, error: `Floor plan '${cleanName}' already exists` }, { status: 400 });
+      }
+
+      const newPlan = {
+        id: planId,
+        name: cleanName,
+        tamilName: tamilName || '',
+        icon: icon || '🏢',
+        description: description || '',
+        floorLevel: Number(floorLevel) || 0,
+        createdAt: new Date().toISOString(),
+      };
+
+      db.floor_plans.push(newPlan);
+      await saveDbAsync(db);
+
+      try {
+        broadcast('FLOOR_PLAN_CREATED', { floorPlan: newPlan });
+      } catch (e) {}
+
+      return NextResponse.json({
+        success: true,
+        message: `Floor plan '${cleanName}' created and saved permanently!`,
+        floorPlan: newPlan,
+        floorPlans: db.floor_plans,
+      });
+    }
+
+    // ─── 0B. Delete Floor Plan with Confirmation ───
+    if (action === 'DELETE_FLOOR_PLAN') {
+      const { floorPlanId, managerPin } = body;
+      if (!floorPlanId) {
+        return NextResponse.json({ success: false, error: 'Floor plan ID is required' }, { status: 400 });
+      }
+
+      if (managerPin && managerPin !== '1234' && managerPin !== '4321') {
+        return NextResponse.json({ success: false, error: 'Invalid Manager PIN' }, { status: 403 });
+      }
+
+      const planIndex = db.floor_plans.findIndex(fp => fp.id === floorPlanId);
+      if (planIndex === -1) {
+        return NextResponse.json({ success: false, error: 'Floor plan not found' }, { status: 404 });
+      }
+
+      const deletedPlan = db.floor_plans.splice(planIndex, 1)[0];
+      const removedTables = (db.tables || []).filter(t => t.section === floorPlanId);
+      db.tables = (db.tables || []).filter(t => t.section !== floorPlanId);
+
+      await saveDbAsync(db);
+
+      try {
+        broadcast('FLOOR_PLAN_DELETED', {
+          floorPlanId,
+          deletedPlan,
+          removedTablesCount: removedTables.length,
+        });
+      } catch (e) {}
+
+      return NextResponse.json({
+        success: true,
+        message: `Floor plan '${deletedPlan.name}' and ${removedTables.length} table(s) deleted successfully`,
+        deletedPlan,
+        floorPlans: db.floor_plans,
+        tables: db.tables,
+      });
+    }
 
     // ─── 1. Update Table Status (Operational Lifecycle) ───
     if (action === 'UPDATE_STATUS') {
@@ -225,7 +344,7 @@ export async function POST(request) {
       };
 
       db.tables.push(newTable);
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -245,7 +364,7 @@ export async function POST(request) {
       if (shape) table.shape = shape;
       if (assignedWaiter) table.assignedWaiter = assignedWaiter;
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -265,7 +384,7 @@ export async function POST(request) {
       if (index === -1) return NextResponse.json({ success: false, error: 'Table not found' }, { status: 404 });
 
       const deleted = db.tables.splice(index, 1)[0];
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -576,8 +695,8 @@ export async function POST(request) {
 
     // ─── 11. QR Code Standee Renderer (Requirement 4) ───
     if (action === 'GET_QR_STANDEE') {
-      const { tableNumber, section, capacity } = body;
-      const baseUrl = 'http://localhost:3000';
+      const { tableNumber, section, capacity, baseUrl: customBaseUrl } = body;
+      const baseUrl = customBaseUrl || getBaseUrl(request);
       const qrUrl = `${baseUrl}/?table=${tableNumber}&section=${section || 'GROUND_FLOOR'}`;
       const qrSvg = generateQrSvg(qrUrl, 260);
       const standeeHtml = generateStandeeCardHtml({

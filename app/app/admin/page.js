@@ -237,6 +237,23 @@ export default function AdminPage() {
   const [, setKdsTimerTick] = useState(0);
 
   // Floor plan & Table Management states (20 Requirements)
+  const [floorPlans, setFloorPlans] = useState([
+    { id: 'GROUND_FLOOR', name: 'Ground Floor Dining', tamilName: 'தரைத்தளம் சாப்பாட்டு கூடம்', icon: '🏛️', description: 'Main traditional Chettinad dining area with open counter', floorLevel: 0 },
+    { id: 'AC_HALL', name: 'AC Royal Hall', tamilName: 'ஏசி ராயல் ஹால்', icon: '❄️', description: 'Air-conditioned premium family dining hall', floorLevel: 1 },
+    { id: 'VERANDA', name: 'Chettinad Veranda', tamilName: 'செட்டிநாடு வராண்டா', icon: '🌿', description: 'Traditional open-air courtyard and garden seating', floorLevel: 0 },
+  ]);
+  const [showAddFloorPlanModal, setShowAddFloorPlanModal] = useState(false);
+  const [newFloorPlanForm, setNewFloorPlanForm] = useState({
+    name: '',
+    tamilName: '',
+    icon: '🏛️',
+    floorLevel: 0,
+    description: '',
+  });
+  const [floorPlanToDelete, setFloorPlanToDelete] = useState(null);
+  const [deletePlanPin, setDeletePlanPin] = useState('');
+  const [isDeletingPlan, setIsDeletingPlan] = useState(false);
+
   const [floorSections, setFloorSections] = useState({ GROUND_FLOOR: [], AC_HALL: [], VERANDA: [] });
   const [floorStats, setFloorStats] = useState({});
   const [floorTables, setFloorTables] = useState([]);
@@ -633,12 +650,33 @@ export default function AdminPage() {
 
   const fetchFloor = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/floor');
+      const res = await fetch(`/api/admin/floor?t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await res.json();
       if (data.success) {
+        if (Array.isArray(data.floorPlans) && data.floorPlans.length > 0) {
+          setFloorPlans(data.floorPlans);
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem('sgr_floor_plans', JSON.stringify(data.floorPlans));
+            } catch (err) {}
+          }
+        }
         setFloorSections(data.sections || {});
         setFloorStats(data.stats || {});
-        setFloorTables(data.tables || []);
+        if (Array.isArray(data.tables)) {
+          setFloorTables(data.tables);
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem('sgr_floor_tables', JSON.stringify(data.tables));
+            } catch (err) {}
+          }
+        }
         setFloorReservations(data.reservations || []);
         setFloorWaitlist(data.waitlist || []);
         setFloorSessionLogs(data.sessionLogs || []);
@@ -650,6 +688,14 @@ export default function AdminPage() {
       }
     } catch (e) {
       console.error('Failed to load floor:', e);
+      if (typeof window !== 'undefined') {
+        try {
+          const cachedPlans = localStorage.getItem('sgr_floor_plans');
+          if (cachedPlans) setFloorPlans(JSON.parse(cachedPlans));
+          const cachedTables = localStorage.getItem('sgr_floor_tables');
+          if (cachedTables) setFloorTables(JSON.parse(cachedTables));
+        } catch (err) {}
+      }
     }
   }, []);
 
@@ -808,6 +854,13 @@ export default function AdminPage() {
       fetchCrmCustomers();
     }
   }, [activeTab, fetchCrmCustomers]);
+
+  // Refresh Floor Plan when Floor tab is activated
+  useEffect(() => {
+    if (activeTab === 'floor') {
+      fetchFloor();
+    }
+  }, [activeTab, fetchFloor]);
 
   // ─── Real-Time SSE Subscription (Stable persistent connection) ───────────
   const sseCallbacksRef = useRef({});
@@ -1597,8 +1650,78 @@ Status: SHIFT CLOSED & VERIFIED
     }
   };
 
+  const handleAddFloorPlanSubmit = async (e) => {
+    e.preventDefault();
+    if (!newFloorPlanForm.name.trim()) {
+      showNotice('Please enter floor plan name', true);
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/floor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'ADD_FLOOR_PLAN',
+          ...newFloorPlanForm,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showNotice(`Floor plan "${newFloorPlanForm.name}" created successfully`);
+        setShowAddFloorPlanModal(false);
+        setNewFloorPlanForm({ name: '', tamilName: '', icon: '🏛️', floorLevel: 0, description: '' });
+        fetchFloor();
+      } else {
+        showNotice(data.error || 'Failed to create floor plan', true);
+      }
+    } catch (err) {
+      showNotice('Network error creating floor plan', true);
+    }
+  };
+
+  const handleConfirmDeleteFloorPlan = async () => {
+    if (!floorPlanToDelete) return;
+    setIsDeletingPlan(true);
+    try {
+      const res = await fetch('/api/admin/floor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'DELETE_FLOOR_PLAN',
+          id: floorPlanToDelete.id,
+          managerPin: deletePlanPin || '1234',
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showNotice(`Floor plan "${floorPlanToDelete.name}" deleted successfully`);
+        setFloorPlanToDelete(null);
+        setDeletePlanPin('');
+        if (floorFilterSection === floorPlanToDelete.id) {
+          setFloorFilterSection('ALL');
+        }
+        fetchFloor();
+        fetchPos();
+      } else {
+        showNotice(data.error || 'Failed to delete floor plan', true);
+      }
+    } catch (err) {
+      showNotice('Network error deleting floor plan', true);
+    } finally {
+      setIsDeletingPlan(false);
+    }
+  };
+
   const handleOpenQrStandee = async (table) => {
     try {
+      const PROD_URL = 'https://srigokulamvegrestaurant.com';
+      const origin = typeof window !== 'undefined' &&
+        window.location.hostname !== 'localhost' &&
+        window.location.hostname !== '127.0.0.1' &&
+        !window.location.hostname.startsWith('192.168.') &&
+        !window.location.hostname.startsWith('10.')
+        ? window.location.origin
+        : PROD_URL;
       const res = await fetch('/api/admin/floor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1607,6 +1730,7 @@ Status: SHIFT CLOSED & VERIFIED
           tableNumber: table.tableNumber,
           section: table.section,
           capacity: table.capacity,
+          baseUrl: origin,
         }),
       });
       const data = await res.json();
@@ -5055,22 +5179,37 @@ Status: SHIFT CLOSED & VERIFIED
             {/* ─── Command Toolbar & Multi-Filters (Requirements 3, 13, 14, 15, 19) ─── */}
             <div className={styles.floorCommandBar}>
               {/* Section Tabs */}
-              <div className={styles.floorSectionTabs}>
-                {[
-                  { id: 'ALL', label: 'All Sections' },
-                  { id: 'GROUND_FLOOR', label: '🏛️ Ground Floor' },
-                  { id: 'AC_HALL', label: '❄️ AC Royal Hall' },
-                  { id: 'VERANDA', label: '🌿 Chettinad Veranda' },
-                ].map(sec => (
+              <div className={styles.floorSectionTabs} style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                <button
+                  type="button"
+                  className={`${styles.floorSectionBtn} ${floorFilterSection === 'ALL' ? styles.floorSectionBtnActive : ''}`}
+                  onClick={() => setFloorFilterSection('ALL')}
+                >
+                  All Sections
+                </button>
+                {(floorPlans.length > 0 ? floorPlans : [
+                  { id: 'GROUND_FLOOR', name: 'Ground Floor', icon: '🏛️' },
+                  { id: 'AC_HALL', name: 'AC Royal Hall', icon: '❄️' },
+                  { id: 'VERANDA', name: 'Chettinad Veranda', icon: '🌿' },
+                ]).map(sec => (
                   <button
                     key={sec.id}
                     type="button"
                     className={`${styles.floorSectionBtn} ${floorFilterSection === sec.id ? styles.floorSectionBtnActive : ''}`}
                     onClick={() => setFloorFilterSection(sec.id)}
                   >
-                    {sec.label}
+                    {sec.icon || '📍'} {sec.name}
                   </button>
                 ))}
+                <button
+                  type="button"
+                  className={styles.floorSectionBtn}
+                  onClick={() => setShowAddFloorPlanModal(true)}
+                  style={{ background: 'rgba(37, 99, 235, 0.12)', borderColor: '#2563eb', color: '#3b82f6', fontWeight: 700 }}
+                  title="Create new dining section / floor plan"
+                >
+                  ➕ Add Floor Plan
+                </button>
               </div>
 
               {/* Filters: Capacity, Waiter, Search */}
@@ -5114,6 +5253,15 @@ Status: SHIFT CLOSED & VERIFIED
 
               {/* Action Buttons: Add Table, Merge/Split, Reservations, Waitlist */}
               <div className={styles.floorActionBtns}>
+                <button
+                  type="button"
+                  className={styles.btnFloorAction}
+                  onClick={() => setShowAddFloorPlanModal(true)}
+                  style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981', borderColor: '#10b981' }}
+                  title="Create new custom dining floor plan"
+                >
+                  ➕ New Floor Plan
+                </button>
                 <button
                   type="button"
                   className={styles.btnFloorAction}
@@ -5171,20 +5319,35 @@ Status: SHIFT CLOSED & VERIFIED
                 <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🪑</div>
                 <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>Floor Plan Ready for Custom Setup</h3>
                 <p style={{ margin: '0 0 1.25rem 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
-                  All tables have been cleared. Click below to add your tables manually to Ground Floor, AC Royal Dining Hall, or Chettinad Veranda.
+                  No tables found. Click below to add your tables manually to Ground Floor, AC Royal Dining Hall, Chettinad Veranda, or create a new floor plan.
                 </p>
-                <button
-                  type="button"
-                  className={styles.btnFloorAction}
-                  onClick={() => setShowAddTableModal(true)}
-                  style={{ background: '#2563eb', color: '#ffffff', borderColor: '#2563eb', padding: '0.6rem 1.25rem', fontSize: '0.9rem' }}
-                >
-                  ➕ Add New Table
-                </button>
+                <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center' }}>
+                  <button
+                    type="button"
+                    className={styles.btnFloorAction}
+                    onClick={() => setShowAddTableModal(true)}
+                    style={{ background: '#2563eb', color: '#ffffff', borderColor: '#2563eb', padding: '0.6rem 1.25rem', fontSize: '0.9rem' }}
+                  >
+                    ➕ Add New Table
+                  </button>
+                  <button
+                    type="button"
+                    className={styles.btnFloorAction}
+                    onClick={() => setShowAddFloorPlanModal(true)}
+                    style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', borderColor: '#10b981', padding: '0.6rem 1.25rem', fontSize: '0.9rem' }}
+                  >
+                    ➕ Create Floor Plan
+                  </button>
+                </div>
               </div>
             )}
 
-            {['GROUND_FLOOR', 'AC_HALL', 'VERANDA'].map(secKey => {
+            {(floorPlans.length > 0 ? floorPlans : [
+              { id: 'GROUND_FLOOR', name: 'Ground Floor Chettinad Dining', tamilName: 'தரைத்தளம்', icon: '🏛️' },
+              { id: 'AC_HALL', name: 'AC Royal Dining Hall', tamilName: 'ஏசி ராயல் ஹால்', icon: '❄️' },
+              { id: 'VERANDA', name: 'Traditional Courtyard / Veranda', tamilName: 'வராண்டா', icon: '🌿' },
+            ]).map(floorPlan => {
+              const secKey = floorPlan.id || floorPlan.sectionId;
               if (floorFilterSection !== 'ALL' && floorFilterSection !== secKey) return null;
               const secTables = floorTables.filter(tbl => {
                 if (tbl.section !== secKey) return false;
@@ -5207,17 +5370,48 @@ Status: SHIFT CLOSED & VERIFIED
                 return null;
               }
 
-              const sectionTitle = secKey === 'GROUND_FLOOR' ? '🏛️ Ground Floor Chettinad Dining' :
-                secKey === 'AC_HALL' ? '❄️ AC Royal Dining Hall' : '🌿 Traditional Chettinad Courtyard / Veranda';
+              const sectionTitle = `${floorPlan.icon || '📍'} ${floorPlan.name}${floorPlan.tamilName ? ` • ${floorPlan.tamilName}` : ''}`;
 
               return (
-                <div key={secKey} style={{ marginBottom: '1.5rem' }}>
-                  <div className={styles.floorSectionTitle}>
-                    <span>{sectionTitle} ({secTables.length} tables)</span>
+                <div key={secKey} style={{ marginBottom: '1.75rem', background: 'var(--bg-card, #18181b)', border: '1px solid var(--border-subtle, #27272a)', borderRadius: '12px', padding: '1.25rem' }}>
+                  <div className={styles.floorSectionTitle} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem', borderBottom: '1px solid var(--border-subtle, #27272a)', paddingBottom: '0.75rem' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+                      <span style={{ fontSize: '1.15rem', fontWeight: 800, color: 'var(--text-primary)' }}>{sectionTitle}</span>
+                      <span className={styles.statusBadge} style={{ background: 'rgba(37, 99, 235, 0.15)', color: '#3b82f6', border: '1px solid #3b82f6', fontSize: '0.75rem' }}>
+                        {secTables.length} tables
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'flex', gap: '0.45rem', alignItems: 'center' }}>
+                      <button
+                        type="button"
+                        className={styles.btnFloorAction}
+                        onClick={() => {
+                          setNewTableData(prev => ({ ...prev, section: secKey }));
+                          setShowAddTableModal(true);
+                        }}
+                        style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem', background: '#2563eb', color: '#fff', borderColor: '#2563eb' }}
+                        title={`Add table to ${floorPlan.name}`}
+                      >
+                        ➕ Add Table
+                      </button>
+                      <button
+                        type="button"
+                        className={styles.btnFloorAction}
+                        onClick={() => {
+                          setFloorPlanToDelete({ ...floorPlan, tableCount: secTables.length });
+                          setDeletePlanPin('');
+                        }}
+                        style={{ fontSize: '0.78rem', padding: '0.35rem 0.75rem', color: '#ef4444', borderColor: 'rgba(239, 68, 68, 0.4)', background: 'rgba(239, 68, 68, 0.08)' }}
+                        title={`Delete floor plan ${floorPlan.name}`}
+                      >
+                        🗑️ Delete Plan
+                      </button>
+                    </div>
                   </div>
 
                   {secTables.length === 0 ? (
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', padding: '1rem', fontStyle: 'italic', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', padding: '1.5rem', fontStyle: 'italic', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.75rem', background: 'rgba(255,255,255,0.02)', borderRadius: '8px' }}>
                       <span>No tables currently in this section.</span>
                       <button
                         type="button"
@@ -5228,7 +5422,7 @@ Status: SHIFT CLOSED & VERIFIED
                         }}
                         style={{ fontSize: '0.75rem', padding: '0.35rem 0.8rem', background: '#2563eb', color: '#fff', borderColor: '#2563eb' }}
                       >
-                        ➕ Add Table to {secKey === 'GROUND_FLOOR' ? 'Ground Floor' : secKey === 'AC_HALL' ? 'AC Hall' : 'Veranda'}
+                        ➕ Add Table to {floorPlan.name}
                       </button>
                     </div>
                   ) : (
@@ -12500,9 +12694,15 @@ Status: SHIFT CLOSED & VERIFIED
                   className={styles.posSelectField}
                   style={{ width: '100%', height: '36px' }}
                 >
-                  <option value="GROUND_FLOOR">🏛️ Ground Floor Chettinad Dining</option>
-                  <option value="AC_HALL">❄️ AC Royal Dining Hall</option>
-                  <option value="VERANDA">🌿 Traditional Courtyard / Veranda</option>
+                  {(floorPlans.length > 0 ? floorPlans : [
+                    { id: 'GROUND_FLOOR', name: 'Ground Floor Chettinad Dining', icon: '🏛️' },
+                    { id: 'AC_HALL', name: 'AC Royal Dining Hall', icon: '❄️' },
+                    { id: 'VERANDA', name: 'Traditional Courtyard / Veranda', icon: '🌿' },
+                  ]).map(fp => (
+                    <option key={fp.id} value={fp.id}>
+                      {fp.icon || '📍'} {fp.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -12613,9 +12813,15 @@ Status: SHIFT CLOSED & VERIFIED
                   className={styles.posSelectField}
                   style={{ width: '100%', height: '36px' }}
                 >
-                  <option value="GROUND_FLOOR">🏛️ Ground Floor Chettinad Dining</option>
-                  <option value="AC_HALL">❄️ AC Royal Dining Hall</option>
-                  <option value="VERANDA">🌿 Traditional Courtyard / Veranda</option>
+                  {(floorPlans.length > 0 ? floorPlans : [
+                    { id: 'GROUND_FLOOR', name: 'Ground Floor Chettinad Dining', icon: '🏛️' },
+                    { id: 'AC_HALL', name: 'AC Royal Dining Hall', icon: '❄️' },
+                    { id: 'VERANDA', name: 'Traditional Courtyard / Veranda', icon: '🌿' },
+                  ]).map(fp => (
+                    <option key={fp.id} value={fp.id}>
+                      {fp.icon || '📍'} {fp.name}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -12660,6 +12866,217 @@ Status: SHIFT CLOSED & VERIFIED
                   type="button"
                   className={styles.btnNavAlt}
                   onClick={() => setShowEditTableModal(null)}
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Delete Floor Plan Confirmation Modal ─── */}
+      {floorPlanToDelete && (
+        <div className={styles.posModalOverlay}>
+          <div className={styles.posModalBox} style={{ maxWidth: '480px', border: '1px solid rgba(239, 68, 68, 0.4)' }}>
+            <div className={styles.posModalHeader}>
+              <div>
+                <h3 className={styles.posModalTitle} style={{ color: '#ef4444' }}>
+                  🗑️ Delete Floor Plan
+                </h3>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  Confirm removal of dining section &amp; all associated tables
+                </span>
+              </div>
+              <button
+                type="button"
+                className={styles.posModalCloseBtn}
+                onClick={() => {
+                  setFloorPlanToDelete(null);
+                  setDeletePlanPin('');
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '0.5rem 0' }}>
+              <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '8px', padding: '0.85rem', color: '#ef4444', fontSize: '0.82rem', lineHeight: '1.4' }}>
+                <div style={{ fontWeight: 800, marginBottom: '0.25rem', fontSize: '0.9rem' }}>
+                  ⚠️ Warning: Irreversible Action
+                </div>
+                Are you sure you want to delete <strong>{floorPlanToDelete.icon || '📍'} {floorPlanToDelete.name}</strong>?
+                {floorPlanToDelete.tableCount > 0 ? (
+                  <div style={{ marginTop: '0.5rem', color: '#f87171' }}>
+                    This section currently contains <strong>{floorPlanToDelete.tableCount} table(s)</strong>. Deleting this floor plan will also permanently remove all tables in this section from the live database.
+                  </div>
+                ) : (
+                  <div style={{ marginTop: '0.5rem' }}>
+                    This floor plan currently has 0 tables and will be removed from your layout.
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block', marginBottom: '0.35rem' }}>
+                  ENTER MANAGER PIN TO CONFIRM (Default: 1234 or 4321):
+                </label>
+                <input
+                  type="password"
+                  placeholder="Manager PIN"
+                  value={deletePlanPin}
+                  onChange={e => setDeletePlanPin(e.target.value)}
+                  className={styles.posDiscountInput}
+                  style={{ width: '100%', height: '38px', letterSpacing: '0.2rem', textAlign: 'center', fontSize: '1.1rem' }}
+                  maxLength={6}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                <button
+                  type="button"
+                  className={styles.btnPunchKot}
+                  style={{ flex: 1, background: '#ef4444', borderColor: '#ef4444' }}
+                  onClick={handleConfirmDeleteFloorPlan}
+                  disabled={isDeletingPlan}
+                >
+                  {isDeletingPlan ? '⏳ Deleting...' : '🗑️ Confirm & Delete Floor Plan'}
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnNavAlt}
+                  onClick={() => {
+                    setFloorPlanToDelete(null);
+                    setDeletePlanPin('');
+                  }}
+                  disabled={isDeletingPlan}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Add Floor Plan Modal ─── */}
+      {showAddFloorPlanModal && (
+        <div className={styles.posModalOverlay}>
+          <div className={styles.posModalBox} style={{ maxWidth: '480px' }}>
+            <div className={styles.posModalHeader}>
+              <div>
+                <h3 className={styles.posModalTitle} style={{ color: '#10b981' }}>
+                  ➕ Create New Dining Floor Plan
+                </h3>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                  Add a new restaurant zone, hall, rooftop terrace, or outdoor courtyard
+                </span>
+              </div>
+              <button
+                type="button"
+                className={styles.posModalCloseBtn}
+                onClick={() => setShowAddFloorPlanModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleAddFloorPlanSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>
+                  FLOOR PLAN NAME (ENGLISH) *
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Rooftop Garden Dining or VIP Banquet Hall"
+                  value={newFloorPlanForm.name}
+                  onChange={e => setNewFloorPlanForm({ ...newFloorPlanForm, name: e.target.value })}
+                  className={styles.posDiscountInput}
+                  style={{ width: '100%', height: '36px' }}
+                  required
+                />
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>
+                  TAMIL NAME (OPTIONAL)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. மாடி தோட்டம் அல்லது விஐபி கூடம்"
+                  value={newFloorPlanForm.tamilName}
+                  onChange={e => setNewFloorPlanForm({ ...newFloorPlanForm, tamilName: e.target.value })}
+                  className={styles.posDiscountInput}
+                  style={{ width: '100%', height: '36px' }}
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>
+                    ICON
+                  </label>
+                  <select
+                    value={newFloorPlanForm.icon}
+                    onChange={e => setNewFloorPlanForm({ ...newFloorPlanForm, icon: e.target.value })}
+                    className={styles.posSelectField}
+                    style={{ width: '100%', height: '36px' }}
+                  >
+                    <option value="🏛️">🏛️ Traditional Heritage</option>
+                    <option value="❄️">❄️ AC Royal Hall</option>
+                    <option value="🌿">🌿 Chettinad Veranda</option>
+                    <option value="🌴">🌴 Palm Garden / Rooftop</option>
+                    <option value="🌟">🌟 VIP Lounge</option>
+                    <option value="🏮">🏮 Lantern Courtyard</option>
+                    <option value="🍽️">🍽️ Dining Hall</option>
+                    <option value="☕">☕ Coffee &amp; Tiffin Nook</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>
+                    FLOOR LEVEL
+                  </label>
+                  <select
+                    value={newFloorPlanForm.floorLevel}
+                    onChange={e => setNewFloorPlanForm({ ...newFloorPlanForm, floorLevel: Number(e.target.value) })}
+                    className={styles.posSelectField}
+                    style={{ width: '100%', height: '36px' }}
+                  >
+                    <option value={0}>Ground Floor (Level 0)</option>
+                    <option value={1}>First Floor (Level 1)</option>
+                    <option value={2}>Second Floor (Level 2)</option>
+                    <option value={3}>Rooftop / Terrace (Level 3)</option>
+                    <option value={-1}>Lower Ground / Basement</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>
+                  DESCRIPTION
+                </label>
+                <textarea
+                  placeholder="e.g. Scenic open-air rooftop dining area for evening dinners and celebrations"
+                  value={newFloorPlanForm.description}
+                  onChange={e => setNewFloorPlanForm({ ...newFloorPlanForm, description: e.target.value })}
+                  className={styles.posDiscountInput}
+                  style={{ width: '100%', height: '60px', resize: 'vertical' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                <button
+                  type="submit"
+                  className={styles.btnPunchKot}
+                  style={{ flex: 1, background: '#10b981', borderColor: '#10b981' }}
+                >
+                  ➕ Save &amp; Create Floor Plan
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnNavAlt}
+                  onClick={() => setShowAddFloorPlanModal(false)}
                 >
                   Cancel
                 </button>
