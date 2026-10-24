@@ -697,10 +697,33 @@ export default function AdminPage() {
   const fetchMenu = useCallback(async () => {
     try {
       setMenuLoading(true);
-      const res = await fetch('/api/admin/menu?includeArchived=true');
+      const res = await fetch(`/api/admin/menu?includeArchived=true&t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await res.json();
       if (data.success) {
-        setMenuItems(data.allMenu || data.menu || []);
+        const rawItems = data.allMenu || data.menu || [];
+        const hydratedItems = rawItems.map(item => {
+          if (item.image && typeof window !== 'undefined') {
+            try {
+              localStorage.setItem('sgr_dish_img_' + item.id, item.image);
+              if (item.title) localStorage.setItem('sgr_dish_img_' + item.title, item.image);
+            } catch (e) {}
+            return item;
+          }
+          if (!item.image && typeof window !== 'undefined') {
+            try {
+              const localImg = localStorage.getItem('sgr_dish_img_' + item.id) || localStorage.getItem('sgr_dish_img_' + item.title);
+              if (localImg) return { ...item, image: localImg };
+            } catch (e) {}
+          }
+          return item;
+        });
+        setMenuItems(hydratedItems);
         setCategoriesList(data.categories || []);
         setMenuAuditLogs(data.auditLogs || []);
         if (Array.isArray(data.mealSections)) setMealSections(data.mealSections);
@@ -2374,6 +2397,7 @@ Status: SHIFT CLOSED & VERIFIED
     setDishModalMode(mode);
     setDishFormTab('INFO');
     if (mode === 'EDIT' && dish) {
+      const localDishImg = typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + dish.id) || localStorage.getItem('sgr_dish_img_' + dish.title) || '') : '';
       setDishFormData({
         id: dish.id,
         title: dish.title || '',
@@ -2383,7 +2407,7 @@ Status: SHIFT CLOSED & VERIFIED
         price: dish.price !== undefined && dish.price !== null ? dish.price : '',
         portionSize: dish.portionSize || 'Standard (1 Person)',
         prepTime: dish.prepTime || 10,
-        image: dish.image || '',
+        image: dish.image || localDishImg || '',
         description: dish.description || '',
         station: dish.station || 'TIFFIN',
         available: dish.available !== false,
@@ -2474,6 +2498,19 @@ Status: SHIFT CLOSED & VERIFIED
         showNotice(data.message || `Dish saved successfully!`);
         setShowDishModal(false);
         setImageUploadStatus('');
+
+        // Persist image to client-side localStorage as fail-safe fallback
+        if (typeof window !== 'undefined') {
+          const savedImg = (data.item && data.item.image) || itemToSave.image;
+          const targetId = (data.item && data.item.id) || itemToSave.id;
+          const targetTitle = (data.item && data.item.title) || itemToSave.title;
+          if (savedImg && targetId) {
+            try {
+              localStorage.setItem('sgr_dish_img_' + targetId, savedImg);
+              if (targetTitle) localStorage.setItem('sgr_dish_img_' + targetTitle, savedImg);
+            } catch (e) {}
+          }
+        }
 
         // Optimistically update the menu in state so the card displays the new image IMMEDIATELY
         if (data.item) {
@@ -2811,8 +2848,8 @@ Status: SHIFT CLOSED & VERIFIED
     }
   };
 
-  // Client-side HTML5 Canvas Image Resizer & Optimizer (<150KB WebP)
-  const compressImageFile = (file, maxWidth = 1080, maxHeight = 1080, quality = 0.85) => {
+  // Client-side HTML5 Canvas Image Resizer & Optimizer (<60KB WebP)
+  const compressImageFile = (file, maxWidth = 800, maxHeight = 800, quality = 0.80) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
       reader.onerror = () => reject(new Error('Failed to read image file'));
@@ -2874,8 +2911,8 @@ Status: SHIFT CLOSED & VERIFIED
       setImageUploading(true);
       setImageUploadStatus('Compressing & optimizing photo...');
 
-      // 1. Client-side canvas compression: scales down to max 1080px and converts to high-efficiency WebP (~70-120KB)
-      const compressedDataUrl = await compressImageFile(file, 1080, 1080, 0.85);
+      // 1. Client-side canvas compression: scales down to max 800px and converts to high-efficiency WebP (~35-60KB)
+      const compressedDataUrl = await compressImageFile(file, 800, 800, 0.80);
       const estSizeKb = Math.round((compressedDataUrl.length * 3) / 4 / 1024);
 
       setDishFormData(prev => ({ ...prev, image: compressedDataUrl }));
@@ -3995,12 +4032,22 @@ Status: SHIFT CLOSED & VERIFIED
                         onClick={() => handleDishClick(dish)}
                         title={`Click to add ${dish.title} to Cart`}
                       >
-                        <img
-                          src={dish.image}
-                          alt={dish.title}
-                          className={styles.posDishThumb}
-                          loading="lazy"
-                        />
+                        {(() => {
+                          const posImg = dish.image || (typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + dish.id) || localStorage.getItem('sgr_dish_img_' + dish.title)) : null);
+                          return (
+                            <img
+                              src={posImg || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='28'%3E🍲%3C/text%3E%3C/svg%3E"}
+                              alt={dish.title}
+                              className={styles.posDishThumb}
+                              loading="eager"
+                              decoding="async"
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='28'%3E🍲%3C/text%3E%3C/svg%3E";
+                              }}
+                            />
+                          );
+                        })()}
                         <div className={styles.posDishInfo}>
                           <span className={styles.posDishTitle}>{dish.title}</span>
                           {dish.tamilTitle && (
@@ -6999,16 +7046,28 @@ Status: SHIFT CLOSED & VERIFIED
                     >
                       {/* Photo Header */}
                       <div className={styles.menuCardImgWrap}>
-                        <img
-                          src={dish.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='28'%3E🍲%3C/text%3E%3C/svg%3E"}
-                          alt={dish.title}
-                          className={styles.menuCardImg}
-                          loading="lazy"
-                          onError={(e) => {
-                            e.currentTarget.onerror = null;
-                            e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='28'%3E🍲%3C/text%3E%3C/svg%3E";
-                          }}
-                        />
+                        {(() => {
+                          const localImage = typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + dish.id) || localStorage.getItem('sgr_dish_img_' + dish.title)) : null;
+                          const effectiveImg = dish.image || localImage;
+                          return (
+                            <img
+                              src={effectiveImg || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='28'%3E🍲%3C/text%3E%3C/svg%3E"}
+                              alt={dish.title}
+                              className={styles.menuCardImg}
+                              loading="eager"
+                              decoding="async"
+                              onError={(e) => {
+                                const fallbackImg = typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + dish.id) || localStorage.getItem('sgr_dish_img_' + dish.title)) : null;
+                                if (fallbackImg && e.currentTarget.src !== fallbackImg) {
+                                  e.currentTarget.src = fallbackImg;
+                                  return;
+                                }
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='28'%3E🍲%3C/text%3E%3C/svg%3E";
+                              }}
+                            />
+                          );
+                        })()}
                         {/* Overlay Badges */}
                         <div className={styles.menuCardOverlayBadge}>
                           <span className={styles.badgeVeg} title="100% Pure Vegetarian Karaikudi Heritage">
@@ -7258,15 +7317,27 @@ Status: SHIFT CLOSED & VERIFIED
                             />
                           </td>
                           <td>
-                            <img
-                              src={dish.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='18'%3E🍲%3C/text%3E%3C/svg%3E"}
-                              alt={dish.title}
-                              className={styles.menuImgThumb}
-                              onError={(e) => {
-                                e.currentTarget.onerror = null;
-                                e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='18'%3E🍲%3C/text%3E%3C/svg%3E";
-                              }}
-                            />
+                            {(() => {
+                              const tblImg = dish.image || (typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + dish.id) || localStorage.getItem('sgr_dish_img_' + dish.title)) : null);
+                              return (
+                                <img
+                                  src={tblImg || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='18'%3E🍲%3C/text%3E%3C/svg%3E"}
+                                  alt={dish.title}
+                                  className={styles.menuImgThumb}
+                                  loading="eager"
+                                  decoding="async"
+                                  onError={(e) => {
+                                    const fallbackImg = typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + dish.id) || localStorage.getItem('sgr_dish_img_' + dish.title)) : null;
+                                    if (fallbackImg && e.currentTarget.src !== fallbackImg) {
+                                      e.currentTarget.src = fallbackImg;
+                                      return;
+                                    }
+                                    e.currentTarget.onerror = null;
+                                    e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='18'%3E🍲%3C/text%3E%3C/svg%3E";
+                                  }}
+                                />
+                              );
+                            })()}
                           </td>
                           <td>
                             <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: '0.85rem' }}>

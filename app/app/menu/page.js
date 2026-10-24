@@ -40,7 +40,7 @@ export default function MenuPage() {
     } catch (e) {}
 
     // Load CMS data
-    fetch('/api/admin/cms?mode=published')
+    fetch(`/api/admin/cms?mode=published&t=${Date.now()}`, { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.published) {
@@ -50,11 +50,28 @@ export default function MenuPage() {
       .catch(() => {});
 
     // Load Live Menu & Meal Sections
-    fetch('/api/admin/menu')
+    fetch(`/api/admin/menu?t=${Date.now()}`, { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
-          if (Array.isArray(data.allMenu || data.menu || data.items)) setLiveMenu(data.allMenu || data.menu || data.items);
+          const rawMenu = data.allMenu || data.menu || data.items || [];
+          const hydratedMenu = rawMenu.map((item) => {
+            if (item.image && typeof window !== 'undefined') {
+              try {
+                localStorage.setItem('sgr_dish_img_' + item.id, item.image);
+                if (item.title) localStorage.setItem('sgr_dish_img_' + item.title, item.image);
+              } catch (e) {}
+              return item;
+            }
+            if (!item.image && typeof window !== 'undefined') {
+              try {
+                const localImg = localStorage.getItem('sgr_dish_img_' + item.id) || localStorage.getItem('sgr_dish_img_' + item.title);
+                if (localImg) return { ...item, image: localImg };
+              } catch (e) {}
+            }
+            return item;
+          });
+          setLiveMenu(hydratedMenu);
           if (Array.isArray(data.categories)) setLiveCategories(data.categories);
           if (Array.isArray(data.mealSections)) setLiveMealSections(data.mealSections);
         }

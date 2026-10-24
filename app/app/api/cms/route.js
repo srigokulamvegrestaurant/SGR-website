@@ -1,13 +1,15 @@
 // app/api/cms/route.js - Public endpoint providing published CMS content to customer website
 import { NextResponse } from 'next/server';
-import { getDb, getWebsiteCms } from '@/lib/db';
+import { getDb, getDbAsync, getWebsiteCms } from '@/lib/db';
 import { DEFAULT_WEBSITE_CMS } from '@/lib/cms_defaults';
 import { getEvaluatedMealSections, DEFAULT_MEAL_SECTIONS } from '@/lib/meal_sections';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 export async function GET() {
   try {
-    const db = getDb();
+    const db = await getDbAsync();
     const cms = getWebsiteCms();
     // Prefer published; if empty or null, fallback to draft, then defaults
     const published = cms?.published || cms?.draft || DEFAULT_WEBSITE_CMS.published;

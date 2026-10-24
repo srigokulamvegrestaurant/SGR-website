@@ -72,20 +72,33 @@ export default function MenuSection({
   // 3. Normalise dishes from liveMenu
   const allItems = useMemo(() => {
     if (Array.isArray(liveMenu) && liveMenu.length > 0) {
-      return liveMenu.map((item) => ({
-        id: item.id,
-        title: item.title,
-        tamilTitle: item.tamilTitle || item.taTitle || '',
-        category: item.category || 'Tiffin',
-        mealSection: String(item.mealSection || 'BREAKFAST').toUpperCase(),
-        price: Number(item.price) || 0,
-        displayOrder: item.displayOrder || 999,
-        popularity: item.displayOrder ? 100 - item.displayOrder : item.isBestseller ? 50 : 10,
-        desc: item.description || item.desc || '',
-        image: item.image || '',
-        station: item.station || 'TIFFIN',
-        available: item.available !== false && item.status !== 'SOLD_OUT' && item.status !== 'UNAVAILABLE' && item.status !== '86',
-      }));
+      return liveMenu.map((item) => {
+        let dishImg = item.image || '';
+        if (dishImg && typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('sgr_dish_img_' + item.id, dishImg);
+            if (item.title) localStorage.setItem('sgr_dish_img_' + item.title, dishImg);
+          } catch (e) {}
+        } else if (!dishImg && typeof window !== 'undefined') {
+          try {
+            dishImg = localStorage.getItem('sgr_dish_img_' + item.id) || localStorage.getItem('sgr_dish_img_' + item.title) || '';
+          } catch (e) {}
+        }
+        return {
+          id: item.id,
+          title: item.title,
+          tamilTitle: item.tamilTitle || item.taTitle || '',
+          category: item.category || 'Tiffin',
+          mealSection: String(item.mealSection || 'BREAKFAST').toUpperCase(),
+          price: Number(item.price) || 0,
+          displayOrder: item.displayOrder || 999,
+          popularity: item.displayOrder ? 100 - item.displayOrder : item.isBestseller ? 50 : 10,
+          desc: item.description || item.desc || '',
+          image: dishImg,
+          station: item.station || 'TIFFIN',
+          available: item.available !== false && item.status !== 'SOLD_OUT' && item.status !== 'UNAVAILABLE' && item.status !== '86',
+        };
+      });
     }
     return [];
   }, [liveMenu]);
@@ -342,7 +355,8 @@ export default function MenuSection({
       ) : displayedItems.length > 0 ? (
         <div className={styles.menuGrid}>
           {displayedItems.map((item) => {
-            const hasCustomImage = Boolean(item.image);
+            const customImg = item.image || (typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + item.id) || localStorage.getItem('sgr_dish_img_' + item.title) || '') : '');
+            const hasCustomImage = Boolean(customImg);
             const fallbackIcon = getFallbackIconForDish(item.title, item.category, item.mealSection);
 
             return (
@@ -354,7 +368,7 @@ export default function MenuSection({
                 <div className={styles.imgWrap}>
                   {hasCustomImage ? (
                     <AnimatedImage
-                      src={item.image}
+                      src={customImg}
                       alt={item.title}
                       style={{ width: '100%', height: '100%', borderRadius: 'inherit' }}
                     />

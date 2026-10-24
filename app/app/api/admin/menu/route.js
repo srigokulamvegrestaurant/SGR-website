@@ -2,10 +2,12 @@
 import { NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
-import { getDb, saveDb, categorizeStation } from '@/lib/db';
+import { getDb, getDbAsync, saveDb, saveDbAsync, categorizeStation } from '@/lib/db';
 import { broadcast } from '@/app/api/events/route';
 import { getEvaluatedMealSections, DEFAULT_MEAL_SECTIONS } from '@/lib/meal_sections';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
 // Helper to log audit changes
 function logMenuAudit(db, { dishId, dishName, action, details, changedBy = 'Admin', role = 'STORE_MANAGER' }) {
@@ -29,7 +31,7 @@ function logMenuAudit(db, { dishId, dishName, action, details, changedBy = 'Admi
 
 export async function GET(request) {
   try {
-    const db = getDb();
+    const db = await getDbAsync();
     const { searchParams } = new URL(request.url);
     const includeArchived = searchParams.get('includeArchived') === 'true';
 
@@ -66,17 +68,26 @@ export async function GET(request) {
     const rawMealSections = db.meal_sections || DEFAULT_MEAL_SECTIONS;
     const mealSections = getEvaluatedMealSections(rawMealSections);
 
-    return NextResponse.json({
-      success: true,
-      menu,
-      allMenu: db.menu || [],
-      mealSections,
-      categories,
-      inventory,
-      recipes,
-      auditLogs,
-      summary,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        menu,
+        allMenu: db.menu || [],
+        mealSections,
+        categories,
+        inventory,
+        recipes,
+        auditLogs,
+        summary,
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+      }
+    );
   } catch (err) {
     console.error('Menu GET Error:', err);
     return NextResponse.json({ success: false, error: err.message }, { status: 500 });

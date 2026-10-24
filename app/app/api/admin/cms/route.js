@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import {
   getDb,
+  getDbAsync,
   saveDb,
   getWebsiteCms,
   saveWebsiteDraft,
@@ -12,10 +13,13 @@ import {
 } from '@/lib/db';
 import { DEFAULT_WEBSITE_CMS, createInitialContentSnapshot } from '@/lib/cms_defaults';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 // GET: Return entire CMS state (draft, published, versions, audit, media, plus active menu)
 export async function GET(req) {
   try {
-    const db = getDb();
+    const db = await getDbAsync();
     const cms = getWebsiteCms();
 
     // Check query params
@@ -23,22 +27,40 @@ export async function GET(req) {
     const mode = searchParams.get('mode'); // 'draft' | 'published' | 'all'
 
     if (mode === 'published') {
-      return NextResponse.json({
-        success: true,
-        published: cms.published || DEFAULT_WEBSITE_CMS.published,
-      });
+      return NextResponse.json(
+        {
+          success: true,
+          published: cms.published || DEFAULT_WEBSITE_CMS.published,
+        },
+        {
+          headers: {
+            'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+            Pragma: 'no-cache',
+            Expires: '0',
+          },
+        }
+      );
     }
 
-    return NextResponse.json({
-      success: true,
-      draft: cms.draft || DEFAULT_WEBSITE_CMS.draft,
-      published: cms.published || DEFAULT_WEBSITE_CMS.published,
-      versions: cms.versions || [],
-      auditLog: cms.auditLog || [],
-      mediaLibrary: cms.mediaLibrary || [],
-      menu: db.menu || [],
-      categories: db.categories || [],
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        draft: cms.draft || DEFAULT_WEBSITE_CMS.draft,
+        published: cms.published || DEFAULT_WEBSITE_CMS.published,
+        versions: cms.versions || [],
+        auditLog: cms.auditLog || [],
+        mediaLibrary: cms.mediaLibrary || [],
+        menu: db.menu || [],
+        categories: db.categories || [],
+      },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+          Pragma: 'no-cache',
+          Expires: '0',
+        },
+      }
+    );
   } catch (error) {
     console.error('Error fetching CMS data:', error);
     return NextResponse.json(

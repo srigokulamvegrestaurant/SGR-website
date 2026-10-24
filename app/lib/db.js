@@ -9,6 +9,7 @@ import { DEFAULT_WEBSITE_CMS, createInitialContentSnapshot } from './cms_default
 import { DEFAULT_BILL_SLIP_FORMAT } from './thermalSlipFormatter.js';
 import { DEFAULT_MEAL_SECTIONS } from './meal_sections.js';
 import { OFFICIAL_MENU_ITEMS } from './menu_pdf_items.js';
+import { loadStateFromPg, saveStateToPg } from './pg_store.js';
 
 // Default protected Developer Admin email addresses (Permanently protected from modification, demotion, deactivation, or deletion)
 export const PROTECTED_DEVELOPER_EMAILS = [
@@ -926,9 +927,51 @@ export function saveDb(data) {
     const targetFile = getDataFilePath();
     fs.writeFileSync(targetFile, JSON.stringify(data, null, 2), 'utf-8');
   } catch (err) {
-    console.error('Error saving data store:', err);
+    console.error('Error saving data store to disk:', err);
+  }
+  // Asynchronously sync to PostgreSQL so images & dishes persist across serverless containers
+  saveStateToPg('restaurant_state', data).catch(() => {});
+  return memoryStore;
+}
+
+export async function saveDbAsync(data) {
+  if (data && data.settings) {
+    syncLegacySettings(data.settings);
+  }
+  memoryStore = data;
+  try {
+    ensureDataStore();
+    const targetFile = getDataFilePath();
+    fs.writeFileSync(targetFile, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (err) {
+    console.error('Error saving data store to disk:', err);
+  }
+  try {
+    await saveStateToPg('restaurant_state', data);
+  } catch (err) {
+    console.warn('Warning: Postgres async save failed:', err.message);
   }
   return memoryStore;
+}
+
+export async function getDbAsync() {
+  try {
+    // Fast check with 2.5s timeout so network lag never freezes requests
+    const pgPromise = loadStateFromPg('restaurant_state');
+    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 2500));
+    const pgData = await Promise.race([pgPromise, timeoutPromise]);
+    if (pgData && Array.isArray(pgData.menu) && pgData.menu.length > 0) {
+      memoryStore = pgData;
+      try {
+        const targetFile = getDataFilePath();
+        fs.writeFileSync(targetFile, JSON.stringify(pgData, null, 2), 'utf-8');
+      } catch (e) {}
+      return memoryStore;
+    }
+  } catch (err) {
+    console.warn('Error reading from PG in getDbAsync (falling back to disk):', err.message);
+  }
+  return getDb();
 }
 
 // Kitchen Station Categorizer (Requirement 6: Dosa, Tiffin, Meals, Snacks, Beverages)
