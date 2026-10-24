@@ -101,142 +101,24 @@ const SEED_DATA = {
     { id: 'cat_sweets', name: 'Sweets', tamilName: 'பாரம்பரிய இனிப்புகள்', icon: '🍯', description: 'Elaneer payasam, badam halwa, and sweet paniyaram', displayOrder: 8, isActive: true, station: 'BEVERAGES' },
     { id: 'cat_beverages', name: 'Beverages', tamilName: 'பானங்கள்', icon: '☕', description: 'Kumbakonam degree filter coffee, jigarthanda, and fresh juices', displayOrder: 9, isActive: true, station: 'BEVERAGES' },
   ],
-  menu_audit_logs: [
-    {
-      id: 'audit_01',
-      timestamp: '2026-10-17T06:00:00.000Z',
-      dishId: 'dish_01',
-      dishName: 'Special Ghee Podi Roast',
-      action: 'ITEM_CREATED',
-      details: 'Initial menu setup with 3 portion variants and 3 add-ons',
-      changedBy: 'Aswin (Lead Architect)',
-      role: 'DEVELOPER_ADMIN',
-    },
-    {
-      id: 'audit_02',
-      timestamp: '2026-10-17T07:15:00.000Z',
-      dishId: 'dish_05',
-      dishName: 'Raja Chettinad Full Meals (Leaf)',
-      action: 'OFFER_APPLIED',
-      details: 'Configured festival special discount 10% (₹210 -> ₹189)',
-      changedBy: 'Karthikeyan (Manager)',
-      role: 'STORE_MANAGER',
-    },
-    {
-      id: 'audit_03',
-      timestamp: '2026-10-17T08:30:00.000Z',
-      dishId: 'dish_04',
-      dishName: 'Chettinad Kuzhi Paniyaram (6 pcs)',
-      action: 'AVAILABILITY_CHANGE',
-      details: 'Marked as SOLD OUT during breakfast rush (Batter depleted)',
-      changedBy: 'Selvam (Head Cook)',
-      role: 'KITCHEN',
-    },
-    {
-      id: 'audit_04',
-      timestamp: '2026-10-17T09:10:00.000Z',
-      dishId: 'dish_04',
-      dishName: 'Chettinad Kuzhi Paniyaram (6 pcs)',
-      action: 'AVAILABILITY_CHANGE',
-      details: 'Fresh batch cast-iron cooked - Restored to AVAILABLE',
-      changedBy: 'Karthikeyan (Manager)',
-      role: 'STORE_MANAGER',
-    },
-  ],
-  customers: [
-    { id: 'cust_01', name: 'Aswin', phone: '9999999999', visits: 18, totalSpend: 8420, tag: 'VIP' },
-    { id: 'cust_02', name: 'Karthik Raja', phone: '9876543210', visits: 12, totalSpend: 5460, tag: 'Regular' },
-    { id: 'cust_03', name: 'Meenakshi Sundaram', phone: '9443123456', visits: 8, totalSpend: 3120, tag: 'Regular' },
-    { id: 'cust_04', name: 'Anand Kumar', phone: '9842155667', visits: 3, totalSpend: 1150, tag: 'New' },
-    { id: 'cust_05', name: 'Suresh Chettiar', phone: '9789012345', visits: 24, totalSpend: 14200, tag: 'VIP' },
-  ],
-  shifts: [
-    {
-      id: 'shift_current',
-      cashierName: 'Rajan (POS Cashier)',
-      startedAt: '2026-10-17T06:30:00.000Z',
-      openingFloat: 2000,
-      cashSales: 5577,
-      upiSales: 13728,
-      cardSales: 1502,
-      payouts: [
-        { id: 'pay_01', amount: 350, reason: 'Fresh Cow Milk Procurement', time: '08:15 AM' }
-      ],
-      status: 'OPEN',
-    }
-  ],
+  menu_audit_logs: [],
+  customers: [],
+  shifts: [],
   held_orders: [],
-  refund_logs: [
-    {
-      id: 'ref_01',
-      billNumber: 'SGR-2026-8812',
-      tableNumber: '04',
-      amount: 140,
-      reason: 'Guest requested less spicy variant, cancelled Kathirikai dish',
-      authorizedBy: 'Karthikeyan (Manager)',
-      timestamp: '2026-10-17T07:15:00.000Z',
-    }
-  ],
-  qr_orders: [
-    {
-      id: 'qr_ord_01',
-      tableNumber: '07',
-      customerName: 'Aswin',
-      phone: '9999999999',
-      items: [
-        { title: 'Special Ghee Podi Roast', price: 120, quantity: 2, variant: 'Extra Ghee Roast' },
-        { title: 'Kumbakonam Degree Filter Coffee', price: 40, quantity: 2, variant: 'Strong Degree Brew' }
-      ],
-      subtotal: 320,
-      otpCode: '7087',
-      otpStatus: 'VERIFIED',
-      captainName: 'Murugan (Captain)',
-      createdAt: '2026-10-17T08:50:00.000Z',
-      status: 'PENDING_POS_ACCEPT',
-    }
-  ],
+  refund_logs: [],
+  qr_orders: [],
   wastage_logs: [],
   expenses: [],
   customer_reviews: [],
   audit_logs: [
     {
       id: 'audit_init_01',
-      timestamp: '2026-10-15T00:00:00.000Z',
-      user: 'Aswin (Lead Architect)',
+      timestamp: '2026-10-24T00:00:00.000Z',
+      user: 'System Lead',
       role: 'DEVELOPER_ADMIN',
       module: 'SYSTEM',
       action: 'SYSTEM_INITIALIZED',
       detail: 'Sri Gokulam Enterprise Restaurant Core deployed with Chettinad Sattvic configuration.',
-      ip: '127.0.0.1',
-    },
-    {
-      id: 'audit_init_02',
-      timestamp: '2026-10-16T08:00:00.000Z',
-      user: 'Owner - Sri Gokulam',
-      role: 'SUPER_ADMIN',
-      module: 'BILLING',
-      action: 'TAX_CONFIGURED',
-      detail: 'Standard Restaurant GST configured at 5% (CGST 2.5% + SGST 2.5%). FSSAI and GSTIN registered.',
-      ip: '192.168.1.10',
-    },
-    {
-      id: 'audit_init_03',
-      timestamp: '2026-10-17T06:30:00.000Z',
-      user: 'Karthikeyan (Manager)',
-      role: 'STORE_MANAGER',
-      module: 'PRINTER',
-      action: 'KOT_STATIONS_CONFIGURED',
-      detail: 'Configured 3 station printers: Tiffin & Dosa, Meals & Gravy, Beverages & Filter Coffee.',
-      ip: '192.168.1.15',
-    },
-    {
-      id: 'audit_init_04',
-      timestamp: '2026-10-17T09:00:00.000Z',
-      user: 'Aswin (Lead Architect)',
-      role: 'DEVELOPER_ADMIN',
-      module: 'SECURITY',
-      action: 'RBAC_SECURITY_ENFORCED',
-      detail: 'Granular permissions matrix enforced across POS, KOT, Inventory, Billing, and Settings.',
       ip: '127.0.0.1',
     },
   ],
@@ -651,28 +533,7 @@ const SEED_DATA = {
       maxFailedLoginAttempts: 5,
       lockoutDurationMinutes: 15,
       forceManagerPinForVoids: true,
-      activeSessions: [
-        {
-          id: 'sess_cur_01',
-          userName: 'Aswin (Lead Architect)',
-          role: 'DEVELOPER_ADMIN',
-          device: 'Desktop POS Terminal (Windows 11 / Chrome)',
-          ip: '192.168.1.10',
-          loginTime: '2026-10-18T06:00:00.000Z',
-          lastActive: '2026-10-18T12:15:00.000Z',
-          isCurrent: true,
-        },
-        {
-          id: 'sess_cur_02',
-          userName: 'Rajan (POS Cashier)',
-          role: 'CASHIER',
-          device: 'TVSE TP 415C Touch POS',
-          ip: '192.168.1.20',
-          loginTime: '2026-10-18T06:30:00.000Z',
-          lastActive: '2026-10-18T11:45:00.000Z',
-          isCurrent: false,
-        },
-      ],
+      activeSessions: [],
     },
 
     // 17. Developer Settings
@@ -871,7 +732,7 @@ export function getDb() {
       // Auto-migrate: populate any missing seed keys
       let needsSave = false;
       for (const [key, value] of Object.entries(SEED_DATA)) {
-        if (!loaded[key] || (Array.isArray(value) && loaded[key].length === 0 && value.length > 0)) {
+        if (loaded[key] === undefined) {
           loaded[key] = value;
           needsSave = true;
         }

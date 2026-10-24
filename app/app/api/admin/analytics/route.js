@@ -55,22 +55,19 @@ export async function GET(request) {
     }
 
     // 1. KPI Metrics
-    const actualSales = filteredBills.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
-    const baselineSalesToday = 21450;
-    const totalSales = actualSales > 0 ? actualSales : Math.round(baselineSalesToday * periodMultiplier);
-
-    const actualOrdersCount = filteredBills.length;
-    const baselineOrdersToday = 48;
-    const totalOrders = actualOrdersCount > 0 ? actualOrdersCount : Math.round(baselineOrdersToday * periodMultiplier);
-
-    const avgOrderValue = totalOrders > 0 ? Math.round(totalSales / totalOrders) : 410;
+    const totalSales = filteredBills.reduce((sum, b) => sum + (b.totalAmount || 0), 0);
+    const totalOrders = filteredBills.length;
+    const avgOrderValue = totalOrders > 0 ? Math.round(totalSales / totalOrders) : 0;
+    if (filteredBills.length === 0) {
+      trendValues = trendLabels.map(() => 0);
+    }
 
     // Occupied tables
     const occupiedCount = tables.filter(t => t.status === 'OCCUPIED' || t.status === 'BILL_GENERATED').length;
     const availableCount = tables.filter(t => t.status === 'AVAILABLE').length;
     const cleaningCount = tables.filter(t => t.status === 'CLEANING').length;
     const reservedCount = tables.filter(t => t.status === 'RESERVED').length;
-    const occupancyRate = tables.length > 0 ? Math.round((occupiedCount / tables.length) * 100) : 25;
+    const occupancyRate = tables.length > 0 ? Math.round((occupiedCount / tables.length) * 100) : 0;
 
     // Kitchen Status (KDS Live Pulse)
     const activeOrders = orders.filter(o => o.status !== 'PAID_SETTLED' && o.status !== 'CANCELLED');
@@ -83,31 +80,37 @@ export async function GET(request) {
     const lowStockAlerts = inventory.filter(i => (i.currentStock || 0) <= (i.lowStockThreshold || 0));
 
     // 2. Sales Breakdown by Category
-    const categorySales = [
+    const categorySales = totalSales > 0 ? [
       { name: 'Traditional Tiffin (Dosai, Idli)', category: 'Traditional Tiffin (Dosai, Idli)', percent: 44, percentage: 44, amount: Math.round(totalSales * 0.44), color: '#3b82f6' },
       { name: 'Chettinad Meals & Raja Thali', category: 'Chettinad Meals & Raja Thali', percent: 32, percentage: 32, amount: Math.round(totalSales * 0.32), color: '#10b981' },
       { name: 'Degree Filter Coffee & Drinks', category: 'Degree Filter Coffee & Drinks', percent: 14, percentage: 14, amount: Math.round(totalSales * 0.14), color: '#8b5cf6' },
       { name: 'Evening Snacks & Savories', category: 'Evening Snacks & Savories', percent: 7, percentage: 7, amount: Math.round(totalSales * 0.07), color: '#f59e0b' },
       { name: 'Traditional Sweets & Payasam', category: 'Traditional Sweets & Payasam', percent: 3, percentage: 3, amount: Math.round(totalSales * 0.03), color: '#ec4899' },
-    ];
+    ] : [];
 
     // Payment Methods Breakdown
-    const paymentBreakdown = [
+    const paymentBreakdown = totalOrders > 0 ? [
       { mode: 'UPI (GPay / PhonePe / Paytm)', method: 'UPI (GPay / PhonePe / Paytm)', percent: 64, percentage: 64, count: Math.round(totalOrders * 0.64), amount: Math.round(totalSales * 0.64), color: '#10b981' },
       { mode: 'Cash at Counter', method: 'Cash at Counter', percent: 26, percentage: 26, count: Math.round(totalOrders * 0.26), amount: Math.round(totalSales * 0.26), color: '#3b82f6' },
       { mode: 'Credit / Debit Card', method: 'Credit / Debit Card', percent: 7, percentage: 7, count: Math.round(totalOrders * 0.07), amount: Math.round(totalSales * 0.07), color: '#8b5cf6' },
       { mode: 'Split Payment', method: 'Split Payment', percent: 3, percentage: 3, count: Math.round(totalOrders * 0.03), amount: Math.round(totalSales * 0.03), color: '#06b6d4' },
-    ];
+    ] : [];
 
     // 3. Best-Selling Popular Dishes
-    const popularDishes = [
-      { id: 'pop_1', name: 'Ghee Podi Roast (Crispy)', title: 'Ghee Podi Roast (Crispy)', category: 'Tiffin', quantity: 94, count: 94, sales: 13160, revenue: 13160, icon: '🥞', image: '🥞', badge: '🔥 Chef Special' },
-      { id: 'pop_2', name: 'Kumbakonam Degree Filter Coffee', title: 'Kumbakonam Degree Filter Coffee', category: 'Beverages', quantity: 142, count: 142, sales: 6390, revenue: 6390, icon: '☕', image: '☕', badge: '⭐ Bestseller' },
-      { id: 'pop_3', name: 'Chettinad Raja Thali Full Meals', title: 'Chettinad Raja Thali Full Meals', category: 'Meals', quantity: 58, count: 58, sales: 12760, revenue: 12760, icon: '🍛', image: '🍛', badge: '👑 Royal Feast' },
-      { id: 'pop_4', name: 'Plain Idli with Trio Chutneys', title: 'Plain Idli with Trio Chutneys', category: 'Tiffin', quantity: 82, count: 82, sales: 4920, revenue: 4920, icon: '⚪', image: '⚪', badge: 'Popular' },
-      { id: 'pop_5', name: 'Karaikudi Kuzhi Paniyaram (6 pcs)', title: 'Karaikudi Kuzhi Paniyaram (6 pcs)', category: 'Snacks', quantity: 51, count: 51, sales: 4590, revenue: 4590, icon: '🧆', image: '🧆', badge: 'Traditional' },
-      { id: 'pop_6', name: 'Elaneer Payasam (Tender Coconut)', title: 'Elaneer Payasam (Tender Coconut)', category: 'Dessert', quantity: 38, count: 38, sales: 3420, revenue: 3420, icon: '🥥', image: '🥥', badge: 'Special' },
-    ];
+    const dishCountMap = {};
+    filteredBills.forEach(b => {
+      (b.items || []).forEach(it => {
+        const title = it.title || 'Special Dish';
+        if (!dishCountMap[title]) {
+          dishCountMap[title] = { id: 'pop_' + (Object.keys(dishCountMap).length + 1), name: title, title, category: it.category || 'Tiffin', quantity: 0, count: 0, sales: 0, revenue: 0, icon: '🍽️', image: '🍽️', badge: 'Popular' };
+        }
+        dishCountMap[title].quantity += (it.quantity || 1);
+        dishCountMap[title].count += (it.quantity || 1);
+        dishCountMap[title].sales += ((it.price || 0) * (it.quantity || 1));
+        dishCountMap[title].revenue += ((it.price || 0) * (it.quantity || 1));
+      });
+    });
+    const popularDishes = Object.values(dishCountMap).sort((a, b) => b.sales - a.sales).slice(0, 6);
 
     // 4. Live Orders Feed
     const liveOrdersList = (orders.slice(0, 10)).map(o => {
@@ -137,14 +140,15 @@ export async function GET(request) {
     });
 
     // 5. Recent Activity Audit Trail
-    const recentActivities = [
-      { id: 'act_1', type: 'BILL_PAID', title: 'Bill Settled', desc: 'Table #07 settled bill ₹841 via UPI (Ref: SGR-2026-9550)', text: 'Table #07 settled bill ₹841 via UPI (Ref: SGR-2026-9550)', time: '2 mins ago', icon: '🧾' },
-      { id: 'act_2', type: 'KDS_READY', title: 'Kitchen KOT Ready', desc: 'Kitchen marked 2x Ghee Podi Roast READY for Table #07', text: 'Kitchen marked 2x Ghee Podi Roast READY for Table #07', time: '8 mins ago', icon: '🍳' },
-      { id: 'act_3', type: 'OTP_VERIFIED', title: 'OTP Authorized', desc: 'Floor Captain Murugan authorized OTP 7087 at Table #07', text: 'Floor Captain Murugan authorized OTP 7087 at Table #07', time: '14 mins ago', icon: '🔑' },
-      { id: 'act_4', type: 'TABLE_OCCUPIED', title: 'Guests Seated', desc: 'Table #03 seated 4 guests (Ground Floor Family Dining)', text: 'Table #03 seated 4 guests (Ground Floor Family Dining)', time: '22 mins ago', icon: '👥' },
-      { id: 'act_5', type: 'INVENTORY_ALERT', title: 'BOM Stock Deduction', desc: 'Cow Ghee stock deducted via BOM (8.40 LTR remaining)', text: 'Cow Ghee stock deducted via BOM (8.40 LTR remaining)', time: '35 mins ago', icon: '🌾' },
-      { id: 'act_6', type: 'TABLE_CLEANED', title: 'Table Sanitized', desc: 'Table #11 sanitized & marked AVAILABLE in AC Hall', text: 'Table #11 sanitized & marked AVAILABLE in AC Hall', time: '48 mins ago', icon: '✨' },
-    ];
+    const recentActivities = (db.audit_logs || db.session_logs || []).slice(0, 6).map((log, idx) => ({
+      id: log.id || ('act_' + idx),
+      type: log.action || 'SYSTEM',
+      title: log.action || 'System Event',
+      desc: log.details || log.message || '',
+      text: log.details || log.message || '',
+      time: log.timestamp ? new Date(log.timestamp).toLocaleTimeString() : 'Recent',
+      icon: '📋',
+    }));
 
     // 6. Notifications & System Alerts
     const notifications = [
@@ -180,7 +184,7 @@ export async function GET(request) {
     const trendItems = trendLabels.map((lbl, idx) => ({
       label: lbl,
       sales: trendValues[idx] || 0,
-      orders: Math.max(1, Math.round((trendValues[idx] || 0) / 400)),
+      orders: totalOrders > 0 ? Math.round((trendValues[idx] || 0) / (avgOrderValue || 1)) : 0,
     }));
 
     return NextResponse.json({
