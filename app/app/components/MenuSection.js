@@ -340,7 +340,7 @@ export default function MenuSection({
           </p>
         </div>
       ) : displayedItems.length > 0 ? (
-        <div className={`${styles.menuGrid} reveal-stagger`}>
+        <div className={styles.menuGrid}>
           {displayedItems.map((item) => {
             const hasCustomImage = Boolean(item.image);
             const fallbackIcon = getFallbackIconForDish(item.title, item.category, item.mealSection);
@@ -349,7 +349,6 @@ export default function MenuSection({
               <div
                 key={item.id}
                 className={`${styles.productCard} ${motionStyles.cardHover}`}
-                data-reveal="scale"
               >
                 {/* Visual Header */}
                 <div className={styles.imgWrap}>
