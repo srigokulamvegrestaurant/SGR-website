@@ -3,6 +3,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import crypto from 'crypto';
 import { DEFAULT_WEBSITE_CMS, createInitialContentSnapshot } from './cms_defaults.js';
 import { DEFAULT_BILL_SLIP_FORMAT } from './thermalSlipFormatter.js';
@@ -15,9 +16,41 @@ export const PROTECTED_DEVELOPER_EMAILS = [
   'info.ajtechsolutions@gmail.com'
 ];
 
-// Storage file location inside .next / app cache or data folder
-const DATA_DIR = path.join(process.cwd(), '.data');
-const DATA_FILE = path.join(DATA_DIR, 'restaurant_state.json');
+// Storage file location: dynamically resolves writable location (supports Vercel serverless /tmp)
+function getDataFilePath() {
+  const defaultDir = path.join(process.cwd(), '.data');
+  const defaultFile = path.join(defaultDir, 'restaurant_state.json');
+
+  // Check if process.cwd() is writable (e.g. local development, VPS, Docker)
+  try {
+    if (!fs.existsSync(defaultDir)) {
+      fs.mkdirSync(defaultDir, { recursive: true });
+    }
+    const testFile = path.join(defaultDir, `.test_write_${process.pid || 1}`);
+    fs.writeFileSync(testFile, '1');
+    fs.unlinkSync(testFile);
+    return defaultFile;
+  } catch {
+    // Read-only filesystem (Vercel serverless / AWS Lambda): use /tmp
+    const tmpDir = path.join(os.tmpdir(), 'srigokulam_data');
+    const tmpFile = path.join(tmpDir, 'restaurant_state.json');
+    try {
+      if (!fs.existsSync(tmpDir)) {
+        fs.mkdirSync(tmpDir, { recursive: true });
+      }
+      if (!fs.existsSync(tmpFile)) {
+        if (fs.existsSync(defaultFile)) {
+          fs.copyFileSync(defaultFile, tmpFile);
+        } else {
+          fs.writeFileSync(tmpFile, JSON.stringify(SEED_DATA, null, 2), 'utf-8');
+        }
+      }
+    } catch (e) {
+      console.warn('Unable to initialize /tmp store:', e);
+    }
+    return tmpFile;
+  }
+}
 
 // Initial seed data matching Sri Gokulam Master Plan
 const SEED_DATA = {
@@ -629,7 +662,8 @@ export function maskSecret(val) {
 
 // Database Snapshot Backup
 export function createDatabaseBackup() {
-  const BACKUP_DIR = path.join(DATA_DIR, 'backups');
+  const targetFile = getDataFilePath();
+  const BACKUP_DIR = path.join(path.dirname(targetFile), 'backups');
   if (!fs.existsSync(BACKUP_DIR)) {
     fs.mkdirSync(BACKUP_DIR, { recursive: true });
   }
@@ -650,7 +684,8 @@ export function createDatabaseBackup() {
 
 // List all snapshots
 export function listDatabaseBackups() {
-  const BACKUP_DIR = path.join(DATA_DIR, 'backups');
+  const targetFile = getDataFilePath();
+  const BACKUP_DIR = path.join(path.dirname(targetFile), 'backups');
   if (!fs.existsSync(BACKUP_DIR)) return [];
   try {
     const files = fs.readdirSync(BACKUP_DIR).filter(f => f.endsWith('.json'));
@@ -671,7 +706,8 @@ export function listDatabaseBackups() {
 
 // Restore Database from Snapshot
 export function restoreDatabaseBackup(filename) {
-  const BACKUP_DIR = path.join(DATA_DIR, 'backups');
+  const targetFile = getDataFilePath();
+  const BACKUP_DIR = path.join(path.dirname(targetFile), 'backups');
   const targetPath = path.join(BACKUP_DIR, path.basename(filename));
   if (!fs.existsSync(targetPath)) {
     throw new Error(`Backup file ${filename} does not exist`);
@@ -688,11 +724,18 @@ export function restoreDatabaseBackup(filename) {
 // Ensure data directory exists
 function ensureDataStore() {
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
+    const targetFile = getDataFilePath();
+    const targetDir = path.dirname(targetFile);
+    if (!fs.existsSync(targetDir)) {
+      fs.mkdirSync(targetDir, { recursive: true });
     }
-    if (!fs.existsSync(DATA_FILE)) {
-      fs.writeFileSync(DATA_FILE, JSON.stringify(SEED_DATA, null, 2), 'utf-8');
+    if (!fs.existsSync(targetFile)) {
+      const defaultFile = path.join(process.cwd(), '.data', 'restaurant_state.json');
+      if (fs.existsSync(defaultFile)) {
+        fs.copyFileSync(defaultFile, targetFile);
+      } else {
+        fs.writeFileSync(targetFile, JSON.stringify(SEED_DATA, null, 2), 'utf-8');
+      }
     }
   } catch (err) {
     console.error('Error initializing data store:', err);
@@ -703,14 +746,15 @@ function ensureDataStore() {
 let memoryStore = null;
 
 export function getDb() {
-  if (memoryStore && memoryStore.inventory?.length > 0 && memoryStore.users?.length > 0) {
+  if (memoryStore && Array.isArray(memoryStore.menu) && memoryStore.menu.length > 0 && Array.isArray(memoryStore.users) && memoryStore.users.length > 0) {
     return memoryStore;
   }
   
   ensureDataStore();
+  const targetFile = getDataFilePath();
   try {
-    if (fs.existsSync(DATA_FILE)) {
-      const content = fs.readFileSync(DATA_FILE, 'utf-8');
+    if (fs.existsSync(targetFile)) {
+      const content = fs.readFileSync(targetFile, 'utf-8');
       const loaded = JSON.parse(content);
       // Auto-migrate: populate any missing seed keys
       let needsSave = false;
@@ -879,7 +923,8 @@ export function saveDb(data) {
   memoryStore = data;
   try {
     ensureDataStore();
-    fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2), 'utf-8');
+    const targetFile = getDataFilePath();
+    fs.writeFileSync(targetFile, JSON.stringify(data, null, 2), 'utf-8');
   } catch (err) {
     console.error('Error saving data store:', err);
   }

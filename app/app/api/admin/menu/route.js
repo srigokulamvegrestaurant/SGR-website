@@ -6,34 +6,6 @@ import { getDb, saveDb, categorizeStation } from '@/lib/db';
 import { broadcast } from '@/app/api/events/route';
 import { getEvaluatedMealSections, DEFAULT_MEAL_SECTIONS } from '@/lib/meal_sections';
 
-// Helper to persist base64 data URLs to static disk storage if filesystem is writable
-function persistImageIfBase64(imageUrl, dishId) {
-  if (!imageUrl || typeof imageUrl !== 'string' || !imageUrl.startsWith('data:image/')) {
-    return imageUrl;
-  }
-  try {
-    const matches = imageUrl.match(/^data:image\/([a-zA-Z0-9+]+);base64,(.+)$/);
-    if (!matches || matches.length < 3) return imageUrl;
-
-    let ext = matches[1].toLowerCase();
-    if (ext === 'jpeg') ext = 'jpg';
-    const buffer = Buffer.from(matches[2], 'base64');
-
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'dishes');
-    if (!fs.existsSync(uploadsDir)) {
-      fs.mkdirSync(uploadsDir, { recursive: true });
-    }
-
-    const safeId = (dishId || `dish_${Date.now()}`).replace(/[^a-zA-Z0-9_-]/g, '_');
-    const filename = `${safeId}_${Date.now()}.${ext}`;
-    const filePath = path.join(uploadsDir, filename);
-    fs.writeFileSync(filePath, buffer);
-    return `/uploads/dishes/${filename}`;
-  } catch (err) {
-    // Read-only filesystem fallback (e.g. Vercel serverless)
-    return imageUrl;
-  }
-}
 
 // Helper to log audit changes
 function logMenuAudit(db, { dishId, dishName, action, details, changedBy = 'Admin', role = 'STORE_MANAGER' }) {
@@ -156,7 +128,7 @@ export async function POST(request) {
         price: numPrice,
         portionSize: item.portionSize || 'Standard (1 Person)',
         prepTime: Number(item.prepTime) || 10,
-        image: persistImageIfBase64(item.image, item.id || `dish_${Date.now()}`),
+        image: item.image || '',
         description: (item.description || '').trim(),
         station: item.station || categorizeStation(item.title),
         available: true,
@@ -240,7 +212,7 @@ export async function POST(request) {
         changes.push(`Status: ${existing.status} → ${item.status}`);
       }
 
-      const finalImage = item.image !== undefined ? persistImageIfBase64(item.image, item.id) : (existing.image || '');
+      const finalImage = item.image !== undefined ? item.image : (existing.image || '');
 
       const updated = {
         ...existing,

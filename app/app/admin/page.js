@@ -2474,6 +2474,12 @@ Status: SHIFT CLOSED & VERIFIED
         showNotice(data.message || `Dish saved successfully!`);
         setShowDishModal(false);
         setImageUploadStatus('');
+
+        // Optimistically update the menu in state so the card displays the new image IMMEDIATELY
+        if (data.item) {
+          setMenuItems(prev => prev.map(d => d.id === data.item.id ? { ...d, ...data.item } : d));
+        }
+
         fetchMenu();
         fetchPos();
       } else {
@@ -2872,30 +2878,7 @@ Status: SHIFT CLOSED & VERIFIED
       const compressedDataUrl = await compressImageFile(file, 1080, 1080, 0.85);
       const estSizeKb = Math.round((compressedDataUrl.length * 3) / 4 / 1024);
 
-      setImageUploadStatus(`Uploading optimized photo (${estSizeKb} KB)...`);
-
-      // 2. Upload to static storage endpoint if available
-      let finalUrl = compressedDataUrl;
-      try {
-        const res = await fetch('/api/admin/upload', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            image: compressedDataUrl,
-            name: (dishFormData.title || file.name || 'dish').toLowerCase().replace(/\.[^.]+$/, ''),
-          }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          if (data.success && data.url) {
-            finalUrl = data.url;
-          }
-        }
-      } catch (uploadErr) {
-        console.warn('Upload endpoint fallback to compressed data URL:', uploadErr);
-      }
-
-      setDishFormData(prev => ({ ...prev, image: finalUrl }));
+      setDishFormData(prev => ({ ...prev, image: compressedDataUrl }));
       setImageUploadStatus(`Photo ready (${estSizeKb} KB)`);
       showNotice(`✅ Photo optimized successfully (${estSizeKb} KB)`);
     } catch (err) {
@@ -7021,6 +7004,10 @@ Status: SHIFT CLOSED & VERIFIED
                           alt={dish.title}
                           className={styles.menuCardImg}
                           loading="lazy"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='28'%3E🍲%3C/text%3E%3C/svg%3E";
+                          }}
                         />
                         {/* Overlay Badges */}
                         <div className={styles.menuCardOverlayBadge}>
@@ -7275,6 +7262,10 @@ Status: SHIFT CLOSED & VERIFIED
                               src={dish.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='18'%3E🍲%3C/text%3E%3C/svg%3E"}
                               alt={dish.title}
                               className={styles.menuImgThumb}
+                              onError={(e) => {
+                                e.currentTarget.onerror = null;
+                                e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='40' height='40' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='18'%3E🍲%3C/text%3E%3C/svg%3E";
+                              }}
                             />
                           </td>
                           <td>
