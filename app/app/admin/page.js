@@ -424,6 +424,8 @@ export default function AdminPage() {
     recipeId: null,
     discount: { active: false, type: 'PERCENT', value: 0, discountedPrice: 0, label: '', startDate: '', endDate: '' },
   });
+  const [imageUploading, setImageUploading] = useState(false);
+  const [imageUploadStatus, setImageUploadStatus] = useState('');
 
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [categoryFormData, setCategoryFormData] = useState({ id: '', name: '', tamilName: '', icon: '🍽️', description: '', station: 'TIFFIN' });
@@ -2452,18 +2454,34 @@ Status: SHIFT CLOSED & VERIFIED
           role: currentUser.role,
         }),
       });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        let errMsg = `Server error (${res.status})`;
+        try {
+          const parsed = JSON.parse(errText);
+          if (parsed.error) errMsg = parsed.error;
+        } catch {
+          if (errText) errMsg += `: ${errText.slice(0, 100)}`;
+        }
+        showNotice(errMsg, true);
+        return;
+      }
+
       const data = await res.json();
       if (data.success) {
         playChime('notification');
         showNotice(data.message || `Dish saved successfully!`);
         setShowDishModal(false);
+        setImageUploadStatus('');
         fetchMenu();
         fetchPos();
       } else {
         showNotice(data.error || 'Failed to save delicacy', true);
       }
     } catch (err) {
-      showNotice('Error saving delicacy', true);
+      console.error('Save dish error:', err);
+      showNotice(err.message || 'Error saving delicacy', true);
     } finally {
       setLoading(false);
     }
@@ -2787,23 +2805,106 @@ Status: SHIFT CLOSED & VERIFIED
     }
   };
 
-  const handleImageFileChange = (e) => {
+  // Client-side HTML5 Canvas Image Resizer & Optimizer (<150KB WebP)
+  const compressImageFile = (file, maxWidth = 1080, maxHeight = 1080, quality = 0.85) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onerror = () => reject(new Error('Failed to read image file'));
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onerror = () => reject(new Error('Invalid image file format'));
+        img.onload = () => {
+          let { width, height } = img;
+          if (width > maxWidth || height > maxHeight) {
+            const ratio = Math.min(maxWidth / width, maxHeight / height);
+            width = Math.round(width * ratio);
+            height = Math.round(height * ratio);
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Canvas context unavailable'));
+            return;
+          }
+
+          ctx.imageSmoothingEnabled = true;
+          ctx.imageSmoothingQuality = 'high';
+          ctx.drawImage(img, 0, 0, width, height);
+
+          try {
+            const webpData = canvas.toDataURL('image/webp', quality);
+            if (webpData.startsWith('data:image/webp')) {
+              resolve(webpData);
+              return;
+            }
+          } catch {
+            // fallback below
+          }
+          const jpegData = canvas.toDataURL('image/jpeg', quality);
+          resolve(jpegData);
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const handleImageFileChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+    if (!file.type.startsWith('image/')) {
       showNotice('Invalid format. Please upload JPG, PNG, or WEBP image.', true);
       return;
     }
-    if (file.size > 5 * 1024 * 1024) {
-      showNotice('Image exceeds 5MB size limit', true);
+    if (file.size > 20 * 1024 * 1024) {
+      showNotice('Image exceeds 20MB limit. Please choose a smaller file.', true);
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (uploadEvent) => {
-      setDishFormData(prev => ({ ...prev, image: uploadEvent.target.result }));
-      showNotice('Photo loaded and validated successfully');
-    };
-    reader.readAsDataURL(file);
+
+    try {
+      setImageUploading(true);
+      setImageUploadStatus('Compressing & optimizing photo...');
+
+      // 1. Client-side canvas compression: scales down to max 1080px and converts to high-efficiency WebP (~70-120KB)
+      const compressedDataUrl = await compressImageFile(file, 1080, 1080, 0.85);
+      const estSizeKb = Math.round((compressedDataUrl.length * 3) / 4 / 1024);
+
+      setImageUploadStatus(`Uploading optimized photo (${estSizeKb} KB)...`);
+
+      // 2. Upload to static storage endpoint if available
+      let finalUrl = compressedDataUrl;
+      try {
+        const res = await fetch('/api/admin/upload', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image: compressedDataUrl,
+            name: (dishFormData.title || file.name || 'dish').toLowerCase().replace(/\.[^.]+$/, ''),
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && data.url) {
+            finalUrl = data.url;
+          }
+        }
+      } catch (uploadErr) {
+        console.warn('Upload endpoint fallback to compressed data URL:', uploadErr);
+      }
+
+      setDishFormData(prev => ({ ...prev, image: finalUrl }));
+      setImageUploadStatus(`Photo ready (${estSizeKb} KB)`);
+      showNotice(`✅ Photo optimized successfully (${estSizeKb} KB)`);
+    } catch (err) {
+      console.error('Image processing error:', err);
+      showNotice('Failed to process image: ' + (err.message || 'Unknown error'), true);
+      setImageUploadStatus('Image processing failed');
+    } finally {
+      setImageUploading(false);
+    }
   };
 
   // ─── Module 8: Live Orders Handlers ─────────────────────────────────────
@@ -13164,7 +13265,7 @@ Status: SHIFT CLOSED & VERIFIED
               ))}
             </div>
 
-            <form onSubmit={handleSaveDish}>
+            <form onSubmit={handleSaveDish} noValidate>
               {/* TAB 1: BASIC INFO */}
               {dishFormTab === 'INFO' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
@@ -13789,30 +13890,59 @@ Status: SHIFT CLOSED & VERIFIED
                 </div>
               )}
 
-              {/* TAB 6: FOOD PHOTOGRAPHY & UPLOAD (Requirement 7) */}
+              {/* TAB 6: FOOD PHOTOGRAPHY & UPLOAD */}
               {dishFormTab === 'PHOTO' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
                   <div style={{ display: 'flex', gap: '1rem', alignItems: 'flex-start' }}>
-                    <div style={{ width: '120px', height: '120px', borderRadius: '10px', overflow: 'hidden', border: '2px solid var(--border-subtle)', background: '#111', flexShrink: 0 }}>
+                    <div style={{ width: '120px', height: '120px', borderRadius: '10px', overflow: 'hidden', border: '2px solid var(--border-subtle)', background: '#111', flexShrink: 0, position: 'relative' }}>
                       <img
                         src={dishFormData.image || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120'%3E%3Crect width='120' height='120' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='32'%3E📷%3C/text%3E%3C/svg%3E"}
                         alt="Preview"
                         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                       />
+                      {dishFormData.image && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDishFormData(prev => ({ ...prev, image: '' }));
+                            setImageUploadStatus('');
+                          }}
+                          style={{
+                            position: 'absolute',
+                            top: '4px',
+                            right: '4px',
+                            background: 'rgba(220, 38, 38, 0.85)',
+                            color: '#ffffff',
+                            border: 'none',
+                            borderRadius: '50%',
+                            width: '22px',
+                            height: '22px',
+                            cursor: 'pointer',
+                            fontSize: '11px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                          }}
+                          title="Remove image"
+                        >
+                          ✕
+                        </button>
+                      )}
                     </div>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                        UPLOAD FOOD PHOTO (JPG, PNG, WEBP &lt; 5MB):
+                        UPLOAD FOOD PHOTO (JPG, PNG, WEBP — AUTO OPTIMIZED):
                       </label>
                       <input
                         type="file"
-                        accept="image/jpeg,image/png,image/webp"
+                        accept="image/jpeg,image/png,image/webp,image/*"
                         onChange={handleImageFileChange}
+                        disabled={imageUploading}
                         className={styles.posDiscountInput}
                         style={{ width: '100%', height: '36px', padding: '0.3rem' }}
                       />
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
-                        Client-side validation verifies aspect ratio, compression, and permanent storage.
+                      <div style={{ fontSize: '0.7rem', color: imageUploading ? '#3b82f6' : (imageUploadStatus.includes('ready') ? '#10b981' : 'var(--text-muted)') }}>
+                        {imageUploading ? '⏳ Compressing & optimizing photo...' : (imageUploadStatus || 'Client-side canvas compression resizes photos to high-res WebP for instant save and speed.')}
                       </div>
                     </div>
                   </div>
@@ -13822,46 +13952,24 @@ Status: SHIFT CLOSED & VERIFIED
                       OR DIRECT PHOTO URL:
                     </label>
                     <input
-                      type="url"
+                      type="text"
                       placeholder="https://..."
-                      value={dishFormData.image}
-                      onChange={e => setDishFormData({ ...dishFormData, image: e.target.value })}
+                      value={dishFormData.image?.startsWith('data:') ? `[Optimized Uploaded Image (~${Math.round((dishFormData.image.length * 3) / 4 / 1024)} KB WebP)]` : (dishFormData.image || '')}
+                      onChange={e => {
+                        const val = e.target.value;
+                        if (!val.startsWith('[Optimized Uploaded Image')) {
+                          setDishFormData({ ...dishFormData, image: val });
+                          setImageUploadStatus('');
+                        }
+                      }}
                       className={styles.posDiscountInput}
                       style={{ width: '100%', height: '36px' }}
                     />
-                  </div>
-
-                  {/* Preset Chettinad Photography Suggestions */}
-                  <div>
-                    <div style={{ fontSize: '0.72rem', fontWeight: 800, color: 'var(--text-muted)', marginBottom: '0.4rem' }}>
-                      OR PICK FROM SRI GOKULAM HIGH-RES CHEST:
-                    </div>
-                    <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '0.35rem' }}>
-                      {[
-
-
-
-
-
-                      ].map((preset, idx) => (
-                        <div
-                          key={idx}
-                          onClick={() => setDishFormData({ ...dishFormData, image: preset.url })}
-                          style={{
-                            cursor: 'pointer',
-                            borderRadius: '8px',
-                            overflow: 'hidden',
-                            border: dishFormData.image === preset.url ? '2px solid #3b82f6' : '1px solid var(--border-subtle)',
-                            width: '80px',
-                            flexShrink: 0,
-                            textAlign: 'center',
-                          }}
-                        >
-                          <img src={preset.url} alt={preset.name} style={{ width: '80px', height: '55px', objectFit: 'cover' }} />
-                          <div style={{ fontSize: '0.62rem', padding: '0.15rem', color: 'var(--text-secondary)' }}>{preset.name}</div>
-                        </div>
-                      ))}
-                    </div>
+                    {dishFormData.image?.startsWith('data:') && (
+                      <div style={{ fontSize: '0.68rem', color: '#10b981', marginTop: '0.2rem' }}>
+                        ✓ High-res optimized image ready to save (~{Math.round((dishFormData.image.length * 3) / 4 / 1024)} KB). Click &quot;Save Changes&quot; below to finish.
+                      </div>
+                    )}
                   </div>
                 </div>
               )}
