@@ -368,15 +368,15 @@
   ],
   "sessions": [
     {
-      "token": "c192b8d38b45ed9f404988c3b17df55ab204556695cb8997ed8536a2f64e7682",
-      "userId": "usr_dev_01",
-      "email": "info.ajnanjiltechsolutions@gmail.com",
+      "userId": "usr_dev_02",
+      "email": "info.ajtechsolutions@gmail.com",
       "role": "DEVELOPER_ADMIN",
-      "fullName": "AJ Nanjil Tech Solutions",
-      "createdAt": "2026-10-20T15:04:53.829Z",
-      "expiresAt": "2026-10-21T15:04:53.829Z",
-      "device": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
-      "ip": "127.0.0.1"
+      "fullName": "AJ Tech Solutions",
+      "createdAt": "2026-10-24T03:57:11.276Z",
+      "expiresAt": "2026-10-25T03:57:11.276Z",
+      "device": "Admin Web Terminal (Chrome / Edge)",
+      "ip": "127.0.0.1",
+      "token": "eyJ1c2VySWQiOiJ1c3JfZGV2XzAyIiwiZW1haWwiOiJpbmZvLmFqdGVjaHNvbHV0aW9uc0BnbWFpbC5jb20iLCJyb2xlIjoiREVWRUxPUEVSX0FETUlOIiwiZnVsbE5hbWUiOiJBSiBUZWNoIFNvbHV0aW9ucyIsImNyZWF0ZWRBdCI6IjIwMjYtMTAtMjRUMDM6NTc6MTEuMjc2WiIsImV4cGlyZXNBdCI6IjIwMjYtMTAtMjVUMDM6NTc6MTEuMjc2WiIsImRldmljZSI6IkFkbWluIFdlYiBUZXJtaW5hbCAoQ2hyb21lIC8gRWRnZSkiLCJpcCI6IjEyNy4wLjAuMSJ9.67YD7Q1OTekovMjLHKKRQ5qVj2m_PdMIGyQLz70Uw4E"
     }
   ],
   "inventory": [],
@@ -854,6 +854,16 @@
       "forceManagerPinForVoids": true,
       "activeSessions": [
         {
+          "id": "sess_eyJ1c2Vy",
+          "userName": "AJ Tech Solutions",
+          "role": "DEVELOPER_ADMIN",
+          "device": "Admin Web Terminal (Chrome / Edge)",
+          "ip": "127.0.0.1",
+          "loginTime": "2026-10-24T03:57:11.276Z",
+          "lastActive": "2026-10-24T03:57:11.276Z",
+          "isCurrent": true
+        },
+        {
           "id": "sess_c192b8d3",
           "userName": "AJ Nanjil Tech Solutions",
           "role": "DEVELOPER_ADMIN",
@@ -985,7 +995,36 @@
       "station": "TIFFIN",
       "description": "Assorted breakfast platter with mini idli, ghee pongal, rava kesari, mini vada, and mini masala roast.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": true,
+      "isBestseller": true,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 3
+      },
+      "allergens": [
+        "Dairy/Milk"
+      ],
+      "ingredients": [
+        "Assorted breakfast platter with mini idli, ghee pongal, rava kesari, mini vada, and mini masala roast."
+      ],
+      "displayOrder": 1,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": "rec_01"
     },
     {
       "id": "dish_bf_02",
@@ -998,7 +1037,34 @@
       "station": "TIFFIN",
       "description": "Steamed fluffy rice cakes made from fermented batter, served with 3 stone-ground chutneys and shallot sambar.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": true,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": true,
+        "isVegan": false,
+        "isGlutenFree": true,
+        "spiceLevel": 1
+      },
+      "allergens": [],
+      "ingredients": [
+        "Steamed fluffy rice cakes made from fermented batter, served with 3 stone-ground chutneys and shallot sambar."
+      ],
+      "displayOrder": 2,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": "rec_02"
     },
     {
       "id": "dish_bf_03",
@@ -1011,7 +1077,34 @@
       "station": "TIFFIN",
       "description": "Hot ven pongal prepared with fragrant raw rice, split yellow moong dal, crushed pepper, ginger, and generous cow ghee.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Hot ven pongal prepared with fragrant raw rice, split yellow moong dal, crushed pepper, ginger, and generous cow ghee."
+      ],
+      "displayOrder": 3,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_04",
@@ -1024,7 +1117,34 @@
       "station": "TIFFIN",
       "description": "Tender steamed idlis tossed generously in freshly roasted Karaikudi gunpowder podi and aromatic hot cow ghee.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": true,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": true,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Tender steamed idlis tossed generously in freshly roasted Karaikudi gunpowder podi and aromatic hot cow ghee."
+      ],
+      "displayOrder": 4,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_05",
@@ -1037,7 +1157,34 @@
       "station": "TIFFIN",
       "description": "Crisp golden-fried urad dal medhu vada seasoned with whole black peppercorns, curry leaves, and ginger.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": true,
+      "isBestseller": false,
+      "isChefSpecial": true,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": true,
+        "spiceLevel": 3
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crisp golden-fried urad dal medhu vada seasoned with whole black peppercorns, curry leaves, and ginger."
+      ],
+      "displayOrder": 5,
+      "discount": {
+        "active": true,
+        "type": "PERCENT",
+        "value": 10,
+        "discountedPrice": 189,
+        "label": "Chettinad Heritage Festival",
+        "startDate": "2026-10-15",
+        "endDate": "2026-10-31"
+      },
+      "recipeId": "rec_04"
     },
     {
       "id": "dish_bf_06",
@@ -1050,7 +1197,34 @@
       "station": "TIFFIN",
       "description": "Crispy medhu vadas submerged in piping hot shallot drumstick sambar garnished with fresh coriander.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": true,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": true,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crispy medhu vadas submerged in piping hot shallot drumstick sambar garnished with fresh coriander."
+      ],
+      "displayOrder": 6,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_07",
@@ -1063,7 +1237,36 @@
       "station": "TIFFIN",
       "description": "Puffed golden wheat pooris served with mild potato masala kizhangu and coconut chutney.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": true,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [
+        "Dairy/Milk"
+      ],
+      "ingredients": [
+        "Puffed golden wheat pooris served with mild potato masala kizhangu and coconut chutney."
+      ],
+      "displayOrder": 7,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": "rec_03"
     },
     {
       "id": "dish_bf_08",
@@ -1076,7 +1279,34 @@
       "station": "DOSA",
       "description": "Traditional thin crispy crepe made from stone-ground rice and lentil batter, served with 3 chutneys and sambar.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Traditional thin crispy crepe made from stone-ground rice and lentil batter, served with 3 chutneys and sambar."
+      ],
+      "displayOrder": 8,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_09",
@@ -1089,7 +1319,34 @@
       "station": "DOSA",
       "description": "Crispy dosa sprinkled with spicy roasted lentil podi and roasted to golden perfection on iron tawa.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crispy dosa sprinkled with spicy roasted lentil podi and roasted to golden perfection on iron tawa."
+      ],
+      "displayOrder": 9,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_10",
@@ -1102,7 +1359,36 @@
       "station": "DOSA",
       "description": "Crisp golden roast dosa filled with seasoned turmeric potato masala, green chillies, and ginger.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [
+        "Dairy/Milk"
+      ],
+      "ingredients": [
+        "Crisp golden roast dosa filled with seasoned turmeric potato masala, green chillies, and ginger."
+      ],
+      "displayOrder": 10,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_11",
@@ -1115,7 +1401,34 @@
       "station": "DOSA",
       "description": "Crispy dosa topped with finely chopped shallots and curry leaves sizzled directly into the crepe.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crispy dosa topped with finely chopped shallots and curry leaves sizzled directly into the crepe."
+      ],
+      "displayOrder": 11,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_12",
@@ -1128,7 +1441,34 @@
       "station": "DOSA",
       "description": "Paper-thin dosa rolled like a cone and generously roasted in pure churned cow ghee.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Paper-thin dosa rolled like a cone and generously roasted in pure churned cow ghee."
+      ],
+      "displayOrder": 12,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_13",
@@ -1141,7 +1481,34 @@
       "station": "DOSA",
       "description": "Signature crispy roast bathed in cow ghee and spiced with spicy homemade Karaikudi podi.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Signature crispy roast bathed in cow ghee and spiced with spicy homemade Karaikudi podi."
+      ],
+      "displayOrder": 13,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_14",
@@ -1154,7 +1521,34 @@
       "station": "DOSA",
       "description": "Thick soft savoury pancake cooked slow on iron griddle with crispy edges and a pillowy centre.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Thick soft savoury pancake cooked slow on iron griddle with crispy edges and a pillowy centre."
+      ],
+      "displayOrder": 14,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_15",
@@ -1167,7 +1561,34 @@
       "station": "DOSA",
       "description": "Thick uthappam studded with sweet caramelised country onions, green chillies, and curry leaves.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Thick uthappam studded with sweet caramelised country onions, green chillies, and curry leaves."
+      ],
+      "displayOrder": 15,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_16",
@@ -1180,7 +1601,34 @@
       "station": "DOSA",
       "description": "Fluffy uthappam generously crusted with aromatic spicy idli podi and drizzled with sesame oil.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Fluffy uthappam generously crusted with aromatic spicy idli podi and drizzled with sesame oil."
+      ],
+      "displayOrder": 16,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_17",
@@ -1193,7 +1641,34 @@
       "station": "DOSA",
       "description": "Lacy, crispy semolina crepe speckled with crushed black pepper, cumin seeds, ginger, and green chillies.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Lacy, crispy semolina crepe speckled with crushed black pepper, cumin seeds, ginger, and green chillies."
+      ],
+      "displayOrder": 17,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_18",
@@ -1206,7 +1681,34 @@
       "station": "DOSA",
       "description": "Golden lacy rava dosa generously sprinkled with finely chopped shallots and roasted crisp.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Golden lacy rava dosa generously sprinkled with finely chopped shallots and roasted crisp."
+      ],
+      "displayOrder": 18,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_19",
@@ -1219,7 +1721,34 @@
       "station": "DOSA",
       "description": "Crisp rava dosa roasted lavishly in aromatic cow ghee for an irresistible golden crunch.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crisp rava dosa roasted lavishly in aromatic cow ghee for an irresistible golden crunch."
+      ],
+      "displayOrder": 19,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_20",
@@ -1232,7 +1761,34 @@
       "station": "DOSA",
       "description": "Royal combination of crisp semolina crepe, diced shallots, and golden melted cow ghee.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Royal combination of crisp semolina crepe, diced shallots, and golden melted cow ghee."
+      ],
+      "displayOrder": 20,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_21",
@@ -1245,7 +1801,34 @@
       "station": "BEVERAGES",
       "description": "Authentic South Indian degree filter coffee brewed from freshly roasted chicory-coffee decoction and frothed milk.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 5,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Authentic South Indian degree filter coffee brewed from freshly roasted chicory-coffee decoction and frothed milk."
+      ],
+      "displayOrder": 21,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_22",
@@ -1258,7 +1841,34 @@
       "station": "BEVERAGES",
       "description": "Hot spiced CTC tea brewed with crushed ginger, cardamom, and fresh country milk.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 5,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Hot spiced CTC tea brewed with crushed ginger, cardamom, and fresh country milk."
+      ],
+      "displayOrder": 22,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_23",
@@ -1271,7 +1881,34 @@
       "station": "BEVERAGES",
       "description": "Pure steamed farm-fresh cow milk boiled with a touch of cardamom.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 5,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Pure steamed farm-fresh cow milk boiled with a touch of cardamom."
+      ],
+      "displayOrder": 23,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_24",
@@ -1284,7 +1921,34 @@
       "station": "BEVERAGES",
       "description": "Steaming hot cow milk sweetened with traditional unrefined diamond sugar crystals (kalkandu).",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 5,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Steaming hot cow milk sweetened with traditional unrefined diamond sugar crystals (kalkandu)."
+      ],
+      "displayOrder": 24,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_25",
@@ -1297,7 +1961,34 @@
       "station": "BEVERAGES",
       "description": "Aromatic strong tea sweetened naturally with crystalline kalkandu rock sugar.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 5,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Aromatic strong tea sweetened naturally with crystalline kalkandu rock sugar."
+      ],
+      "displayOrder": 25,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_26",
@@ -1310,7 +2001,34 @@
       "station": "BEVERAGES",
       "description": "First-decoction filter coffee frothed with diamond rock sugar crystals for a mellow traditional sweetness.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 5,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "First-decoction filter coffee frothed with diamond rock sugar crystals for a mellow traditional sweetness."
+      ],
+      "displayOrder": 26,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_27",
@@ -1323,7 +2041,34 @@
       "station": "BEVERAGES",
       "description": "Wholesome hot cow milk infused with country raw cane sugar (nattu sarkarai) and cardamom.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 5,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Wholesome hot cow milk infused with country raw cane sugar (nattu sarkarai) and cardamom."
+      ],
+      "displayOrder": 27,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_28",
@@ -1336,7 +2081,34 @@
       "station": "BEVERAGES",
       "description": "Traditional hot tea sweetened with organic raw unrefined country cane sugar.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 5,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Traditional hot tea sweetened with organic raw unrefined country cane sugar."
+      ],
+      "displayOrder": 28,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_bf_29",
@@ -1349,7 +2121,34 @@
       "station": "BEVERAGES",
       "description": "Aromatic Kumbakonam brass filter coffee sweetened with pure country cane jaggery sugar.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 5,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Aromatic Kumbakonam brass filter coffee sweetened with pure country cane jaggery sugar."
+      ],
+      "displayOrder": 29,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_01",
@@ -1362,7 +2161,34 @@
       "station": "MEALS",
       "description": "Tangy Ponni rice tempered in sesame oil with fresh lemon juice, mustard seeds, curry leaves, and crunchy peanuts.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Tangy Ponni rice tempered in sesame oil with fresh lemon juice, mustard seeds, curry leaves, and crunchy peanuts."
+      ],
+      "displayOrder": 30,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_02",
@@ -1375,7 +2201,34 @@
       "station": "MEALS",
       "description": "Creamy curd rice tempered with mustard, green chillies, ginger, and curry leaves, topped with pomegranate and pickle.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Creamy curd rice tempered with mustard, green chillies, ginger, and curry leaves, topped with pomegranate and pickle."
+      ],
+      "displayOrder": 31,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_03",
@@ -1388,7 +2241,34 @@
       "station": "MEALS",
       "description": "Fragrant spiced rice cooked with ripe country tomatoes, shallots, garlic, and freshly ground Chettinad spices.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Fragrant spiced rice cooked with ripe country tomatoes, shallots, garlic, and freshly ground Chettinad spices."
+      ],
+      "displayOrder": 32,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_04",
@@ -1401,7 +2281,34 @@
       "station": "MEALS",
       "description": "Seeraga samba rice slow-dum cooked with tender button mushrooms, fresh mint, coriander, and royal Chettinad spices.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Seeraga samba rice slow-dum cooked with tender button mushrooms, fresh mint, coriander, and royal Chettinad spices."
+      ],
+      "displayOrder": 33,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_05",
@@ -1414,7 +2321,34 @@
       "station": "MEALS",
       "description": "Classic vegetable dum biryani packed with carrots, beans, peas, and potatoes simmered in rich saffron-infused masala.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Classic vegetable dum biryani packed with carrots, beans, peas, and potatoes simmered in rich saffron-infused masala."
+      ],
+      "displayOrder": 34,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_06",
@@ -1427,7 +2361,34 @@
       "station": "MEALS",
       "description": "Fragrant spiced rice layered with soft marinated malai paneer cubes, fried onions, mint, and pure cow ghee.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Fragrant spiced rice layered with soft marinated malai paneer cubes, fried onions, mint, and pure cow ghee."
+      ],
+      "displayOrder": 35,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_07",
@@ -1440,7 +2401,34 @@
       "station": "MEALS",
       "description": "Delicately spiced basmati rice cooked with whole aromatic spices, seasonal garden vegetables, and ghee.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Delicately spiced basmati rice cooked with whole aromatic spices, seasonal garden vegetables, and ghee."
+      ],
+      "displayOrder": 36,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_08",
@@ -1453,7 +2441,34 @@
       "station": "MEALS",
       "description": "Aromatic long-grain rice gently sautéed with golden paneer cubes, whole spices, and toasted cashews.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Aromatic long-grain rice gently sautéed with golden paneer cubes, whole spices, and toasted cashews."
+      ],
+      "displayOrder": 37,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_09",
@@ -1466,7 +2481,34 @@
       "station": "MEALS",
       "description": "Light and fragrant basmati rice tossed with fresh mushrooms, green peas, and whole spices.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Light and fragrant basmati rice tossed with fresh mushrooms, green peas, and whole spices."
+      ],
+      "displayOrder": 38,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_10",
@@ -1479,7 +2521,34 @@
       "station": "MEALS",
       "description": "Compact traditional lunch combo with variety rice, sambar sadham, curd rice, poriyal, appalam, and pickle.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 15,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Compact traditional lunch combo with variety rice, sambar sadham, curd rice, poriyal, appalam, and pickle."
+      ],
+      "displayOrder": 39,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_11",
@@ -1492,7 +2561,34 @@
       "station": "MEALS",
       "description": "Grand Karaikudi plantain leaf feast: Ponni rice, sambar, vatha kuzhambu, rasam, kootu, poriyal, mor kuzhambu, appalam, curd, and payasam.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 15,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Grand Karaikudi plantain leaf feast: Ponni rice, sambar, vatha kuzhambu, rasam, kootu, poriyal, mor kuzhambu, appalam, curd, and payasam."
+      ],
+      "displayOrder": 40,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_12",
@@ -1505,7 +2601,34 @@
       "station": "NORTH_INDIAN",
       "description": "Traditional clay-oven tandoor baked leavened bread with a soft blistered crust.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Traditional clay-oven tandoor baked leavened bread with a soft blistered crust."
+      ],
+      "displayOrder": 41,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_13",
@@ -1518,7 +2641,34 @@
       "station": "NORTH_INDIAN",
       "description": "Tandoori naan brushed generously with rich melted butter for a soft, flaky texture.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Tandoori naan brushed generously with rich melted butter for a soft, flaky texture."
+      ],
+      "displayOrder": 42,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_14",
@@ -1531,7 +2681,34 @@
       "station": "NORTH_INDIAN",
       "description": "Whole wheat flatbread baked crisp in clay tandoor oven, wholesome and oil-free.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Whole wheat flatbread baked crisp in clay tandoor oven, wholesome and oil-free."
+      ],
+      "displayOrder": 43,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_15",
@@ -1544,7 +2721,34 @@
       "station": "NORTH_INDIAN",
       "description": "Whole wheat tandoori roti layered with fresh butter.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Whole wheat tandoori roti layered with fresh butter."
+      ],
+      "displayOrder": 44,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_16",
@@ -1557,7 +2761,34 @@
       "station": "NORTH_INDIAN",
       "description": "Fresh cottage cheese cubes simmered in a silky, mildly sweet butter and cashew tomato gravy with kasuri methi.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Fresh cottage cheese cubes simmered in a silky, mildly sweet butter and cashew tomato gravy with kasuri methi."
+      ],
+      "displayOrder": 45,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_17",
@@ -1570,7 +2801,34 @@
       "station": "NORTH_INDIAN",
       "description": "Clay-oven charred paneer tikka tossed in a spicy, aromatic onion-tomato masala gravy.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Clay-oven charred paneer tikka tossed in a spicy, aromatic onion-tomato masala gravy."
+      ],
+      "displayOrder": 46,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_18",
@@ -1583,7 +2841,34 @@
       "station": "NORTH_INDIAN",
       "description": "Tender button mushrooms stir-fried with crushed black peppercorns, curry leaves, shallots, and Chettinad spices.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Tender button mushrooms stir-fried with crushed black peppercorns, curry leaves, shallots, and Chettinad spices."
+      ],
+      "displayOrder": 47,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_19",
@@ -1596,7 +2881,34 @@
       "station": "NORTH_INDIAN",
       "description": "Fresh mushrooms cooked in a rich, semi-dry onion and tomato gravy flavored with garam masala.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Fresh mushrooms cooked in a rich, semi-dry onion and tomato gravy flavored with garam masala."
+      ],
+      "displayOrder": 48,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_20",
@@ -1609,7 +2921,34 @@
       "station": "NORTH_INDIAN",
       "description": "Slow-simmered tender white chickpeas cooked in a tangy Punjabi tomato-onion masala with roasted cumin.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Slow-simmered tender white chickpeas cooked in a tangy Punjabi tomato-onion masala with roasted cumin."
+      ],
+      "displayOrder": 49,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_21",
@@ -1622,7 +2961,34 @@
       "station": "NORTH_INDIAN",
       "description": "Sweet tender green peas simmered in a spiced onion-tomato gravy with ginger and cream.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Sweet tender green peas simmered in a spiced onion-tomato gravy with ginger and cream."
+      ],
+      "displayOrder": 50,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_22",
@@ -1635,7 +3001,34 @@
       "station": "NORTH_INDIAN",
       "description": "Cauliflower florets cooked to perfection in an aromatic spicy North Indian curry.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Cauliflower florets cooked to perfection in an aromatic spicy North Indian curry."
+      ],
+      "displayOrder": 51,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_23",
@@ -1648,7 +3041,34 @@
       "station": "CHINESE",
       "description": "Crispy batter-fried paneer cubes tossed in a savoury garlic, ginger, and soy Indo-Chinese sauce.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crispy batter-fried paneer cubes tossed in a savoury garlic, ginger, and soy Indo-Chinese sauce."
+      ],
+      "displayOrder": 52,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_24",
@@ -1661,7 +3081,34 @@
       "station": "CHINESE",
       "description": "Crisp golden mushroom bites stir-fried with spring onions, chillies, and tang Manchurian glaze.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crisp golden mushroom bites stir-fried with spring onions, chillies, and tang Manchurian glaze."
+      ],
+      "displayOrder": 53,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_25",
@@ -1674,7 +3121,34 @@
       "station": "CHINESE",
       "description": "All-time favourite crisp cauliflower florets tossed in tangy wok sauce with capsicum and spring onions.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "All-time favourite crisp cauliflower florets tossed in tangy wok sauce with capsicum and spring onions."
+      ],
+      "displayOrder": 54,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_26",
@@ -1687,7 +3161,34 @@
       "station": "CHINESE",
       "description": "Crunchy baby corn slices tossed in spicy garlic soy sauce with shallots and bell peppers.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crunchy baby corn slices tossed in spicy garlic soy sauce with shallots and bell peppers."
+      ],
+      "displayOrder": 55,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_27",
@@ -1700,7 +3201,34 @@
       "station": "CHINESE",
       "description": "Deep-fried spicy mushrooms seasoned with Kashmiri red chilli, curry leaves, and green chillies.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Deep-fried spicy mushrooms seasoned with Kashmiri red chilli, curry leaves, and green chillies."
+      ],
+      "displayOrder": 56,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_28",
@@ -1713,7 +3241,34 @@
       "station": "CHINESE",
       "description": "Spicy marinated cottage cheese fried crisp with curry leaves, crushed garlic, and sliced chillies.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Spicy marinated cottage cheese fried crisp with curry leaves, crushed garlic, and sliced chillies."
+      ],
+      "displayOrder": 57,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_29",
@@ -1726,7 +3281,34 @@
       "station": "CHINESE",
       "description": "Crispy cauliflower florets coated with south-style 65 masala, curry leaves, and fried green chillies.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crispy cauliflower florets coated with south-style 65 masala, curry leaves, and fried green chillies."
+      ],
+      "displayOrder": 58,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_30",
@@ -1739,7 +3321,34 @@
       "station": "CHINESE",
       "description": "Crisp baby corn sticks tossed with spicy red pepper seasoning and fresh curry leaves.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crisp baby corn sticks tossed with spicy red pepper seasoning and fresh curry leaves."
+      ],
+      "displayOrder": 59,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_lu_31",
@@ -1752,7 +3361,34 @@
       "station": "NORTH_INDIAN",
       "description": "Succulent cubes of paneer marinated in hung curd, carom seeds, and tandoori spices, char-grilled with capsicum and onions.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Succulent cubes of paneer marinated in hung curd, carom seeds, and tandoori spices, char-grilled with capsicum and onions."
+      ],
+      "displayOrder": 60,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_es_01",
@@ -1765,7 +3401,34 @@
       "station": "SNACKS",
       "description": "Heritage Chettinad sweet delicacy made with raw rice, dal, jaggery, cardamom, and coconut fried in ghee.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Heritage Chettinad sweet delicacy made with raw rice, dal, jaggery, cardamom, and coconut fried in ghee."
+      ],
+      "displayOrder": 61,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_es_02",
@@ -1778,7 +3441,34 @@
       "station": "SNACKS",
       "description": "Traditional sweet vada made from fluffy urad dal batter and crystal kalkandu sugar, crispy outside and melt-in-mouth inside.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Traditional sweet vada made from fluffy urad dal batter and crystal kalkandu sugar, crispy outside and melt-in-mouth inside."
+      ],
+      "displayOrder": 62,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_es_03",
@@ -1791,7 +3481,34 @@
       "station": "SNACKS",
       "description": "Golden-crusted savoury dumplings tempered with shallots, mustard, and curry leaves, cooked in cast iron paniyaram moulds.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Golden-crusted savoury dumplings tempered with shallots, mustard, and curry leaves, cooked in cast iron paniyaram moulds."
+      ],
+      "displayOrder": 63,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_es_04",
@@ -1804,7 +3521,34 @@
       "station": "SNACKS",
       "description": "Iconic Chettinad wedding delicacy: paper-thin white dumplings with crispy frilly lace borders and soft pillow centre.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Iconic Chettinad wedding delicacy: paper-thin white dumplings with crispy frilly lace borders and soft pillow centre."
+      ],
+      "displayOrder": 64,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_es_05",
@@ -1817,7 +3561,34 @@
       "station": "SNACKS",
       "description": "Steamed rice flour dumplings stuffed with fragrant sweet coconut, jaggery, and cardamom filling.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Steamed rice flour dumplings stuffed with fragrant sweet coconut, jaggery, and cardamom filling."
+      ],
+      "displayOrder": 65,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_01",
@@ -1830,7 +3601,34 @@
       "station": "TIFFIN",
       "description": "Soft steaming idlis served fresh for dinner with 3 Karaikudi chutneys and hot sambar.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Soft steaming idlis served fresh for dinner with 3 Karaikudi chutneys and hot sambar."
+      ],
+      "displayOrder": 66,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_02",
@@ -1843,7 +3641,34 @@
       "station": "TIFFIN",
       "description": "Bowl of bite-sized button idlis drenched in piping hot shallot sambar with a spoonful of pure cow ghee.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Bowl of bite-sized button idlis drenched in piping hot shallot sambar with a spoonful of pure cow ghee."
+      ],
+      "displayOrder": 67,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_03",
@@ -1856,7 +3681,34 @@
       "station": "TIFFIN",
       "description": "Crispy fried idli cubes tossed in spicy South-Indian 65 masala with curry leaves and green chillies.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crispy fried idli cubes tossed in spicy South-Indian 65 masala with curry leaves and green chillies."
+      ],
+      "displayOrder": 68,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_04",
@@ -1869,7 +3721,34 @@
       "station": "CHINESE",
       "description": "Golden idli cubes tossed with diced capsicum, onions, and tangy ginger-garlic Manchurian sauce.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Golden idli cubes tossed with diced capsicum, onions, and tangy ginger-garlic Manchurian sauce."
+      ],
+      "displayOrder": 69,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_05",
@@ -1882,7 +3761,34 @@
       "station": "CHINESE",
       "description": "Crisp idli chunks wok-tossed with fresh chillies, bell peppers, shallots, and spicy Indo-Chinese sauce.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crisp idli chunks wok-tossed with fresh chillies, bell peppers, shallots, and spicy Indo-Chinese sauce."
+      ],
+      "displayOrder": 70,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_06",
@@ -1895,7 +3801,34 @@
       "station": "TIFFIN",
       "description": "Idlis sautéed with fresh ground black pepper, curry leaves, and ghee for a zesty warming dinner.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Idlis sautéed with fresh ground black pepper, curry leaves, and ghee for a zesty warming dinner."
+      ],
+      "displayOrder": 71,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_07",
@@ -1908,7 +3841,34 @@
       "station": "TIFFIN",
       "description": "Steamed idlis tossed in a rich onion, tomato, and Chettinad spice masala gravy.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Steamed idlis tossed in a rich onion, tomato, and Chettinad spice masala gravy."
+      ],
+      "displayOrder": 72,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_08",
@@ -1921,7 +3881,34 @@
       "station": "TIFFIN",
       "description": "Delicate steamed string hoppers served with rich coconut milk and spicy kurma.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Delicate steamed string hoppers served with rich coconut milk and spicy kurma."
+      ],
+      "displayOrder": 73,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_09",
@@ -1934,7 +3921,34 @@
       "station": "TIFFIN",
       "description": "Steamed string hoppers seasoned with fresh lemon juice, mustard, green chillies, and roasted peanuts.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Steamed string hoppers seasoned with fresh lemon juice, mustard, green chillies, and roasted peanuts."
+      ],
+      "displayOrder": 74,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_10",
@@ -1947,7 +3961,34 @@
       "station": "TIFFIN",
       "description": "Steamed string hoppers tossed with sautéed seasonal vegetables, mint, and aromatic biryani spices.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Steamed string hoppers tossed with sautéed seasonal vegetables, mint, and aromatic biryani spices."
+      ],
+      "displayOrder": 75,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_11",
@@ -1960,7 +4001,34 @@
       "station": "TIFFIN",
       "description": "Soft whole wheat flatbreads served with vegetable kurma and coconut chutney.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Soft whole wheat flatbreads served with vegetable kurma and coconut chutney."
+      ],
+      "displayOrder": 76,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_12",
@@ -1973,7 +4041,34 @@
       "station": "TIFFIN",
       "description": "Warm soft wheat chapathis paired with mixed vegetable gravy.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Warm soft wheat chapathis paired with mixed vegetable gravy."
+      ],
+      "displayOrder": 77,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_13",
@@ -1986,7 +4081,34 @@
       "station": "TIFFIN",
       "description": "Soft tawa chapathis served with spicy Chettinad mushroom masala kurma.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Soft tawa chapathis served with spicy Chettinad mushroom masala kurma."
+      ],
+      "displayOrder": 78,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_14",
@@ -1999,7 +4121,34 @@
       "station": "TIFFIN",
       "description": "Whole wheat chapathis paired with a rich paneer butter kurma.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Whole wheat chapathis paired with a rich paneer butter kurma."
+      ],
+      "displayOrder": 79,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_15",
@@ -2012,7 +4161,34 @@
       "station": "TIFFIN",
       "description": "Whole wheat flatbread infused with roasted garlic and herbs.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Whole wheat flatbread infused with roasted garlic and herbs."
+      ],
+      "displayOrder": 80,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_16",
@@ -2025,7 +4201,34 @@
       "station": "TIFFIN",
       "description": "Spiced wheat chapathis kneaded with carom seeds, cumin, and mild spices.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Spiced wheat chapathis kneaded with carom seeds, cumin, and mild spices."
+      ],
+      "displayOrder": 81,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_17",
@@ -2038,7 +4241,34 @@
       "station": "DOSA",
       "description": "Crisp classic dosa served with sambar and 3 freshly ground chutneys.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crisp classic dosa served with sambar and 3 freshly ground chutneys."
+      ],
+      "displayOrder": 82,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_18",
@@ -2051,7 +4281,34 @@
       "station": "DOSA",
       "description": "Golden dosa generously spiced with Karaikudi idli podi and sesame oil.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Golden dosa generously spiced with Karaikudi idli podi and sesame oil."
+      ],
+      "displayOrder": 83,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_19",
@@ -2064,7 +4321,34 @@
       "station": "DOSA",
       "description": "Crisp crepe studded with chopped country onions and green chillies.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crisp crepe studded with chopped country onions and green chillies."
+      ],
+      "displayOrder": 84,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_20",
@@ -2077,7 +4361,34 @@
       "station": "DOSA",
       "description": "Crispy dosa smeared with spicy roasted garlic paste and ghee.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crispy dosa smeared with spicy roasted garlic paste and ghee."
+      ],
+      "displayOrder": 85,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_21",
@@ -2090,7 +4401,34 @@
       "station": "DOSA",
       "description": "Crisp roast stuffed with savoury Chettinad pepper mushroom filling.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crisp roast stuffed with savoury Chettinad pepper mushroom filling."
+      ],
+      "displayOrder": 86,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_22",
@@ -2103,7 +4441,34 @@
       "station": "DOSA",
       "description": "Crisp golden crepe loaded with grated spiced paneer and coriander.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crisp golden crepe loaded with grated spiced paneer and coriander."
+      ],
+      "displayOrder": 87,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_23",
@@ -2116,7 +4481,34 @@
       "station": "DOSA",
       "description": "Golden roast with savoury potato masala, onions, and curry leaves.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Golden roast with savoury potato masala, onions, and curry leaves."
+      ],
+      "displayOrder": 88,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_24",
@@ -2129,7 +4521,34 @@
       "station": "DOSA",
       "description": "Classic cone-shaped crispy roast roasted purely in cow ghee.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Classic cone-shaped crispy roast roasted purely in cow ghee."
+      ],
+      "displayOrder": 89,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_25",
@@ -2142,7 +4561,34 @@
       "station": "DOSA",
       "description": "Crisp ghee roast layered with homemade Karaikudi gunpowder podi.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crisp ghee roast layered with homemade Karaikudi gunpowder podi."
+      ],
+      "displayOrder": 90,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_26",
@@ -2155,7 +4601,34 @@
       "station": "DOSA",
       "description": "Thick, spongy rice-lentil pancake with golden edges.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Thick, spongy rice-lentil pancake with golden edges."
+      ],
+      "displayOrder": 91,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_27",
@@ -2168,7 +4641,34 @@
       "station": "DOSA",
       "description": "Soft uthappam generously topped with caramelised onions and chillies.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Soft uthappam generously topped with caramelised onions and chillies."
+      ],
+      "displayOrder": 92,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_28",
@@ -2181,7 +4681,34 @@
       "station": "DOSA",
       "description": "Pillowy uthappam topped with grated carrots, tomatoes, onions, and coriander.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Pillowy uthappam topped with grated carrots, tomatoes, onions, and coriander."
+      ],
+      "displayOrder": 93,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_29",
@@ -2194,7 +4721,34 @@
       "station": "DOSA",
       "description": "Fragrant uthappam topped lavishly with fresh garden coriander leaves.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Fragrant uthappam topped lavishly with fresh garden coriander leaves."
+      ],
+      "displayOrder": 94,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_30",
@@ -2207,7 +4761,34 @@
       "station": "DOSA",
       "description": "Semolina-based thick savoury pancake studded with green chillies and cumin.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Semolina-based thick savoury pancake studded with green chillies and cumin."
+      ],
+      "displayOrder": 95,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_31",
@@ -2220,7 +4801,34 @@
       "station": "DOSA",
       "description": "Lacy rava crepe roasted in rich cow ghee for a crispy texture.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Lacy rava crepe roasted in rich cow ghee for a crispy texture."
+      ],
+      "displayOrder": 96,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_32",
@@ -2233,7 +4841,34 @@
       "station": "DOSA",
       "description": "Crispy rava dosa filled with crunchy chopped shallots.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crispy rava dosa filled with crunchy chopped shallots."
+      ],
+      "displayOrder": 97,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_33",
@@ -2246,7 +4881,34 @@
       "station": "DOSA",
       "description": "Golden crisp rava dosa sizzled with fresh onions and pure cow ghee.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Golden crisp rava dosa sizzled with fresh onions and pure cow ghee."
+      ],
+      "displayOrder": 98,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_34",
@@ -2259,7 +4921,34 @@
       "station": "TIFFIN",
       "description": "Flaky, layered South Indian flatbread beaten light and served with spicy salna.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Flaky, layered South Indian flatbread beaten light and served with spicy salna."
+      ],
+      "displayOrder": 99,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_35",
@@ -2272,7 +4961,34 @@
       "station": "TIFFIN",
       "description": "Flaky parotta served with spicy Chettinad mushroom kurma.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Flaky parotta served with spicy Chettinad mushroom kurma."
+      ],
+      "displayOrder": 100,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_36",
@@ -2285,7 +5001,34 @@
       "station": "TIFFIN",
       "description": "Crispy shredded parotta pieces tossed with onions, capsicum, and spicy sauce on a roaring flame.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Crispy shredded parotta pieces tossed with onions, capsicum, and spicy sauce on a roaring flame."
+      ],
+      "displayOrder": 101,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_37",
@@ -2298,7 +5041,34 @@
       "station": "TIFFIN",
       "description": "Minced parotta beaten rhythmically on iron tawa with spiced vegetables, onions, and salna.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Minced parotta beaten rhythmically on iron tawa with spiced vegetables, onions, and salna."
+      ],
+      "displayOrder": 102,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_38",
@@ -2311,7 +5081,34 @@
       "station": "TIFFIN",
       "description": "Minced flaky parotta shredded with fresh button mushrooms, curry leaves, and spicy Chettinad masala.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Minced flaky parotta shredded with fresh button mushrooms, curry leaves, and spicy Chettinad masala."
+      ],
+      "displayOrder": 103,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_39",
@@ -2324,7 +5121,34 @@
       "station": "TIFFIN",
       "description": "Shredded parotta tossed on hot griddle with marinated paneer cubes and rich salna.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Shredded parotta tossed on hot griddle with marinated paneer cubes and rich salna."
+      ],
+      "displayOrder": 104,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_40",
@@ -2337,7 +5161,34 @@
       "station": "TIFFIN",
       "description": "Healthier alternative: shredded whole wheat parotta tossed with spices and mixed vegetables.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Healthier alternative: shredded whole wheat parotta tossed with spices and mixed vegetables."
+      ],
+      "displayOrder": 105,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_41",
@@ -2350,7 +5201,34 @@
       "station": "TIFFIN",
       "description": "Signature house special kothu combining parotta, idiyappam, and vegetables tossed in rich gravy.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Signature house special kothu combining parotta, idiyappam, and vegetables tossed in rich gravy."
+      ],
+      "displayOrder": 106,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_42",
@@ -2363,7 +5241,34 @@
       "station": "CHINESE",
       "description": "Wok-tossed noodles with shredded cabbage, carrots, bell peppers, and mild soy-garlic seasoning.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Wok-tossed noodles with shredded cabbage, carrots, bell peppers, and mild soy-garlic seasoning."
+      ],
+      "displayOrder": 107,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_43",
@@ -2376,7 +5281,34 @@
       "station": "CHINESE",
       "description": "Wok-fried noodles with fresh button mushrooms, spring onions, and garlic.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Wok-fried noodles with fresh button mushrooms, spring onions, and garlic."
+      ],
+      "displayOrder": 108,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_44",
@@ -2389,7 +5321,34 @@
       "station": "CHINESE",
       "description": "Stir-fried noodles loaded with golden paneer cubes, crisp vegetables, and spring onions.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Stir-fried noodles loaded with golden paneer cubes, crisp vegetables, and spring onions."
+      ],
+      "displayOrder": 109,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_45",
@@ -2402,7 +5361,34 @@
       "station": "CHINESE",
       "description": "Fragrant basmati rice wok-tossed with finely diced garden vegetables and white pepper.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Fragrant basmati rice wok-tossed with finely diced garden vegetables and white pepper."
+      ],
+      "displayOrder": 110,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_46",
@@ -2415,7 +5401,34 @@
       "station": "CHINESE",
       "description": "Basmati rice stir-fried in high-heat wok with tender paneer cubes and vegetables.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "Basmati rice stir-fried in high-heat wok with tender paneer cubes and vegetables."
+      ],
+      "displayOrder": 111,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     },
     {
       "id": "dish_dn_47",
@@ -2428,14 +5441,138 @@
       "station": "CHINESE",
       "description": "High-heat wok-tossed basmati rice with sliced fresh mushrooms and spring onions.",
       "available": true,
-      "status": "AVAILABLE"
+      "status": "AVAILABLE",
+      "portionSize": "Standard (1 Person)",
+      "prepTime": 10,
+      "isFeatured": false,
+      "isBestseller": false,
+      "isChefSpecial": false,
+      "dietary": {
+        "isVeg": true,
+        "isJain": false,
+        "isVegan": false,
+        "isGlutenFree": false,
+        "spiceLevel": 2
+      },
+      "allergens": [],
+      "ingredients": [
+        "High-heat wok-tossed basmati rice with sliced fresh mushrooms and spring onions."
+      ],
+      "displayOrder": 112,
+      "discount": {
+        "active": false,
+        "type": "PERCENT",
+        "value": 0,
+        "discountedPrice": 0,
+        "label": "",
+        "startDate": "",
+        "endDate": ""
+      },
+      "recipeId": null
     }
   ],
-  "customers": [],
-  "shifts": [],
+  "customers": [
+    {
+      "id": "cust_01",
+      "name": "Aswin",
+      "phone": "9999999999",
+      "visits": 18,
+      "totalSpend": 8420,
+      "tag": "VIP"
+    },
+    {
+      "id": "cust_02",
+      "name": "Karthik Raja",
+      "phone": "9876543210",
+      "visits": 12,
+      "totalSpend": 5460,
+      "tag": "Regular"
+    },
+    {
+      "id": "cust_03",
+      "name": "Meenakshi Sundaram",
+      "phone": "9443123456",
+      "visits": 8,
+      "totalSpend": 3120,
+      "tag": "Regular"
+    },
+    {
+      "id": "cust_04",
+      "name": "Anand Kumar",
+      "phone": "9842155667",
+      "visits": 3,
+      "totalSpend": 1150,
+      "tag": "New"
+    },
+    {
+      "id": "cust_05",
+      "name": "Suresh Chettiar",
+      "phone": "9789012345",
+      "visits": 24,
+      "totalSpend": 14200,
+      "tag": "VIP"
+    }
+  ],
+  "shifts": [
+    {
+      "id": "shift_current",
+      "cashierName": "Rajan (POS Cashier)",
+      "startedAt": "2026-10-17T06:30:00.000Z",
+      "openingFloat": 2000,
+      "cashSales": 5577,
+      "upiSales": 13728,
+      "cardSales": 1502,
+      "payouts": [
+        {
+          "id": "pay_01",
+          "amount": 350,
+          "reason": "Fresh Cow Milk Procurement",
+          "time": "08:15 AM"
+        }
+      ],
+      "status": "OPEN"
+    }
+  ],
   "held_orders": [],
-  "refund_logs": [],
-  "qr_orders": [],
+  "refund_logs": [
+    {
+      "id": "ref_01",
+      "billNumber": "SGR-2026-8812",
+      "tableNumber": "04",
+      "amount": 140,
+      "reason": "Guest requested less spicy variant, cancelled Kathirikai dish",
+      "authorizedBy": "Karthikeyan (Manager)",
+      "timestamp": "2026-10-17T07:15:00.000Z"
+    }
+  ],
+  "qr_orders": [
+    {
+      "id": "qr_ord_01",
+      "tableNumber": "07",
+      "customerName": "Aswin",
+      "phone": "9999999999",
+      "items": [
+        {
+          "title": "Special Ghee Podi Roast",
+          "price": 120,
+          "quantity": 2,
+          "variant": "Extra Ghee Roast"
+        },
+        {
+          "title": "Kumbakonam Degree Filter Coffee",
+          "price": 40,
+          "quantity": 2,
+          "variant": "Strong Degree Brew"
+        }
+      ],
+      "subtotal": 320,
+      "otpCode": "7087",
+      "otpStatus": "VERIFIED",
+      "captainName": "Murugan (Captain)",
+      "createdAt": "2026-10-17T08:50:00.000Z",
+      "status": "PENDING_POS_ACCEPT"
+    }
+  ],
   "reservations": [],
   "waitlist": [],
   "session_logs": [],
@@ -2532,13 +5669,95 @@
       "isActive": true
     }
   ],
-  "menu_audit_logs": [],
+  "menu_audit_logs": [
+    {
+      "id": "audit_01",
+      "timestamp": "2026-10-17T06:00:00.000Z",
+      "dishId": "dish_01",
+      "dishName": "Special Ghee Podi Roast",
+      "action": "ITEM_CREATED",
+      "details": "Initial menu setup with 3 portion variants and 3 add-ons",
+      "changedBy": "Aswin (Lead Architect)",
+      "role": "DEVELOPER_ADMIN"
+    },
+    {
+      "id": "audit_02",
+      "timestamp": "2026-10-17T07:15:00.000Z",
+      "dishId": "dish_05",
+      "dishName": "Raja Chettinad Full Meals (Leaf)",
+      "action": "OFFER_APPLIED",
+      "details": "Configured festival special discount 10% (₹210 -> ₹189)",
+      "changedBy": "Karthikeyan (Manager)",
+      "role": "STORE_MANAGER"
+    },
+    {
+      "id": "audit_03",
+      "timestamp": "2026-10-17T08:30:00.000Z",
+      "dishId": "dish_04",
+      "dishName": "Chettinad Kuzhi Paniyaram (6 pcs)",
+      "action": "AVAILABILITY_CHANGE",
+      "details": "Marked as SOLD OUT during breakfast rush (Batter depleted)",
+      "changedBy": "Selvam (Head Cook)",
+      "role": "KITCHEN"
+    },
+    {
+      "id": "audit_04",
+      "timestamp": "2026-10-17T09:10:00.000Z",
+      "dishId": "dish_04",
+      "dishName": "Chettinad Kuzhi Paniyaram (6 pcs)",
+      "action": "AVAILABILITY_CHANGE",
+      "details": "Fresh batch cast-iron cooked - Restored to AVAILABLE",
+      "changedBy": "Karthikeyan (Manager)",
+      "role": "STORE_MANAGER"
+    }
+  ],
   "suppliers": [],
   "purchase_orders": [],
   "stock_movements": [],
   "expenses": [],
   "customer_reviews": [],
-  "audit_logs": [],
+  "audit_logs": [
+    {
+      "id": "audit_init_01",
+      "timestamp": "2026-10-15T00:00:00.000Z",
+      "user": "Aswin (Lead Architect)",
+      "role": "DEVELOPER_ADMIN",
+      "module": "SYSTEM",
+      "action": "SYSTEM_INITIALIZED",
+      "detail": "Sri Gokulam Enterprise Restaurant Core deployed with Chettinad Sattvic configuration.",
+      "ip": "127.0.0.1"
+    },
+    {
+      "id": "audit_init_02",
+      "timestamp": "2026-10-16T08:00:00.000Z",
+      "user": "Owner - Sri Gokulam",
+      "role": "SUPER_ADMIN",
+      "module": "BILLING",
+      "action": "TAX_CONFIGURED",
+      "detail": "Standard Restaurant GST configured at 5% (CGST 2.5% + SGST 2.5%). FSSAI and GSTIN registered.",
+      "ip": "192.168.1.10"
+    },
+    {
+      "id": "audit_init_03",
+      "timestamp": "2026-10-17T06:30:00.000Z",
+      "user": "Karthikeyan (Manager)",
+      "role": "STORE_MANAGER",
+      "module": "PRINTER",
+      "action": "KOT_STATIONS_CONFIGURED",
+      "detail": "Configured 3 station printers: Tiffin & Dosa, Meals & Gravy, Beverages & Filter Coffee.",
+      "ip": "192.168.1.15"
+    },
+    {
+      "id": "audit_init_04",
+      "timestamp": "2026-10-17T09:00:00.000Z",
+      "user": "Aswin (Lead Architect)",
+      "role": "DEVELOPER_ADMIN",
+      "module": "SECURITY",
+      "action": "RBAC_SECURITY_ENFORCED",
+      "detail": "Granular permissions matrix enforced across POS, KOT, Inventory, Billing, and Settings.",
+      "ip": "127.0.0.1"
+    }
+  ],
   "website_cms": {
     "draft": {
       "sections": [
@@ -3516,7 +6735,509 @@
       "updatedAt": "2026-10-18T12:37:52.550Z",
       "updatedBy": "AJ Nanjil Tech Solutions"
     },
-    "versions": [],
+    "versions": [
+      {
+        "id": "ver_init_100",
+        "versionNumber": "1.0.0",
+        "timestamp": "2026-10-18T00:00:00.000Z",
+        "publishedBy": "Aswin (Lead Architect)",
+        "role": "DEVELOPER_ADMIN",
+        "summary": "Initial production launch snapshot of Sri Gokulam customer website with Chettinad Sattvic design system",
+        "snapshot": {
+          "sections": [
+            {
+              "id": "hero",
+              "name": "Hero Moving Banners & Carousel",
+              "icon": "🎠",
+              "isVisible": true,
+              "order": 1,
+              "editable": true
+            },
+            {
+              "id": "ticker",
+              "name": "Continuous Marquee Ticker Bar",
+              "icon": "📢",
+              "isVisible": true,
+              "order": 2,
+              "editable": true
+            },
+            {
+              "id": "specials",
+              "name": "Our Specials Category Cards",
+              "icon": "⭐",
+              "isVisible": true,
+              "order": 3,
+              "editable": true
+            },
+            {
+              "id": "sensory",
+              "name": "Signature Sensory Dishes Live Motion",
+              "icon": "🍲",
+              "isVisible": true,
+              "order": 4,
+              "editable": true
+            },
+            {
+              "id": "menu",
+              "name": "Interactive Menu with Filters & Multi-Sort",
+              "icon": "📋",
+              "isVisible": true,
+              "order": 5,
+              "editable": true
+            },
+            {
+              "id": "chooseUs",
+              "name": "Why Choose Us • Heritage & Purity Story",
+              "icon": "✨",
+              "isVisible": true,
+              "order": 6,
+              "editable": true
+            },
+            {
+              "id": "reviews",
+              "name": "Customer Reviews & 5-Star Testimonials",
+              "icon": "🌟",
+              "isVisible": true,
+              "order": 7,
+              "editable": true
+            },
+            {
+              "id": "footer",
+              "name": "Heritage Footer & Operating Hours",
+              "icon": "🏛️",
+              "isVisible": true,
+              "order": 8,
+              "editable": true
+            }
+          ],
+          "heroSlides": [],
+          "buttons": [
+            {
+              "id": "btn_reservation",
+              "key": "tableReservation",
+              "name": "Table Reservation CTA",
+              "text": "Table Reservation",
+              "tamilText": "மேஜை முன்பதிவு",
+              "icon": "📅",
+              "action": "reservation",
+              "link": "#reservation",
+              "bgColor": "#f59e0b",
+              "textColor": "#051B41",
+              "isVisible": true,
+              "shape": "pill",
+              "position": "Header & Banners"
+            },
+            {
+              "id": "btn_qr_dine_in",
+              "key": "qrDineIn",
+              "name": "QR Table Order CTA",
+              "text": "QR Dine-In",
+              "tamilText": "மேஜை QR ஆர்டர்",
+              "icon": "📲",
+              "action": "qr",
+              "link": "#",
+              "bgColor": "#0284c7",
+              "textColor": "#ffffff",
+              "isVisible": true,
+              "shape": "pill",
+              "position": "Header & Hero"
+            },
+            {
+              "id": "btn_view_menu",
+              "key": "viewMenu",
+              "name": "View Menu CTA",
+              "text": "View Full Menu",
+              "tamilText": "முழு மெனு பார்க்க",
+              "icon": "📜",
+              "action": "menu",
+              "link": "#menu",
+              "bgColor": "#051B41",
+              "textColor": "#f59e0b",
+              "isVisible": true,
+              "shape": "pill",
+              "position": "Hero & Specials"
+            },
+            {
+              "id": "btn_contact_us",
+              "key": "contactUs",
+              "name": "Reserve Table / Contact",
+              "text": "Reserve Table",
+              "tamilText": "மேஜை முன்பதிவு",
+              "icon": "📞",
+              "action": "tel",
+              "link": "tel:+919876543210",
+              "bgColor": "#10b981",
+              "textColor": "#ffffff",
+              "isVisible": true,
+              "shape": "pill",
+              "position": "Footer & Nav"
+            },
+            {
+              "id": "btn_whatsapp",
+              "key": "whatsapp",
+              "name": "WhatsApp Direct Chat",
+              "text": "WhatsApp Order",
+              "tamilText": "வாட்ஸ்அப் ஆர்டர்",
+              "icon": "💬",
+              "action": "external",
+              "link": "https://wa.me/919443123456",
+              "bgColor": "#25d366",
+              "textColor": "#ffffff",
+              "isVisible": true,
+              "shape": "pill",
+              "position": "Floating Bar"
+            }
+          ],
+          "pages": [
+            {
+              "id": "page_home",
+              "title": "Home",
+              "slug": "/",
+              "status": "PUBLISHED",
+              "isSystem": true,
+              "inNav": true,
+              "inFooter": true,
+              "displayOrder": 1,
+              "seoTitle": "Sri Gokulam Veg Restaurant | Karaikudi Chettinad Heritage",
+              "metaDesc": "Authentic 100% vegetarian Chettinad dining with pure cow ghee roasts, banana leaf meals, and brass filter coffee.",
+              "updatedAt": "2026-10-18T00:00:00.000Z"
+            },
+            {
+              "id": "page_menu",
+              "title": "Our Menu",
+              "slug": "/#menu",
+              "status": "PUBLISHED",
+              "isSystem": false,
+              "inNav": true,
+              "inFooter": true,
+              "displayOrder": 2,
+              "seoTitle": "Chettinad Sattvic Menu | Sri Gokulam",
+              "metaDesc": "Browse 100% vegetarian tiffins, royal banana leaf thali, degree coffee, and Chettinad sweets.",
+              "updatedAt": "2026-10-18T00:00:00.000Z"
+            },
+            {
+              "id": "page_specials",
+              "title": "Our Specials",
+              "slug": "/#specials",
+              "status": "PUBLISHED",
+              "isSystem": false,
+              "inNav": true,
+              "inFooter": false,
+              "displayOrder": 3,
+              "seoTitle": "Specials & Combos | Sri Gokulam Karaikudi",
+              "metaDesc": "Signature dishes crafted with pure cow ghee and freshly pounded Chettinad spices.",
+              "updatedAt": "2026-10-18T00:00:00.000Z"
+            },
+            {
+              "id": "page_signature",
+              "title": "Signature Dishes",
+              "slug": "/#signature",
+              "status": "PUBLISHED",
+              "isSystem": false,
+              "inNav": true,
+              "inFooter": false,
+              "displayOrder": 4,
+              "seoTitle": "Sensory Signature Dishes | Sri Gokulam",
+              "metaDesc": "Live sizzle, fresh aroma, and pure cow ghee preparations served hot in Karaikudi.",
+              "updatedAt": "2026-10-18T00:00:00.000Z"
+            },
+            {
+              "id": "page_choose_us",
+              "title": "Why Choose Us",
+              "slug": "/choose-us",
+              "status": "PUBLISHED",
+              "isSystem": false,
+              "inNav": true,
+              "inFooter": true,
+              "displayOrder": 5,
+              "seoTitle": "Why Choose Sri Gokulam | Authentic Chettinad Veg Excellence",
+              "metaDesc": "Discover why Sri Gokulam is Karaikudi’s #1 vegetarian destination: 100% pure cow ghee, stone-ground Chettinad spices, and warm hospitality.",
+              "updatedAt": "2026-10-20T00:00:00.000Z"
+            },
+            {
+              "id": "page_about",
+              "title": "About Us & Heritage",
+              "slug": "/about",
+              "status": "PUBLISHED",
+              "isSystem": false,
+              "inNav": true,
+              "inFooter": true,
+              "displayOrder": 5,
+              "seoTitle": "Our Heritage | Sri Gokulam Veg Restaurant",
+              "metaDesc": "Founded on the sacred traditions of Chettinad sattvic hospitality in Karaikudi.",
+              "content": "Sri Gokulam Veg Restaurant was born from a timeless culinary philosophy: pure ingredients, time-tested recipes, and heartfelt hospitality. Situated in Karaikudi, the cultural capital of Chettinad, we honor traditional vegetarian gastronomy without artificial additives or preservatives.",
+              "updatedAt": "2026-10-18T00:00:00.000Z"
+            },
+            {
+              "id": "page_gallery",
+              "title": "Photo Gallery",
+              "slug": "/gallery",
+              "status": "PUBLISHED",
+              "isSystem": false,
+              "inNav": true,
+              "inFooter": true,
+              "displayOrder": 6,
+              "seoTitle": "Photo Gallery | Sri Gokulam Karaikudi",
+              "metaDesc": "Visual feast of authentic Chettinad dishes, traditional courtyard, and heritage dining ambiance.",
+              "updatedAt": "2026-10-18T00:00:00.000Z"
+            },
+            {
+              "id": "page_contact",
+              "title": "Contact & Location",
+              "slug": "/#contact",
+              "status": "PUBLISHED",
+              "isSystem": false,
+              "inNav": true,
+              "inFooter": true,
+              "displayOrder": 7,
+              "seoTitle": "Contact Us | Sri Gokulam Karaikudi",
+              "metaDesc": "Reach Sri Gokulam on Mudiyarasan Salai, Near Bharat Petroleum Bunk and Thevar Silai, Karaikudi. Phone: +91 94431 23456.",
+              "updatedAt": "2026-10-18T00:00:00.000Z"
+            },
+            {
+              "id": "page_catering",
+              "title": "Catering & Bulk Orders",
+              "slug": "/catering",
+              "status": "PUBLISHED",
+              "isSystem": false,
+              "inNav": false,
+              "inFooter": true,
+              "displayOrder": 8,
+              "seoTitle": "Vegetarian Catering Services | Sri Gokulam",
+              "metaDesc": "Authentic South Indian wedding & traditional celebration catering in Sivaganga & Chettinad.",
+              "content": "We cater for traditional Tamil weddings, Sashtiabdapoorthi, Upanayanam, housewarmings, and corporate gatherings with authentic banana leaf service and pure ghee preparations.",
+              "updatedAt": "2026-10-18T00:00:00.000Z"
+            }
+          ],
+          "design": {
+            "primaryColor": "#051B41",
+            "secondaryColor": "#0E2954",
+            "accentGold": "#D4AF37",
+            "ctaColor": "#f59e0b",
+            "bgBody": "#ffffff",
+            "textPrimary": "#0f172a",
+            "fontFamily": "Inter, system-ui, sans-serif",
+            "headingFontFamily": "'Playfair Display', Georgia, serif",
+            "logoUrl": "/restaurant_logo.jpg",
+            "faviconUrl": "/favicon.ico",
+            "borderRadius": "12px",
+            "containerWidth": "1280px",
+            "spacingScale": "STANDARD",
+            "animationSpeed": "NORMAL",
+            "themeMode": "CLASSIC_CHETTINAD"
+          },
+          "content": {
+            "brandTa": "ஸ்ரீ கோகுலம்",
+            "brandEn": "SRI GOKULAM",
+            "brandSub": "VEG RESTAURANT",
+            "tagline": "Authentic Chettinad Sattvic Culinary Heritage",
+            "announcementText": "Authentic Chettinad Sattvic Culinary Heritage • Karaikudi, Tamil Nadu",
+            "announcementBadge": "100% PURE VEG",
+            "announcementPhone": "+91 98765 43210",
+            "topAnnouncementEnabled": true,
+            "storyTitle": "Preserving Sacred Vegetarian Arts",
+            "storyDescription": "Every dish is seasoned with generationally perfected recipes, pure cow ghee, and sattvic love in the heart of Karaikudi.",
+            "addressLine1": "Mudiyarasan Salai, Near Bharat Petroleum Bunk & Thevar Silai",
+            "addressLine2": "Karaikudi, Sivaganga District, Tamil Nadu - 630003",
+            "primaryPhone": "+91 98765 43210",
+            "secondaryPhone": "+91 94431 23456",
+            "email": "contact@srigokulamveg.com",
+            "hours": {
+              "breakfast": "7:00 AM – 11:00 AM",
+              "lunch": "12:00 PM – 3:30 PM",
+              "dinner": "6:30 PM – 10:30 PM",
+              "note": "Open All 7 Days a Week for Pure Sattvic Dining"
+            },
+            "social": {
+              "instagram": "https://instagram.com/srigokulamveg",
+              "facebook": "https://facebook.com/srigokulamveg",
+              "youtube": "https://youtube.com/@srigokulamveg",
+              "maps": "https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Karaikudi"
+            },
+            "marqueeItems": [
+              {
+                "icon": "🦚",
+                "text": "ஸ்ரீ கோகுலம் சைவ உணவகம்"
+              },
+              {
+                "icon": "✨",
+                "text": "100% PURE COW GHEE PREPARATIONS"
+              },
+              {
+                "icon": "🍱",
+                "text": "UNLIMITED CHETTINAD RAJA MEALS AT ₹180"
+              },
+              {
+                "icon": "🥞",
+                "text": "CRISPY GHEE ROAST DOSA WITH TRIO CHUTNEYS"
+              },
+              {
+                "icon": "☕",
+                "text": "AUTHENTIC KUMBAKONAM BRASS FILTER COFFEE"
+              },
+              {
+                "icon": "📲",
+                "text": "CONTACTLESS QR TABLE ORDERING WITH OTP VERIFICATION"
+              },
+              {
+                "icon": "🍃",
+                "text": "TRADITIONAL SATTVIC CULINARY HERITAGE"
+              },
+              {
+                "icon": "⭐",
+                "text": "KARAIKUDI'S TOP RATED VEGETARIAN DINING DESTINATION"
+              }
+            ],
+            "specialCategories": [],
+            "qrTableStory": {
+              "badge": "SMART DINING EXPERIENCE",
+              "title": "Contactless Smart Table QR Dine-In",
+              "subtitle": "Scan table QR, select your favorite dishes, verify via instant OTP, and enjoy live kitchen prep.",
+              "step1": "1. Scan Unique Table QR Standee",
+              "step2": "2. Explore Visual Menu & Add Dishes",
+              "step3": "3. Instant 4-Digit Waiter OTP Handshake",
+              "step4": "4. Direct Live Kitchen Prep & Service"
+            },
+            "reviewsBadge": "5-Star Google Rated",
+            "reviewsHeading": "What Karaikudi Food Lovers Say"
+          },
+          "header": {
+            "topAnnouncementEnabled": true,
+            "announcementBadge": "100% PURE VEG",
+            "announcementText": "Authentic Chettinad Sattvic Culinary Heritage • Karaikudi, Tamil Nadu",
+            "announcementPhone": "+91 98765 43210",
+            "brandTa": "ஸ்ரீ கோகுலம்",
+            "brandEn": "SRI GOKULAM",
+            "brandSub": "VEG RESTAURANT",
+            "logoUrl": "/restaurant_logo.jpg",
+            "tagline": "Chettinad Sattvic Culinary Heritage",
+            "navLinks": [
+              {
+                "id": "nav_home",
+                "label": "Home",
+                "href": "#",
+                "isVisible": true,
+                "isExternal": false,
+                "order": 1
+              },
+              {
+                "id": "nav_specials",
+                "label": "Our Specials",
+                "href": "#specials",
+                "isVisible": true,
+                "isExternal": false,
+                "order": 2
+              },
+              {
+                "id": "nav_signature",
+                "label": "Signature Dishes",
+                "href": "#signature",
+                "isVisible": true,
+                "isExternal": false,
+                "order": 3
+              },
+              {
+                "id": "nav_menu",
+                "label": "Full Menu",
+                "href": "#menu",
+                "isVisible": true,
+                "isExternal": false,
+                "order": 4
+              },
+              {
+                "id": "nav_table_qr",
+                "label": "Table QR Dine-In",
+                "href": "#table-qr",
+                "isVisible": true,
+                "isExternal": false,
+                "order": 5
+              },
+              {
+                "id": "nav_contact",
+                "label": "Contact",
+                "href": "#contact",
+                "isVisible": true,
+                "isExternal": false,
+                "order": 6
+              }
+            ],
+            "headerActionButtons": [
+              "btn_order_now",
+              "btn_qr_dine_in"
+            ]
+          },
+          "footer": {
+            "brandTitle": "ஸ்ரீ கோகுலம் • SRI GOKULAM",
+            "brandStory": "Preserving the sacred vegetarian culinary arts of Chettinad and Tamil Nadu. Every dish is seasoned with generationally perfected recipes, pure cow ghee, and sattvic love in the heart of Karaikudi.",
+            "badgeText": "🌿 100% PURE SATTVIC VEGETARIAN",
+            "hours": {
+              "breakfast": "7:00 AM – 11:00 AM",
+              "lunch": "12:00 PM – 3:30 PM",
+              "dinner": "6:30 PM – 10:30 PM",
+              "note": "Open All 7 Days a Week"
+            },
+            "addressLine1": "Heritage High Street, Karaikudi",
+            "addressLine2": "Sivaganga District, Tamil Nadu 630001",
+            "primaryPhone": "+91 98765 43210",
+            "secondaryPhone": "+91 94431 23456",
+            "email": "contact@srigokulamveg.com",
+            "social": {
+              "instagram": "https://instagram.com/srigokulamveg",
+              "facebook": "https://facebook.com/srigokulamveg",
+              "youtube": "https://youtube.com/@srigokulamveg",
+              "whatsapp": "https://wa.me/919443123456",
+              "maps": "https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Karaikudi"
+            },
+            "complianceText": "All Rights Reserved © 2026 Sri Gokulam Veg Restaurant",
+            "developerCreditText": "Designed & Developed with excellence by",
+            "developerName": "AJ Nanjil Tech Solutions",
+            "developerUrl": "https://ajnanjiltechsolutions.com/",
+            "fssaiNumber": "12423011000456",
+            "gstinNumber": "33AABCS1429B1Z8",
+            "quickLinks": [
+              {
+                "id": "ql_home",
+                "label": "Home",
+                "href": "/",
+                "isVisible": true
+              },
+              {
+                "id": "ql_menu",
+                "label": "Our Menu",
+                "href": "/#menu",
+                "isVisible": true
+              },
+              {
+                "id": "ql_about",
+                "label": "About Us & Heritage",
+                "href": "/about",
+                "isVisible": true
+              },
+              {
+                "id": "ql_gallery",
+                "label": "Photo Gallery",
+                "href": "/gallery",
+                "isVisible": true
+              },
+              {
+                "id": "ql_contact",
+                "label": "Contact Us",
+                "href": "/#contact",
+                "isVisible": true
+              },
+              {
+                "id": "ql_catering",
+                "label": "Catering & Bulk Orders",
+                "href": "/catering",
+                "isVisible": true
+              }
+            ]
+          },
+          "customerReviews": [],
+          "videoReviews": []
+        }
+      }
+    ],
     "auditLog": [
       {
         "id": "cms_log_1792327237507_5yxv",

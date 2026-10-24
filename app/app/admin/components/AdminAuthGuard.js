@@ -31,11 +31,13 @@ export default function AdminAuthGuard({ children }) {
       setErrorMessage('');
 
       try {
+        const localToken = typeof window !== 'undefined' ? localStorage.getItem('sgr_admin_session') : null;
         const res = await fetch('/api/auth/session', {
           method: 'GET',
           cache: 'no-store',
           headers: {
             'Cache-Control': 'no-cache, no-store, must-revalidate',
+            ...(localToken ? { Authorization: `Bearer ${localToken}` } : {}),
           },
         });
 

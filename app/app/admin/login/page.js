@@ -14,6 +14,7 @@ export default function AdminLoginPage() {
   const [step, setStep] = useState(1); // 1 = Email Input, 2 = OTP Verification, 3 = Authenticated Success
   const [email, setEmail] = useState('');
   const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', '']);
+  const [otpTicket, setOtpTicket] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
@@ -35,7 +36,10 @@ export default function AdminLoginPage() {
     let active = true;
     const checkExistingSession = async () => {
       try {
-        const res = await fetch('/api/auth/session');
+        const localToken = typeof window !== 'undefined' ? localStorage.getItem('sgr_admin_session') : null;
+        const res = await fetch('/api/auth/session', {
+          headers: localToken ? { Authorization: `Bearer ${localToken}` } : {},
+        });
         const data = await res.json();
         if (active && data.authenticated && data.user) {
           setAuthenticatedUser(data.user);
@@ -131,6 +135,12 @@ export default function AdminLoginPage() {
         setDevOtpPreview(data.devOtp || '');
         setOtpDigits(['', '', '', '', '', '']);
         setSuccessMsg(data.message || `One-time code dispatched to ${cleanEmail}`);
+        if (data.otpTicket) {
+          setOtpTicket(data.otpTicket);
+          try {
+            sessionStorage.setItem('sgr_otp_ticket', data.otpTicket);
+          } catch (e) {}
+        }
         
         // Auto-focus first digit after transition
         setTimeout(() => {
@@ -168,6 +178,8 @@ export default function AdminLoginPage() {
     setLoading(true);
     setErrorMsg('');
 
+    const savedTicket = otpTicket || (typeof window !== 'undefined' ? sessionStorage.getItem('sgr_otp_ticket') : '');
+
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
@@ -176,12 +188,17 @@ export default function AdminLoginPage() {
           action: 'VERIFY_OTP',
           email: email.trim().toLowerCase(),
           otp: fullCode,
+          otpTicket: savedTicket || undefined,
         }),
       });
 
       const data = await res.json();
 
       if (data.success) {
+        try {
+          sessionStorage.removeItem('sgr_otp_ticket');
+        } catch (e) {}
+
         // Persist session token and user info
         if (data.sessionToken) {
           localStorage.setItem('sgr_admin_session', data.sessionToken);
