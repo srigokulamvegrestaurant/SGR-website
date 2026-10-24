@@ -2627,7 +2627,7 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
                   <div>
                     <h2 className={styles.cardTitle}>Third-Party API Integrations</h2>
                     <p className={styles.cardSubtitle}>
-                      Manage Payment Gateway, WhatsApp Cloud API, Email, and GitHub CDN (Status reflects verified credentials only)
+                      Manage Payment Gateway, WhatsApp Cloud API, Email, and SMS (Status reflects verified credentials only)
                     </p>
                   </div>
                 </div>

@@ -3687,12 +3687,6 @@ Status: SHIFT CLOSED & VERIFIED
             )}
           </button>
           <button
-            className={`${styles.tabBtn} ${activeTab === 'cdn' ? styles.tabActive : ''}`}
-            onClick={() => setActiveTab('cdn')}
-          >
-            🖼️ GitHub CDN
-          </button>
-          <button
             className={`${styles.tabBtn} ${activeTab === 'settings' ? styles.tabActive : ''}`}
             onClick={() => setActiveTab('settings')}
             style={{ color: '#38bdf8' }}
@@ -5034,6 +5028,31 @@ Status: SHIFT CLOSED & VERIFIED
             </div>
 
             {/* ─── Visual Floor Layout Cards Grid ─── */}
+            {floorTables.length === 0 && (
+              <div style={{
+                textAlign: 'center',
+                padding: '3rem 1.5rem',
+                background: 'var(--bg-card, #18181b)',
+                borderRadius: '12px',
+                border: '1px dashed var(--border-subtle, #3f3f46)',
+                marginBottom: '1.5rem'
+              }}>
+                <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>🪑</div>
+                <h3 style={{ margin: '0 0 0.5rem 0', color: 'var(--text-primary)' }}>Floor Plan Ready for Custom Setup</h3>
+                <p style={{ margin: '0 0 1.25rem 0', color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+                  All tables have been cleared. Click below to add your tables manually to Ground Floor, AC Royal Dining Hall, or Chettinad Veranda.
+                </p>
+                <button
+                  type="button"
+                  className={styles.btnFloorAction}
+                  onClick={() => setShowAddTableModal(true)}
+                  style={{ background: '#2563eb', color: '#ffffff', borderColor: '#2563eb', padding: '0.6rem 1.25rem', fontSize: '0.9rem' }}
+                >
+                  ➕ Add New Table
+                </button>
+              </div>
+            )}
+
             {['GROUND_FLOOR', 'AC_HALL', 'VERANDA'].map(secKey => {
               if (floorFilterSection !== 'ALL' && floorFilterSection !== secKey) return null;
               const secTables = floorTables.filter(tbl => {
@@ -5067,8 +5086,19 @@ Status: SHIFT CLOSED & VERIFIED
                   </div>
 
                   {secTables.length === 0 ? (
-                    <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', padding: '1rem', fontStyle: 'italic' }}>
-                      No tables match current filters in this section.
+                    <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem', padding: '1rem', fontStyle: 'italic', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      <span>No tables currently in this section.</span>
+                      <button
+                        type="button"
+                        className={styles.btnFloorAction}
+                        onClick={() => {
+                          setNewTableData(prev => ({ ...prev, section: secKey }));
+                          setShowAddTableModal(true);
+                        }}
+                        style={{ fontSize: '0.75rem', padding: '0.35rem 0.8rem', background: '#2563eb', color: '#fff', borderColor: '#2563eb' }}
+                      >
+                        ➕ Add Table to {secKey === 'GROUND_FLOOR' ? 'Ground Floor' : secKey === 'AC_HALL' ? 'AC Hall' : 'Veranda'}
+                      </button>
                     </div>
                   ) : (
                     <div className={styles.tablesGridFloor}>
@@ -9837,52 +9867,6 @@ Status: SHIFT CLOSED & VERIFIED
         )}
 
         {/* ══════════════════════════════════════════════════════════════════════
-            MODULE 6: GITHUB REPOSITORY ASSET CDN HUB
-           ══════════════════════════════════════════════════════════════════════ */}
-        {activeTab === 'cdn' && (
-          <div>
-            <div className={styles.cdnBanner}>
-              <div>
-                <h3 style={{ margin: 0, color: 'var(--accent-blue)' }}>
-                  ⚡ Zero-Cost Cloud Asset CDN Engine (GitHub REST API + jsDelivr)
-                </h3>
-                <p style={{ margin: '0.35rem 0 0 0', fontSize: '0.82rem', color: 'var(--text-secondary)' }}>
-                  Directly versions WebP menu photography in the GitHub repository, eliminating expensive monthly AWS S3 / Cloudinary fees.
-                </p>
-              </div>
-              <span className={styles.liveBadge} style={{ background: 'rgba(2, 132, 199, 0.15)', color: '#0284c7' }}>
-                Repo: aj-tech-solutions/sri-gokulam-assets
-              </span>
-            </div>
-
-            <div className={styles.cdnGrid}>
-              {[
-                { name: 'Ghee Podi Roast', cat: 'Tiffin', url: 'https://cdn.jsdelivr.net/gh/aj-tech-solutions/sri-gokulam-assets@main/menu/tiffin/ghee_podi_roast.webp' },
-                { name: 'Plain Idli with Trio Chutneys', cat: 'Tiffin', url: 'https://cdn.jsdelivr.net/gh/aj-tech-solutions/sri-gokulam-assets@main/menu/tiffin/plain_idli.webp' },
-                { name: 'Kumbakonam Degree Filter Coffee', cat: 'Beverages', url: 'https://cdn.jsdelivr.net/gh/aj-tech-solutions/sri-gokulam-assets@main/menu/beverages/filter_coffee.webp' },
-                { name: 'Chettinad Special Meals on Leaf', cat: 'Meals', url: 'https://cdn.jsdelivr.net/gh/aj-tech-solutions/sri-gokulam-assets@main/menu/meals/chettinad_thali.webp' },
-                { name: 'Karaikudi Kuzhi Paniyaram', cat: 'Snacks', url: 'https://cdn.jsdelivr.net/gh/aj-tech-solutions/sri-gokulam-assets@main/menu/snacks/kuzhi_paniyaram.webp' },
-              ].map((ast, idx) => (
-                <div key={idx} className={styles.cdnCard}>
-                  <div className={styles.cdnCardTitle}>{ast.name}</div>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--accent-blue)' }}>Category: {ast.cat} • WebP Compressed</div>
-                  <div className={styles.cdnUrlSnippet}>{ast.url}</div>
-                  <button
-                    className={styles.btnStatusQuick}
-                    onClick={() => {
-                      navigator.clipboard.writeText(ast.url);
-                      showNotice('CDN URL copied!');
-                    }}
-                  >
-                    📋 Copy Public CDN URL
-                  </button>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ══════════════════════════════════════════════════════════════════════
             MODULE 7: DEVELOPER ADMIN HUB (ASWIN / AJ TECH SOLUTIONS)
            ══════════════════════════════════════════════════════════════════════ */}
         {activeTab === 'devhub' && currentUser.role === 'DEVELOPER_ADMIN' && (
@@ -13835,7 +13819,7 @@ Status: SHIFT CLOSED & VERIFIED
 
                   <div>
                     <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>
-                      OR DIRECT PHOTO URL / GITHUB CDN:
+                      OR DIRECT PHOTO URL:
                     </label>
                     <input
                       type="url"

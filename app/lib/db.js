@@ -21,24 +21,7 @@ const DATA_FILE = path.join(DATA_DIR, 'restaurant_state.json');
 
 // Initial seed data matching Sri Gokulam Master Plan
 const SEED_DATA = {
-  tables: [
-    { id: 'tbl_01', tableNumber: '01', section: 'GROUND_FLOOR', capacity: 2, shape: 'ROUND', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_02', tableNumber: '02', section: 'GROUND_FLOOR', capacity: 4, shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_03', tableNumber: '03', section: 'GROUND_FLOOR', capacity: 4, shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_04', tableNumber: '04', section: 'GROUND_FLOOR', capacity: 6, shape: 'RECTANGLE', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_05', tableNumber: '05', section: 'GROUND_FLOOR', capacity: 2, shape: 'ROUND', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_06', tableNumber: '06', section: 'GROUND_FLOOR', capacity: 4, shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_07', tableNumber: '07', section: 'AC_HALL', capacity: 4, shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Rajan (POS Cashier)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_08', tableNumber: '08', section: 'AC_HALL', capacity: 4, shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Rajan (POS Cashier)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_09', tableNumber: '09', section: 'AC_HALL', capacity: 6, shape: 'RECTANGLE', status: 'AVAILABLE', assignedWaiter: 'Rajan (POS Cashier)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_10', tableNumber: '10', section: 'AC_HALL', capacity: 8, shape: 'RECTANGLE', status: 'AVAILABLE', assignedWaiter: 'Rajan (POS Cashier)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_11', tableNumber: '11', section: 'AC_HALL', capacity: 4, shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Rajan (POS Cashier)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_12', tableNumber: '12', section: 'AC_HALL', capacity: 6, shape: 'RECTANGLE', status: 'AVAILABLE', assignedWaiter: 'Rajan (POS Cashier)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_13', tableNumber: '13', section: 'VERANDA', capacity: 2, shape: 'ROUND', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_14', tableNumber: '14', section: 'VERANDA', capacity: 4, shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_15', tableNumber: '15', section: 'VERANDA', capacity: 4, shape: 'SQUARE', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)', activeOrderId: null, activeSessionId: null },
-    { id: 'tbl_16', tableNumber: '16', section: 'VERANDA', capacity: 6, shape: 'RECTANGLE', status: 'AVAILABLE', assignedWaiter: 'Murugan (Floor Captain)', activeOrderId: null, activeSessionId: null },
-  ],
+  tables: [],
   reservations: [],
   waitlist: [],
   session_logs: [],
