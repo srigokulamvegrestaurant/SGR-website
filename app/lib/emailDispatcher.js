@@ -16,11 +16,23 @@ function getTransporter() {
     return null;
   }
 
+  const host = process.env.SMTP_HOST?.trim() || 'smtp.gmail.com';
+  const port = Number(process.env.SMTP_PORT) || 587;
+  const isSecure = port === 465;
+
   transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host,
+    port,
+    secure: isSecure,
     auth: {
       user,
       pass,
+    },
+    connectionTimeout: 5000, // 5s connection timeout (fails fast on blocked cloud ports)
+    greetingTimeout: 5000,
+    socketTimeout: 6000,
+    tls: {
+      rejectUnauthorized: false,
     },
   });
 

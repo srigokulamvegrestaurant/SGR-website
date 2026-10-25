@@ -6,8 +6,22 @@ import { Pool } from 'pg';
 let pool = null;
 
 function getPgPool() {
-  const dbUrl = process.env.DATABASE_URL || 'postgresql://postgres:8HKLzdPyoGRppRTE@db.oolonnixnuherowpodla.supabase.co:5432/postgres';
+  let dbUrl = process.env.DATABASE_URL || 'postgresql://postgres.oolonnixnuherowpodla:8HKLzdPyoGRppRTE@aws-0-ap-south-1.pooler.supabase.com:5432/postgres';
   if (!dbUrl) return null;
+
+  // IPv6 to IPv4 Auto-Resolution:
+  // Direct Supabase hostnames (db.<ref>.supabase.co) resolve only to IPv6 AAAA records.
+  // Railway and cloud containers without outbound IPv6 routing fail with ENETUNREACH.
+  // We automatically normalize to the IPv4 connection pooler on port 5432.
+  if (dbUrl.includes('db.oolonnixnuherowpodla.supabase.co') || dbUrl.match(/@db\.[a-z0-9]+\.supabase\.co/i)) {
+    dbUrl = dbUrl.replace(
+      /postgres:\/\/([^:]+):([^@]+)@db\.([a-z0-9]+)\.supabase\.co(?::\d+)?\/postgres/i,
+      (match, user, pass, ref) => {
+        const poolerUser = user.includes('.') ? user : `postgres.${ref}`;
+        return `postgresql://${poolerUser}:${pass}@aws-0-ap-south-1.pooler.supabase.com:5432/postgres`;
+      }
+    );
+  }
 
   if (!pool) {
     try {
@@ -16,7 +30,7 @@ function getPgPool() {
         ssl: { rejectUnauthorized: false },
         max: 5,
         idleTimeoutMillis: 30000,
-        connectionTimeoutMillis: 15000,
+        connectionTimeoutMillis: 10000,
       });
 
       pool.on('error', (err) => {
