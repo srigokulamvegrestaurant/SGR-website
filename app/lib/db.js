@@ -141,6 +141,22 @@ const SEED_DATA = {
       otpLastRequestedAt: null,
       createdAt: '2026-10-15T00:00:00.000Z'
     },
+    {
+      id: 'usr_owner_main',
+      fullName: 'Sri Gokulam Admin',
+      email: 'srigokulamvegrestaurant@gmail.com',
+      phone: '+91 98765 00000',
+      role: 'DEVELOPER_ADMIN',
+      isActive: true,
+      isProtected: true,
+      otpHash: null,
+      otpExpiresAt: null,
+      otpAttempts: 0,
+      otpLockoutUntil: null,
+      otpResendCount: 0,
+      otpLastRequestedAt: null,
+      createdAt: '2026-10-15T00:00:00.000Z'
+    },
     { id: 'usr_01', fullName: 'Aswin (AJ Tech)', email: 'aswin@ajtechsolutions.com', phone: '9999999999', role: 'DEVELOPER_ADMIN', isActive: true, isProtected: false, otpHash: null, otpExpiresAt: null, otpAttempts: 0, otpLockoutUntil: null, otpResendCount: 0, otpLastRequestedAt: null, createdAt: '2026-10-15T00:00:00.000Z' },
     { id: 'usr_02', fullName: 'Owner - Sri Gokulam', email: 'owner@srigokulam.com', phone: '9876500001', role: 'SUPER_ADMIN', isActive: true, isProtected: false, otpHash: null, otpExpiresAt: null, otpAttempts: 0, otpLockoutUntil: null, otpResendCount: 0, otpLastRequestedAt: null, createdAt: '2026-10-15T00:00:00.000Z' },
     { id: 'usr_03', fullName: 'Karthikeyan (Manager)', email: 'manager@srigokulam.com', phone: '9876500002', role: 'STORE_MANAGER', isActive: true, isProtected: false, otpHash: null, otpExpiresAt: null, otpAttempts: 0, otpLockoutUntil: null, otpResendCount: 0, otpLastRequestedAt: null, createdAt: '2026-10-15T00:00:00.000Z' },
