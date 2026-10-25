@@ -3,7 +3,9 @@
 import { NextResponse } from 'next/server';
 import {
   getDb,
+  getDbAsync,
   saveDb,
+  saveDbAsync,
   DEFAULT_SETTINGS,
   recordAuditLog,
   maskSecret,
@@ -54,7 +56,7 @@ export async function GET(request) {
     const auditModule = searchParams.get('auditModule') || 'ALL';
     const auditLimit = parseInt(searchParams.get('auditLimit') || '50', 10);
 
-    const db = getDb();
+    const db = await getDbAsync();
     const sanitized = sanitizeSettingsForClient(db.settings);
 
     // Filter audit logs
@@ -152,7 +154,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const { action, caller = { name: 'Admin', role: 'SUPER_ADMIN' } } = body;
-    const db = getDb();
+    const db = await getDbAsync();
     const callerIp = request.headers.get('x-forwarded-for') || '127.0.0.1';
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -228,7 +230,7 @@ export async function POST(request) {
 
       // Synchronize legacy flat settings
       syncLegacySettings(db.settings);
-      saveDb(db);
+      await saveDbAsync(db);
 
       // Record Audit Log
       recordAuditLog({
@@ -268,7 +270,7 @@ export async function POST(request) {
       }
 
       syncLegacySettings(db.settings);
-      saveDb(db);
+      await saveDbAsync(db);
 
       recordAuditLog({
         user: caller.name || 'Admin',
@@ -330,7 +332,7 @@ export async function POST(request) {
 
       db.users = db.users || [];
       db.users.push(newUser);
-      saveDb(db);
+      await saveDbAsync(db);
 
       recordAuditLog({
         user: caller.name || 'Admin',
@@ -387,7 +389,7 @@ export async function POST(request) {
         isActive: userPayload.isActive !== undefined ? userPayload.isActive : existingUser.isActive,
       };
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       recordAuditLog({
         user: caller.name || 'Admin',
@@ -428,7 +430,7 @@ export async function POST(request) {
       }
 
       const deleted = db.users.splice(userIndex, 1)[0];
-      saveDb(db);
+      await saveDbAsync(db);
 
       recordAuditLog({
         user: caller.name || 'Admin',
@@ -463,7 +465,7 @@ export async function POST(request) {
         ...db.settings.roles_permissions,
         ...permissions,
       };
-      saveDb(db);
+      await saveDbAsync(db);
 
       recordAuditLog({
         user: caller.name || 'Admin',
@@ -608,7 +610,7 @@ export async function POST(request) {
         };
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       recordAuditLog({
         user: caller.name || 'Admin',
@@ -671,7 +673,7 @@ export async function POST(request) {
       return NextResponse.json({
         success: true,
         message: res.message,
-        settings: sanitizeSettingsForClient(getDb().settings),
+        settings: sanitizeSettingsForClient(db.settings),
       });
     }
 
@@ -682,7 +684,7 @@ export async function POST(request) {
       if (!db.settings.security) db.settings.security = {};
       const current = (db.settings.security.activeSessions || []).filter(s => s.isCurrent);
       db.settings.security.activeSessions = current;
-      saveDb(db);
+      await saveDbAsync(db);
 
       recordAuditLog({
         user: caller.name || 'Admin',
@@ -718,7 +720,7 @@ export async function POST(request) {
       // Reset settings to defaults while preserving existing order & bill logs
       db.settings = JSON.parse(JSON.stringify(DEFAULT_SETTINGS));
       syncLegacySettings(db.settings);
-      saveDb(db);
+      await saveDbAsync(db);
 
       recordAuditLog({
         user: caller.name || 'Developer Admin',

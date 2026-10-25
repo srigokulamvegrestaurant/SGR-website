@@ -1,6 +1,6 @@
 // app/api/orders/route.js - Order Creation & Query API
 import { NextResponse } from 'next/server';
-import { getDb, saveDb, categorizeStation, recordCustomerTransaction } from '@/lib/db';
+import { getDb, getDbAsync, saveDb, saveDbAsync, categorizeStation, recordCustomerTransaction } from '@/lib/db';
 import { broadcast } from '@/app/api/events/route';
 
 export async function GET(request) {
@@ -9,7 +9,7 @@ export async function GET(request) {
     const table = searchParams.get('table');
     const status = searchParams.get('status');
 
-    const db = getDb();
+    const db = await getDbAsync();
     let orders = [...(db.orders || [])];
 
     if (table) {
@@ -64,7 +64,7 @@ export async function POST(request) {
       );
     }
 
-    const db = getDb();
+    const db = await getDbAsync();
 
     // Generate random 4-digit OTP
     const generatedOtp = String(Math.floor(1000 + Math.random() * 9000));
@@ -143,7 +143,7 @@ export async function POST(request) {
       });
     }
 
-    saveDb(db);
+    await saveDbAsync(db);
 
     // Broadcast real-time event to all connected waiter devices
     try {

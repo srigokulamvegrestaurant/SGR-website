@@ -2,7 +2,9 @@
 import { NextResponse } from 'next/server';
 import {
   getDb,
+  getDbAsync,
   saveDb,
+  saveDbAsync,
   validateCustomerSession,
   normalizePhoneNumber,
 } from '@/lib/db';
@@ -31,7 +33,7 @@ export async function GET(request) {
 
     const targetPhone = normalizePhoneNumber(auth.customer.phone);
     const targetName = (auth.customer.name || '').trim().toLowerCase();
-    const db = getDb();
+    const db = await getDbAsync();
     const allReservations = db.reservations || [];
 
     const filtered = allReservations.filter((r) => {
@@ -73,7 +75,7 @@ export async function POST(request) {
       return NextResponse.json({ success: false, error: 'Please enter a valid 10-digit mobile number' }, { status: 400 });
     }
 
-    const db = getDb();
+    const db = await getDbAsync();
     db.reservations = db.reservations || [];
     db.tables = db.tables || [];
 
@@ -115,7 +117,7 @@ export async function POST(request) {
       assignedTable.status = 'RESERVED';
     }
 
-    saveDb(db);
+    await saveDbAsync(db);
 
     return NextResponse.json({
       success: true,

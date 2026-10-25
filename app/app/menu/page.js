@@ -56,20 +56,21 @@ export default function MenuPage() {
         if (data.success) {
           const rawMenu = data.allMenu || data.menu || data.items || [];
           const hydratedMenu = rawMenu.map((item) => {
+            const itemTitle = item.title || item.name || '';
             if (item.image && typeof window !== 'undefined') {
               try {
-                localStorage.setItem('sgr_dish_img_' + item.id, item.image);
-                if (item.title) localStorage.setItem('sgr_dish_img_' + item.title, item.image);
+                if (item.id) localStorage.setItem('sgr_dish_img_' + item.id, item.image);
+                if (itemTitle) localStorage.setItem('sgr_dish_img_' + itemTitle, item.image);
               } catch (e) {}
-              return item;
+              return { ...item, title: itemTitle };
             }
             if (!item.image && typeof window !== 'undefined') {
               try {
-                const localImg = localStorage.getItem('sgr_dish_img_' + item.id) || localStorage.getItem('sgr_dish_img_' + item.title);
-                if (localImg) return { ...item, image: localImg };
+                const localImg = (item.id ? localStorage.getItem('sgr_dish_img_' + item.id) : '') || (itemTitle ? localStorage.getItem('sgr_dish_img_' + itemTitle) : '');
+                if (localImg) return { ...item, title: itemTitle, image: localImg };
               } catch (e) {}
             }
-            return item;
+            return { ...item, title: itemTitle };
           });
           setLiveMenu(hydratedMenu);
           if (Array.isArray(data.categories)) setLiveCategories(data.categories);

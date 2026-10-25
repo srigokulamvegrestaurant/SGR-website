@@ -285,7 +285,7 @@ export async function POST(request) {
         table.billNumber = table.billNumber || `SGR-2026-${Math.floor(1000 + Math.random() * 9000)}`;
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast('TABLE_STATUS_CHANGED', {
@@ -310,7 +310,7 @@ export async function POST(request) {
       if (!table) return NextResponse.json({ success: false, error: 'Table not found' }, { status: 404 });
 
       table.assignedWaiter = waiterName;
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -414,7 +414,7 @@ export async function POST(request) {
         }
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -441,7 +441,7 @@ export async function POST(request) {
         }
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -458,7 +458,7 @@ export async function POST(request) {
       table.status = 'BILL_REQUESTED';
       table.billRequested = true;
       table.billRequestedAt = new Date().toISOString();
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast('BILL_REQUESTED', { tableNumber: table.tableNumber });
@@ -492,7 +492,7 @@ export async function POST(request) {
         generatedAt: new Date().toISOString(),
       };
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -529,7 +529,7 @@ export async function POST(request) {
       table.billNumber = null;
       table.billDetails = null;
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -563,7 +563,7 @@ export async function POST(request) {
           targetTable.status = 'RESERVED';
         }
 
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({ success: true, message: `Reservation confirmed for ${newRes.guestName}`, reservation: newRes });
       }
 
@@ -578,7 +578,7 @@ export async function POST(request) {
           targetTable.occupiedAt = new Date().toISOString();
           targetTable.activeSessionId = `ses_tbl${targetTable.tableNumber}_${Date.now()}`;
         }
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({ success: true, message: `Seated reservation for ${res.guestName} at Table #${res.tableNumber}` });
       }
 
@@ -590,7 +590,7 @@ export async function POST(request) {
           if (targetTable && targetTable.status === 'RESERVED') {
             targetTable.status = 'AVAILABLE';
           }
-          saveDb(db);
+          await saveDbAsync(db);
         }
         return NextResponse.json({ success: true, message: 'Reservation cancelled' });
       }
@@ -612,7 +612,7 @@ export async function POST(request) {
           status: 'WAITING',
         };
         db.waitlist.push(newEntry);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({ success: true, message: `Added ${newEntry.guestName} to waitlist`, entry: newEntry });
       }
 
@@ -627,13 +627,13 @@ export async function POST(request) {
           targetTable.occupiedAt = new Date().toISOString();
           targetTable.activeSessionId = `ses_tbl${targetTable.tableNumber}_${Date.now()}`;
         }
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({ success: true, message: `Seated waitlist guest ${entry.guestName} at Table #${targetTableNumber}` });
       }
 
       if (subAction === 'REMOVE') {
         db.waitlist = db.waitlist.filter(w => w.id !== waitlistId);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({ success: true, message: 'Removed from waitlist' });
       }
     }
@@ -680,7 +680,7 @@ export async function POST(request) {
       });
 
       table.status = 'OCCUPIED';
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast('NEW_KOT_ORDER', { kot: newKot });

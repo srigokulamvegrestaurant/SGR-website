@@ -1,10 +1,9 @@
-// app/api/admin/features/route.js - Developer Admin Hub & Feature Flags (AJ Tech Solutions)
 import { NextResponse } from 'next/server';
-import { getDb, saveDb } from '@/lib/db';
+import { getDb, getDbAsync, saveDb, saveDbAsync } from '@/lib/db';
 
 export async function GET() {
   try {
-    const db = getDb();
+    const db = await getDbAsync();
     return NextResponse.json({
       success: true,
       settings: db.settings,
@@ -34,12 +33,12 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const { action, flagName, value, userPayload } = body;
-    const db = getDb();
+    const db = await getDbAsync();
 
     if (action === 'TOGGLE_FLAG') {
       if (!db.settings) db.settings = {};
       db.settings[flagName] = value;
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -50,7 +49,7 @@ export async function POST(request) {
 
     if (action === 'UPDATE_SETTINGS') {
       db.settings = { ...db.settings, ...body.settings };
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -83,7 +82,7 @@ export async function POST(request) {
 
       db.users = db.users || [];
       db.users.push(newUser);
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,

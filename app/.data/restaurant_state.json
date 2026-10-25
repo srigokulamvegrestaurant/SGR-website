@@ -5839,13 +5839,29 @@
           "isVisible": true
         }
       ],
-      "updatedAt": "2026-10-18T12:37:52.550Z",
-      "updatedBy": "AJ Nanjil Tech Solutions",
+      "updatedAt": "2026-10-25T04:53:10.345Z",
+      "updatedBy": "Aswin",
       "heroSlides": [],
       "videoReviews": [],
       "customerReviews": []
     },
     "auditLog": [
+      {
+        "id": "cms_log_1792903990345_tjh4",
+        "timestamp": "2026-10-25T04:53:10.345Z",
+        "action": "LIVE_UPDATE",
+        "details": "Live website updated (1.3.0): Revert QA test tagline",
+        "user": "Aswin",
+        "role": "SUPER_ADMIN"
+      },
+      {
+        "id": "cms_log_1792903984620_nguu",
+        "role": "SUPER_ADMIN",
+        "user": "Aswin",
+        "action": "LIVE_UPDATE",
+        "details": "Live website updated (1.2.0): QA Test Verification 1792903980892",
+        "timestamp": "2026-10-25T04:53:04.620Z"
+      },
       {
         "id": "cms_log_1792327237507_5yxv",
         "role": "DEVELOPER_ADMIN",
@@ -5984,6 +6000,998 @@
       }
     ],
     "versions": [
+      {
+        "id": "ver_1792903990345",
+        "versionNumber": "1.3.0",
+        "timestamp": "2026-10-25T04:53:10.345Z",
+        "publishedBy": "Aswin",
+        "role": "SUPER_ADMIN",
+        "summary": "Revert QA test tagline",
+        "snapshot": {
+          "pages": [
+            {
+              "id": "page_home",
+              "slug": "/",
+              "inNav": true,
+              "title": "Home",
+              "status": "PUBLISHED",
+              "inFooter": true,
+              "isSystem": true,
+              "metaDesc": "Authentic 100% vegetarian Chettinad dining with pure cow ghee roasts, banana leaf meals, and brass filter coffee.",
+              "seoTitle": "Sri Gokulam Veg Restaurant | Karaikudi Chettinad Heritage",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 1
+            },
+            {
+              "id": "page_menu",
+              "slug": "/#menu",
+              "inNav": true,
+              "title": "Our Menu",
+              "status": "PUBLISHED",
+              "inFooter": true,
+              "isSystem": false,
+              "metaDesc": "Browse 100% vegetarian tiffins, royal banana leaf thali, degree coffee, and Chettinad sweets.",
+              "seoTitle": "Chettinad Sattvic Menu | Sri Gokulam",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 2
+            },
+            {
+              "id": "page_specials",
+              "slug": "/#specials",
+              "inNav": true,
+              "title": "Our Specials",
+              "status": "PUBLISHED",
+              "inFooter": false,
+              "isSystem": false,
+              "metaDesc": "Signature dishes crafted with pure cow ghee and freshly pounded Chettinad spices.",
+              "seoTitle": "Specials & Combos | Sri Gokulam Karaikudi",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 3
+            },
+            {
+              "id": "page_signature",
+              "slug": "/#signature",
+              "inNav": true,
+              "title": "Signature Dishes",
+              "status": "PUBLISHED",
+              "inFooter": false,
+              "isSystem": false,
+              "metaDesc": "Live sizzle, fresh aroma, and pure cow ghee preparations served hot in Karaikudi.",
+              "seoTitle": "Sensory Signature Dishes | Sri Gokulam",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 4
+            },
+            {
+              "id": "page_about",
+              "slug": "/about",
+              "inNav": true,
+              "title": "About Us & Heritage",
+              "status": "PUBLISHED",
+              "content": "Sri Gokulam Veg Restaurant was born from a timeless culinary philosophy: pure ingredients, time-tested recipes, and heartfelt hospitality. Situated in Karaikudi, the cultural capital of Chettinad, we honor traditional vegetarian gastronomy without artificial additives or preservatives.",
+              "inFooter": true,
+              "isSystem": false,
+              "metaDesc": "Founded on the sacred traditions of Chettinad sattvic hospitality in Karaikudi.",
+              "seoTitle": "Our Heritage | Sri Gokulam Veg Restaurant",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 5
+            },
+            {
+              "id": "page_gallery",
+              "slug": "/gallery",
+              "inNav": true,
+              "title": "Photo Gallery",
+              "status": "PUBLISHED",
+              "inFooter": true,
+              "isSystem": false,
+              "metaDesc": "Visual feast of authentic Chettinad dishes, traditional courtyard, and heritage dining ambiance.",
+              "seoTitle": "Photo Gallery | Sri Gokulam Karaikudi",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 6
+            },
+            {
+              "id": "page_contact",
+              "slug": "/#contact",
+              "inNav": true,
+              "title": "Contact & Location",
+              "status": "PUBLISHED",
+              "inFooter": true,
+              "isSystem": false,
+              "metaDesc": "Reach Sri Gokulam on Subramaniapuram Main Road, Karaikudi. Phone: +91 98765 43210.",
+              "seoTitle": "Contact Us | Sri Gokulam Karaikudi",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 7
+            },
+            {
+              "id": "page_catering",
+              "slug": "/catering",
+              "inNav": false,
+              "title": "Catering & Bulk Orders",
+              "status": "PUBLISHED",
+              "content": "We cater for traditional Tamil weddings, Sashtiabdapoorthi, Upanayanam, housewarmings, and corporate gatherings with authentic banana leaf service and pure ghee preparations.",
+              "inFooter": true,
+              "isSystem": false,
+              "metaDesc": "Authentic South Indian wedding & traditional celebration catering in Sivaganga & Chettinad.",
+              "seoTitle": "Vegetarian Catering Services | Sri Gokulam",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 8
+            }
+          ],
+          "design": {
+            "bgBody": "#ffffff",
+            "logoUrl": "/restaurant_logo.jpg",
+            "ctaColor": "#f59e0b",
+            "themeMode": "CLASSIC_CHETTINAD",
+            "accentGold": "#D4AF37",
+            "faviconUrl": "/favicon.ico",
+            "fontFamily": "Inter, system-ui, sans-serif",
+            "textPrimary": "#0f172a",
+            "borderRadius": "12px",
+            "primaryColor": "#051B41",
+            "spacingScale": "STANDARD",
+            "animationSpeed": "NORMAL",
+            "containerWidth": "1280px",
+            "secondaryColor": "#0E2954",
+            "headingFontFamily": "'Playfair Display', Georgia, serif"
+          },
+          "footer": {
+            "email": "contact@srigokulamveg.com",
+            "hours": {
+              "note": "Open All 7 Days a Week",
+              "lunch": "12:00 PM – 3:30 PM",
+              "dinner": "6:30 PM – 10:30 PM",
+              "breakfast": "7:00 AM – 11:00 AM"
+            },
+            "social": {
+              "maps": "https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Karaikudi",
+              "youtube": "https://youtube.com/@srigokulamveg",
+              "facebook": "https://facebook.com/srigokulamveg",
+              "whatsapp": "https://wa.me/919443123456",
+              "instagram": "https://instagram.com/srigokulamveg"
+            },
+            "badgeText": "🌿 100% PURE SATTVIC VEGETARIAN",
+            "brandStory": "Preserving the sacred vegetarian culinary arts of Chettinad and Tamil Nadu. Every dish is seasoned with generationally perfected recipes, pure cow ghee, and sattvic love in the heart of Karaikudi.",
+            "brandTitle": "ஸ்ரீ கோகுலம் • SRI GOKULAM",
+            "quickLinks": [
+              {
+                "id": "ql_home",
+                "href": "/",
+                "label": "Home",
+                "isVisible": true
+              },
+              {
+                "id": "ql_menu",
+                "href": "/#menu",
+                "label": "Our Menu",
+                "isVisible": true
+              },
+              {
+                "id": "ql_about",
+                "href": "/about",
+                "label": "About Us & Heritage",
+                "isVisible": true
+              },
+              {
+                "id": "ql_gallery",
+                "href": "/gallery",
+                "label": "Photo Gallery",
+                "isVisible": true
+              },
+              {
+                "id": "ql_contact",
+                "href": "/#contact",
+                "label": "Contact Us",
+                "isVisible": true
+              },
+              {
+                "id": "ql_catering",
+                "href": "/catering",
+                "label": "Catering & Bulk Orders",
+                "isVisible": true
+              }
+            ],
+            "fssaiNumber": "12423011000456",
+            "gstinNumber": "33AABCS1429B1Z8",
+            "addressLine1": "Heritage High Street, Karaikudi",
+            "addressLine2": "Sivaganga District, Tamil Nadu 630001",
+            "developerUrl": "https://ajnanjiltechsolutions.com/",
+            "primaryPhone": "+91 98765 43210",
+            "developerName": "AJ Nanjil Tech Solutions",
+            "complianceText": "All Rights Reserved © 2026 Sri Gokulam Veg Restaurant",
+            "secondaryPhone": "+91 94431 23456",
+            "developerCreditText": "Designed & Developed with excellence by"
+          },
+          "header": {
+            "brandEn": "SRI GOKULAM",
+            "brandTa": "ஸ்ரீ கோகுலம்",
+            "logoUrl": "/restaurant_logo.jpg",
+            "tagline": "Chettinad Sattvic Culinary Heritage",
+            "brandSub": "VEG RESTAURANT",
+            "navLinks": [
+              {
+                "id": "nav_home",
+                "href": "#",
+                "label": "Home",
+                "order": 1,
+                "isVisible": true,
+                "isExternal": false
+              },
+              {
+                "id": "nav_specials",
+                "href": "#specials",
+                "label": "Our Specials",
+                "order": 2,
+                "isVisible": true,
+                "isExternal": false
+              },
+              {
+                "id": "nav_signature",
+                "href": "#signature",
+                "label": "Signature Dishes",
+                "order": 3,
+                "isVisible": true,
+                "isExternal": false
+              },
+              {
+                "id": "nav_menu",
+                "href": "#menu",
+                "label": "Full Menu",
+                "order": 4,
+                "isVisible": true,
+                "isExternal": false
+              },
+              {
+                "id": "nav_table_qr",
+                "href": "#table-qr",
+                "label": "Table QR Dine-In",
+                "order": 5,
+                "isVisible": true,
+                "isExternal": false
+              },
+              {
+                "id": "nav_contact",
+                "href": "#contact",
+                "label": "Contact",
+                "order": 6,
+                "isVisible": true,
+                "isExternal": false
+              }
+            ],
+            "updatedAt": "2026-10-18T11:33:07.998Z",
+            "topAnnouncement": {
+              "text": "✨ Live Announcement: Authentic Chettinad Raja Ilai Sappadu Available Today! Call +91 98424 00000",
+              "phone": "📞 +91 98424 00000",
+              "isActive": true
+            },
+            "announcementText": "Authentic Chettinad Sattvic Culinary Heritage • Karaikudi, Tamil Nadu",
+            "announcementBadge": "100% PURE VEG",
+            "announcementPhone": "+91 98765 43210",
+            "headerActionButtons": [
+              "btn_order_now",
+              "btn_qr_dine_in"
+            ],
+            "topAnnouncementEnabled": true
+          },
+          "buttons": [
+            {
+              "id": "btn_order_now",
+              "key": "orderNow",
+              "icon": "🛒",
+              "link": "#",
+              "name": "Order Online CTA",
+              "text": "Order Online",
+              "shape": "pill",
+              "action": "drawer",
+              "bgColor": "#f59e0b",
+              "position": "Header & Banners",
+              "isVisible": true,
+              "tamilText": "ஆன்லைனில் ஆர்டர்",
+              "textColor": "#051B41"
+            },
+            {
+              "id": "btn_qr_dine_in",
+              "key": "qrDineIn",
+              "icon": "📲",
+              "link": "#",
+              "name": "QR Table Order CTA",
+              "text": "QR Dine-In",
+              "shape": "pill",
+              "action": "qr",
+              "bgColor": "#0284c7",
+              "position": "Header & Hero",
+              "isVisible": true,
+              "tamilText": "மேஜை QR ஆர்டர்",
+              "textColor": "#ffffff"
+            },
+            {
+              "id": "btn_view_menu",
+              "key": "viewMenu",
+              "icon": "📜",
+              "link": "#menu",
+              "name": "View Menu CTA",
+              "text": "View Full Menu",
+              "shape": "pill",
+              "action": "menu",
+              "bgColor": "#051B41",
+              "position": "Hero & Specials",
+              "isVisible": true,
+              "tamilText": "முழு மெனு பார்க்க",
+              "textColor": "#f59e0b"
+            },
+            {
+              "id": "btn_contact_us",
+              "key": "contactUs",
+              "icon": "📞",
+              "link": "tel:+919876543210",
+              "name": "Reserve Table / Contact",
+              "text": "Reserve Table",
+              "shape": "pill",
+              "action": "tel",
+              "bgColor": "#10b981",
+              "position": "Footer & Nav",
+              "isVisible": true,
+              "tamilText": "மேஜை முன்பதிவு",
+              "textColor": "#ffffff"
+            },
+            {
+              "id": "btn_whatsapp",
+              "key": "whatsapp",
+              "icon": "💬",
+              "link": "https://wa.me/919443123456",
+              "name": "WhatsApp Direct Chat",
+              "text": "WhatsApp Order",
+              "shape": "pill",
+              "action": "external",
+              "bgColor": "#25d366",
+              "position": "Floating Bar",
+              "isVisible": true,
+              "tamilText": "வாட்ஸ்அப் ஆர்டர்",
+              "textColor": "#ffffff"
+            }
+          ],
+          "content": {
+            "email": "contact@srigokulamveg.com",
+            "hours": {
+              "note": "Open All 7 Days a Week for Pure Sattvic Dining",
+              "lunch": "12:00 PM – 3:30 PM",
+              "dinner": "6:30 PM – 10:30 PM",
+              "breakfast": "7:00 AM – 11:00 AM"
+            },
+            "social": {
+              "maps": "https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Karaikudi",
+              "youtube": "https://youtube.com/@srigokulamveg",
+              "facebook": "https://facebook.com/srigokulamveg",
+              "instagram": "https://instagram.com/srigokulamveg"
+            },
+            "brandEn": "SRI GOKULAM",
+            "brandTa": "ஸ்ரீ கோகுலம்",
+            "tagline": "Authentic Chettinad Sattvic Culinary Heritage",
+            "brandSub": "VEG RESTAURANT",
+            "storyTitle": "Preserving Sacred Vegetarian Arts",
+            "addressLine1": "No. 42, Subramaniapuram Main Road",
+            "addressLine2": "Karaikudi, Sivaganga District, Tamil Nadu - 630002",
+            "marqueeItems": [
+              {
+                "icon": "🦚",
+                "text": "ஸ்ரீ கோகுலம் சைவ உணவகம்"
+              },
+              {
+                "icon": "✨",
+                "text": "100% PURE COW GHEE PREPARATIONS"
+              },
+              {
+                "icon": "🍱",
+                "text": "UNLIMITED CHETTINAD RAJA MEALS AT ₹180"
+              },
+              {
+                "icon": "🥞",
+                "text": "CRISPY GHEE ROAST DOSA WITH TRIO CHUTNEYS"
+              },
+              {
+                "icon": "☕",
+                "text": "AUTHENTIC KUMBAKONAM BRASS FILTER COFFEE"
+              },
+              {
+                "icon": "📲",
+                "text": "CONTACTLESS QR TABLE ORDERING WITH OTP VERIFICATION"
+              },
+              {
+                "icon": "🍃",
+                "text": "TRADITIONAL SATTVIC CULINARY HERITAGE"
+              },
+              {
+                "icon": "⭐",
+                "text": "KARAIKUDI'S TOP RATED VEGETARIAN DINING DESTINATION"
+              }
+            ],
+            "primaryPhone": "+91 98765 43210",
+            "qrTableStory": {
+              "badge": "SMART DINING EXPERIENCE",
+              "step1": "1. Scan Unique Table QR Standee",
+              "step2": "2. Explore Visual Menu & Add Dishes",
+              "step3": "3. Instant 4-Digit Waiter OTP Handshake",
+              "step4": "4. Direct Live Kitchen Prep & Service",
+              "title": "Contactless Smart Table QR Dine-In",
+              "subtitle": "Scan table QR, select your favorite dishes, verify via instant OTP, and enjoy live kitchen prep."
+            },
+            "reviewsBadge": "5-Star Google Rated",
+            "reviewsHeading": "What Karaikudi Food Lovers Say",
+            "secondaryPhone": "+91 94431 23456",
+            "announcementText": "Authentic Chettinad Sattvic Culinary Heritage • Karaikudi, Tamil Nadu",
+            "storyDescription": "Every dish is seasoned with generationally perfected recipes, pure cow ghee, and sattvic love in the heart of Karaikudi.",
+            "announcementBadge": "100% PURE VEG",
+            "announcementPhone": "+91 98765 43210",
+            "specialCategories": [],
+            "topAnnouncementEnabled": true
+          },
+          "sections": [
+            {
+              "id": "hero",
+              "icon": "🎠",
+              "name": "Hero Moving Banners & Carousel",
+              "order": 1,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "ticker",
+              "icon": "📢",
+              "name": "Continuous Marquee Ticker Bar",
+              "order": 2,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "specials",
+              "icon": "⭐",
+              "name": "Our Specials Category Cards",
+              "order": 3,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "sensory",
+              "icon": "🍲",
+              "name": "Signature Sensory Dishes Live Motion",
+              "order": 4,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "menu",
+              "icon": "📋",
+              "name": "Interactive Menu with Filters & Multi-Sort",
+              "order": 5,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "tableQr",
+              "icon": "📱",
+              "name": "Contactless QR Table Ordering Story",
+              "order": 6,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "reviews",
+              "icon": "🌟",
+              "name": "Customer Reviews & 5-Star Testimonials",
+              "order": 7,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "footer",
+              "icon": "🏛️",
+              "name": "Heritage Footer & Operating Hours",
+              "order": 8,
+              "editable": true,
+              "isVisible": true
+            }
+          ],
+          "updatedAt": "2026-10-25T04:53:10.345Z",
+          "updatedBy": "Aswin",
+          "heroSlides": [],
+          "videoReviews": [],
+          "customerReviews": []
+        }
+      },
+      {
+        "id": "ver_1792903984620",
+        "role": "SUPER_ADMIN",
+        "summary": "QA Test Verification 1792903980892",
+        "snapshot": {
+          "pages": [
+            {
+              "id": "page_home",
+              "slug": "/",
+              "inNav": true,
+              "title": "Home",
+              "status": "PUBLISHED",
+              "inFooter": true,
+              "isSystem": true,
+              "metaDesc": "Authentic 100% vegetarian Chettinad dining with pure cow ghee roasts, banana leaf meals, and brass filter coffee.",
+              "seoTitle": "Sri Gokulam Veg Restaurant | Karaikudi Chettinad Heritage",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 1
+            },
+            {
+              "id": "page_menu",
+              "slug": "/#menu",
+              "inNav": true,
+              "title": "Our Menu",
+              "status": "PUBLISHED",
+              "inFooter": true,
+              "isSystem": false,
+              "metaDesc": "Browse 100% vegetarian tiffins, royal banana leaf thali, degree coffee, and Chettinad sweets.",
+              "seoTitle": "Chettinad Sattvic Menu | Sri Gokulam",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 2
+            },
+            {
+              "id": "page_specials",
+              "slug": "/#specials",
+              "inNav": true,
+              "title": "Our Specials",
+              "status": "PUBLISHED",
+              "inFooter": false,
+              "isSystem": false,
+              "metaDesc": "Signature dishes crafted with pure cow ghee and freshly pounded Chettinad spices.",
+              "seoTitle": "Specials & Combos | Sri Gokulam Karaikudi",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 3
+            },
+            {
+              "id": "page_signature",
+              "slug": "/#signature",
+              "inNav": true,
+              "title": "Signature Dishes",
+              "status": "PUBLISHED",
+              "inFooter": false,
+              "isSystem": false,
+              "metaDesc": "Live sizzle, fresh aroma, and pure cow ghee preparations served hot in Karaikudi.",
+              "seoTitle": "Sensory Signature Dishes | Sri Gokulam",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 4
+            },
+            {
+              "id": "page_about",
+              "slug": "/about",
+              "inNav": true,
+              "title": "About Us & Heritage",
+              "status": "PUBLISHED",
+              "content": "Sri Gokulam Veg Restaurant was born from a timeless culinary philosophy: pure ingredients, time-tested recipes, and heartfelt hospitality. Situated in Karaikudi, the cultural capital of Chettinad, we honor traditional vegetarian gastronomy without artificial additives or preservatives.",
+              "inFooter": true,
+              "isSystem": false,
+              "metaDesc": "Founded on the sacred traditions of Chettinad sattvic hospitality in Karaikudi.",
+              "seoTitle": "Our Heritage | Sri Gokulam Veg Restaurant",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 5
+            },
+            {
+              "id": "page_gallery",
+              "slug": "/gallery",
+              "inNav": true,
+              "title": "Photo Gallery",
+              "status": "PUBLISHED",
+              "inFooter": true,
+              "isSystem": false,
+              "metaDesc": "Visual feast of authentic Chettinad dishes, traditional courtyard, and heritage dining ambiance.",
+              "seoTitle": "Photo Gallery | Sri Gokulam Karaikudi",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 6
+            },
+            {
+              "id": "page_contact",
+              "slug": "/#contact",
+              "inNav": true,
+              "title": "Contact & Location",
+              "status": "PUBLISHED",
+              "inFooter": true,
+              "isSystem": false,
+              "metaDesc": "Reach Sri Gokulam on Subramaniapuram Main Road, Karaikudi. Phone: +91 98765 43210.",
+              "seoTitle": "Contact Us | Sri Gokulam Karaikudi",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 7
+            },
+            {
+              "id": "page_catering",
+              "slug": "/catering",
+              "inNav": false,
+              "title": "Catering & Bulk Orders",
+              "status": "PUBLISHED",
+              "content": "We cater for traditional Tamil weddings, Sashtiabdapoorthi, Upanayanam, housewarmings, and corporate gatherings with authentic banana leaf service and pure ghee preparations.",
+              "inFooter": true,
+              "isSystem": false,
+              "metaDesc": "Authentic South Indian wedding & traditional celebration catering in Sivaganga & Chettinad.",
+              "seoTitle": "Vegetarian Catering Services | Sri Gokulam",
+              "updatedAt": "2026-10-18T00:00:00.000Z",
+              "displayOrder": 8
+            }
+          ],
+          "design": {
+            "bgBody": "#ffffff",
+            "logoUrl": "/restaurant_logo.jpg",
+            "ctaColor": "#f59e0b",
+            "themeMode": "CLASSIC_CHETTINAD",
+            "accentGold": "#D4AF37",
+            "faviconUrl": "/favicon.ico",
+            "fontFamily": "Inter, system-ui, sans-serif",
+            "textPrimary": "#0f172a",
+            "borderRadius": "12px",
+            "primaryColor": "#051B41",
+            "spacingScale": "STANDARD",
+            "animationSpeed": "NORMAL",
+            "containerWidth": "1280px",
+            "secondaryColor": "#0E2954",
+            "headingFontFamily": "'Playfair Display', Georgia, serif"
+          },
+          "footer": {
+            "email": "contact@srigokulamveg.com",
+            "hours": {
+              "note": "Open All 7 Days a Week",
+              "lunch": "12:00 PM – 3:30 PM",
+              "dinner": "6:30 PM – 10:30 PM",
+              "breakfast": "7:00 AM – 11:00 AM"
+            },
+            "social": {
+              "maps": "https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Karaikudi",
+              "youtube": "https://youtube.com/@srigokulamveg",
+              "facebook": "https://facebook.com/srigokulamveg",
+              "whatsapp": "https://wa.me/919443123456",
+              "instagram": "https://instagram.com/srigokulamveg"
+            },
+            "badgeText": "🌿 100% PURE SATTVIC VEGETARIAN",
+            "brandStory": "Preserving the sacred vegetarian culinary arts of Chettinad and Tamil Nadu. Every dish is seasoned with generationally perfected recipes, pure cow ghee, and sattvic love in the heart of Karaikudi.",
+            "brandTitle": "ஸ்ரீ கோகுலம் • SRI GOKULAM",
+            "quickLinks": [
+              {
+                "id": "ql_home",
+                "href": "/",
+                "label": "Home",
+                "isVisible": true
+              },
+              {
+                "id": "ql_menu",
+                "href": "/#menu",
+                "label": "Our Menu",
+                "isVisible": true
+              },
+              {
+                "id": "ql_about",
+                "href": "/about",
+                "label": "About Us & Heritage",
+                "isVisible": true
+              },
+              {
+                "id": "ql_gallery",
+                "href": "/gallery",
+                "label": "Photo Gallery",
+                "isVisible": true
+              },
+              {
+                "id": "ql_contact",
+                "href": "/#contact",
+                "label": "Contact Us",
+                "isVisible": true
+              },
+              {
+                "id": "ql_catering",
+                "href": "/catering",
+                "label": "Catering & Bulk Orders",
+                "isVisible": true
+              }
+            ],
+            "fssaiNumber": "12423011000456",
+            "gstinNumber": "33AABCS1429B1Z8",
+            "addressLine1": "Heritage High Street, Karaikudi",
+            "addressLine2": "Sivaganga District, Tamil Nadu 630001",
+            "developerUrl": "https://ajnanjiltechsolutions.com/",
+            "primaryPhone": "+91 98765 43210",
+            "developerName": "AJ Nanjil Tech Solutions",
+            "complianceText": "All Rights Reserved © 2026 Sri Gokulam Veg Restaurant",
+            "secondaryPhone": "+91 94431 23456",
+            "developerCreditText": "Designed & Developed with excellence by"
+          },
+          "header": {
+            "brandEn": "SRI GOKULAM",
+            "brandTa": "ஸ்ரீ கோகுலம்",
+            "logoUrl": "/restaurant_logo.jpg",
+            "tagline": "Chettinad Sattvic Culinary Heritage",
+            "brandSub": "VEG RESTAURANT",
+            "navLinks": [
+              {
+                "id": "nav_home",
+                "href": "#",
+                "label": "Home",
+                "order": 1,
+                "isVisible": true,
+                "isExternal": false
+              },
+              {
+                "id": "nav_specials",
+                "href": "#specials",
+                "label": "Our Specials",
+                "order": 2,
+                "isVisible": true,
+                "isExternal": false
+              },
+              {
+                "id": "nav_signature",
+                "href": "#signature",
+                "label": "Signature Dishes",
+                "order": 3,
+                "isVisible": true,
+                "isExternal": false
+              },
+              {
+                "id": "nav_menu",
+                "href": "#menu",
+                "label": "Full Menu",
+                "order": 4,
+                "isVisible": true,
+                "isExternal": false
+              },
+              {
+                "id": "nav_table_qr",
+                "href": "#table-qr",
+                "label": "Table QR Dine-In",
+                "order": 5,
+                "isVisible": true,
+                "isExternal": false
+              },
+              {
+                "id": "nav_contact",
+                "href": "#contact",
+                "label": "Contact",
+                "order": 6,
+                "isVisible": true,
+                "isExternal": false
+              }
+            ],
+            "updatedAt": "2026-10-18T11:33:07.998Z",
+            "topAnnouncement": {
+              "text": "✨ Live Announcement: Authentic Chettinad Raja Ilai Sappadu Available Today! Call +91 98424 00000",
+              "phone": "📞 +91 98424 00000",
+              "isActive": true
+            },
+            "announcementText": "Authentic Chettinad Sattvic Culinary Heritage • Karaikudi, Tamil Nadu",
+            "announcementBadge": "100% PURE VEG",
+            "announcementPhone": "+91 98765 43210",
+            "headerActionButtons": [
+              "btn_order_now",
+              "btn_qr_dine_in"
+            ],
+            "topAnnouncementEnabled": true
+          },
+          "buttons": [
+            {
+              "id": "btn_order_now",
+              "key": "orderNow",
+              "icon": "🛒",
+              "link": "#",
+              "name": "Order Online CTA",
+              "text": "Order Online",
+              "shape": "pill",
+              "action": "drawer",
+              "bgColor": "#f59e0b",
+              "position": "Header & Banners",
+              "isVisible": true,
+              "tamilText": "ஆன்லைனில் ஆர்டர்",
+              "textColor": "#051B41"
+            },
+            {
+              "id": "btn_qr_dine_in",
+              "key": "qrDineIn",
+              "icon": "📲",
+              "link": "#",
+              "name": "QR Table Order CTA",
+              "text": "QR Dine-In",
+              "shape": "pill",
+              "action": "qr",
+              "bgColor": "#0284c7",
+              "position": "Header & Hero",
+              "isVisible": true,
+              "tamilText": "மேஜை QR ஆர்டர்",
+              "textColor": "#ffffff"
+            },
+            {
+              "id": "btn_view_menu",
+              "key": "viewMenu",
+              "icon": "📜",
+              "link": "#menu",
+              "name": "View Menu CTA",
+              "text": "View Full Menu",
+              "shape": "pill",
+              "action": "menu",
+              "bgColor": "#051B41",
+              "position": "Hero & Specials",
+              "isVisible": true,
+              "tamilText": "முழு மெனு பார்க்க",
+              "textColor": "#f59e0b"
+            },
+            {
+              "id": "btn_contact_us",
+              "key": "contactUs",
+              "icon": "📞",
+              "link": "tel:+919876543210",
+              "name": "Reserve Table / Contact",
+              "text": "Reserve Table",
+              "shape": "pill",
+              "action": "tel",
+              "bgColor": "#10b981",
+              "position": "Footer & Nav",
+              "isVisible": true,
+              "tamilText": "மேஜை முன்பதிவு",
+              "textColor": "#ffffff"
+            },
+            {
+              "id": "btn_whatsapp",
+              "key": "whatsapp",
+              "icon": "💬",
+              "link": "https://wa.me/919443123456",
+              "name": "WhatsApp Direct Chat",
+              "text": "WhatsApp Order",
+              "shape": "pill",
+              "action": "external",
+              "bgColor": "#25d366",
+              "position": "Floating Bar",
+              "isVisible": true,
+              "tamilText": "வாட்ஸ்அப் ஆர்டர்",
+              "textColor": "#ffffff"
+            }
+          ],
+          "content": {
+            "email": "contact@srigokulamveg.com",
+            "hours": {
+              "note": "Open All 7 Days a Week for Pure Sattvic Dining",
+              "lunch": "12:00 PM – 3:30 PM",
+              "dinner": "6:30 PM – 10:30 PM",
+              "breakfast": "7:00 AM – 11:00 AM"
+            },
+            "social": {
+              "maps": "https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Karaikudi",
+              "youtube": "https://youtube.com/@srigokulamveg",
+              "facebook": "https://facebook.com/srigokulamveg",
+              "instagram": "https://instagram.com/srigokulamveg"
+            },
+            "brandEn": "SRI GOKULAM",
+            "brandTa": "ஸ்ரீ கோகுலம்",
+            "tagline": "QA Verified Sattvic Cuisine",
+            "brandSub": "VEG RESTAURANT",
+            "storyTitle": "Preserving Sacred Vegetarian Arts",
+            "addressLine1": "No. 42, Subramaniapuram Main Road",
+            "addressLine2": "Karaikudi, Sivaganga District, Tamil Nadu - 630002",
+            "marqueeItems": [
+              {
+                "icon": "🦚",
+                "text": "ஸ்ரீ கோகுலம் சைவ உணவகம்"
+              },
+              {
+                "icon": "✨",
+                "text": "100% PURE COW GHEE PREPARATIONS"
+              },
+              {
+                "icon": "🍱",
+                "text": "UNLIMITED CHETTINAD RAJA MEALS AT ₹180"
+              },
+              {
+                "icon": "🥞",
+                "text": "CRISPY GHEE ROAST DOSA WITH TRIO CHUTNEYS"
+              },
+              {
+                "icon": "☕",
+                "text": "AUTHENTIC KUMBAKONAM BRASS FILTER COFFEE"
+              },
+              {
+                "icon": "📲",
+                "text": "CONTACTLESS QR TABLE ORDERING WITH OTP VERIFICATION"
+              },
+              {
+                "icon": "🍃",
+                "text": "TRADITIONAL SATTVIC CULINARY HERITAGE"
+              },
+              {
+                "icon": "⭐",
+                "text": "KARAIKUDI'S TOP RATED VEGETARIAN DINING DESTINATION"
+              }
+            ],
+            "primaryPhone": "+91 98765 43210",
+            "qrTableStory": {
+              "badge": "SMART DINING EXPERIENCE",
+              "step1": "1. Scan Unique Table QR Standee",
+              "step2": "2. Explore Visual Menu & Add Dishes",
+              "step3": "3. Instant 4-Digit Waiter OTP Handshake",
+              "step4": "4. Direct Live Kitchen Prep & Service",
+              "title": "Contactless Smart Table QR Dine-In",
+              "subtitle": "Scan table QR, select your favorite dishes, verify via instant OTP, and enjoy live kitchen prep."
+            },
+            "reviewsBadge": "5-Star Google Rated",
+            "reviewsHeading": "What Karaikudi Food Lovers Say",
+            "secondaryPhone": "+91 94431 23456",
+            "announcementText": "Authentic Chettinad Sattvic Culinary Heritage • Karaikudi, Tamil Nadu",
+            "storyDescription": "Every dish is seasoned with generationally perfected recipes, pure cow ghee, and sattvic love in the heart of Karaikudi.",
+            "announcementBadge": "100% PURE VEG",
+            "announcementPhone": "+91 98765 43210",
+            "specialCategories": [],
+            "topAnnouncementEnabled": true
+          },
+          "sections": [
+            {
+              "id": "hero",
+              "icon": "🎠",
+              "name": "Hero Moving Banners & Carousel",
+              "order": 1,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "ticker",
+              "icon": "📢",
+              "name": "Continuous Marquee Ticker Bar",
+              "order": 2,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "specials",
+              "icon": "⭐",
+              "name": "Our Specials Category Cards",
+              "order": 3,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "sensory",
+              "icon": "🍲",
+              "name": "Signature Sensory Dishes Live Motion",
+              "order": 4,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "menu",
+              "icon": "📋",
+              "name": "Interactive Menu with Filters & Multi-Sort",
+              "order": 5,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "tableQr",
+              "icon": "📱",
+              "name": "Contactless QR Table Ordering Story",
+              "order": 6,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "reviews",
+              "icon": "🌟",
+              "name": "Customer Reviews & 5-Star Testimonials",
+              "order": 7,
+              "editable": true,
+              "isVisible": true
+            },
+            {
+              "id": "footer",
+              "icon": "🏛️",
+              "name": "Heritage Footer & Operating Hours",
+              "order": 8,
+              "editable": true,
+              "isVisible": true
+            }
+          ],
+          "updatedAt": "2026-10-25T04:53:04.611Z",
+          "updatedBy": "Aswin",
+          "heroSlides": [],
+          "videoReviews": [],
+          "customerReviews": []
+        },
+        "timestamp": "2026-10-25T04:53:04.620Z",
+        "publishedBy": "Aswin",
+        "versionNumber": "1.2.0"
+      },
       {
         "id": "ver_init_100",
         "role": "DEVELOPER_ADMIN",
@@ -6753,17 +7761,17 @@
       "buttons": [
         {
           "id": "btn_order_now",
-          "key": "tableReservation",
-          "icon": "📅",
+          "key": "orderNow",
+          "icon": "🛒",
           "link": "#",
           "name": "Order Online CTA",
-          "text": "Table Reservation",
+          "text": "Order Online",
           "shape": "pill",
-          "action": "reservation",
+          "action": "drawer",
           "bgColor": "#f59e0b",
           "position": "Header & Banners",
           "isVisible": true,
-          "tamilText": "மேஜை முன்பதிவு",
+          "tamilText": "ஆன்லைனில் ஆர்டர்",
           "textColor": "#051B41"
         },
         {
@@ -6968,8 +7976,8 @@
           "isVisible": true
         }
       ],
-      "updatedAt": "2026-10-18T12:37:52.550Z",
-      "updatedBy": "AJ Nanjil Tech Solutions",
+      "updatedAt": "2026-10-25T04:53:10.345Z",
+      "updatedBy": "Aswin",
       "heroSlides": [],
       "videoReviews": [],
       "customerReviews": []

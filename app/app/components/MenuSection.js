@@ -73,20 +73,21 @@ export default function MenuSection({
   const allItems = useMemo(() => {
     if (Array.isArray(liveMenu) && liveMenu.length > 0) {
       return liveMenu.map((item) => {
+        const dishTitle = item.title || item.name || '';
         let dishImg = item.image || '';
         if (dishImg && typeof window !== 'undefined') {
           try {
-            localStorage.setItem('sgr_dish_img_' + item.id, dishImg);
-            if (item.title) localStorage.setItem('sgr_dish_img_' + item.title, dishImg);
+            if (item.id) localStorage.setItem('sgr_dish_img_' + item.id, dishImg);
+            if (dishTitle) localStorage.setItem('sgr_dish_img_' + dishTitle, dishImg);
           } catch (e) {}
         } else if (!dishImg && typeof window !== 'undefined') {
           try {
-            dishImg = localStorage.getItem('sgr_dish_img_' + item.id) || localStorage.getItem('sgr_dish_img_' + item.title) || '';
+            dishImg = (item.id ? localStorage.getItem('sgr_dish_img_' + item.id) : '') || (dishTitle ? localStorage.getItem('sgr_dish_img_' + dishTitle) : '') || '';
           } catch (e) {}
         }
         return {
           id: item.id,
-          title: item.title,
+          title: dishTitle,
           tamilTitle: item.tamilTitle || item.taTitle || '',
           category: item.category || 'Tiffin',
           mealSection: String(item.mealSection || 'BREAKFAST').toUpperCase(),
@@ -355,7 +356,7 @@ export default function MenuSection({
       ) : displayedItems.length > 0 ? (
         <div className={styles.menuGrid}>
           {displayedItems.map((item) => {
-            const customImg = item.image || (typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + item.id) || localStorage.getItem('sgr_dish_img_' + item.title) || '') : '');
+            const customImg = item.image || (typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + item.id) || localStorage.getItem('sgr_dish_img_' + (item.title || item.name)) || '') : '');
             const hasCustomImage = Boolean(customImg);
             const fallbackIcon = getFallbackIconForDish(item.title, item.category, item.mealSection);
 

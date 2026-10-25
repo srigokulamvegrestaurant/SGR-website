@@ -4,11 +4,17 @@ import {
   getDb,
   getDbAsync,
   saveDb,
+  saveDbAsync,
   getWebsiteCms,
+  getWebsiteCmsAsync,
   saveWebsiteDraft,
+  saveWebsiteDraftAsync,
   saveAndPublishWebsiteCms,
+  saveAndPublishWebsiteCmsAsync,
   publishWebsiteCms,
+  publishWebsiteCmsAsync,
   rollbackWebsiteVersion,
+  rollbackWebsiteVersionAsync,
   recordCmsAuditLog,
 } from '@/lib/db';
 import { DEFAULT_WEBSITE_CMS, createInitialContentSnapshot } from '@/lib/cms_defaults';
@@ -20,7 +26,7 @@ export const revalidate = 0;
 export async function GET(req) {
   try {
     const db = await getDbAsync();
-    const cms = getWebsiteCms();
+    const cms = await getWebsiteCmsAsync();
 
     // Check query params
     const { searchParams } = new URL(req.url);
@@ -88,7 +94,7 @@ export async function POST(req) {
       );
     }
 
-    const db = getDb();
+    const db = await getDbAsync();
     if (!db.website_cms) {
       db.website_cms = JSON.parse(JSON.stringify(DEFAULT_WEBSITE_CMS));
     }
@@ -100,7 +106,7 @@ export async function POST(req) {
         if (!draftData) {
           return NextResponse.json({ success: false, error: 'Draft data is required' }, { status: 400 });
         }
-        const updatedCms = saveWebsiteDraft(draftData, user);
+        const updatedCms = await saveWebsiteDraftAsync(draftData, user);
         return NextResponse.json({
           success: true,
           message: 'Website draft saved successfully',
@@ -114,7 +120,7 @@ export async function POST(req) {
         if (!data) {
           return NextResponse.json({ success: false, error: 'Data is required' }, { status: 400 });
         }
-        const result = saveAndPublishWebsiteCms(data, user, summary || 'Live website update saved');
+        const result = await saveAndPublishWebsiteCmsAsync(data, user, summary || 'Live website update saved');
         return NextResponse.json({
           success: true,
           message: `Live website updated immediately (Version ${result.publishedVersion})`,
@@ -159,7 +165,7 @@ export async function POST(req) {
           if (!db.website_cms.published) db.website_cms.published = JSON.parse(JSON.stringify(db.website_cms.draft));
           db.website_cms.published.buttons = JSON.parse(JSON.stringify(updatedButtons));
         }
-        saveDb(db);
+        await saveDbAsync(db);
 
         return NextResponse.json({
           success: true,
@@ -181,7 +187,7 @@ export async function POST(req) {
           db.website_cms.published.buttons = (db.website_cms.published.buttons || []).filter(b => b.id !== buttonId);
         }
         recordCmsAuditLog('BUTTON_DELETE', `Deleted button: ${target?.name || buttonId}`, user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Button deleted successfully',
@@ -226,7 +232,7 @@ export async function POST(req) {
           if (!db.website_cms.published) db.website_cms.published = JSON.parse(JSON.stringify(db.website_cms.draft));
           db.website_cms.published.customerReviews = JSON.parse(JSON.stringify(updatedReviews));
         }
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: `Customer feedback saved and updated live`,
@@ -245,7 +251,7 @@ export async function POST(req) {
           db.website_cms.published.customerReviews = (db.website_cms.published.customerReviews || []).filter(r => r.id !== reviewId);
         }
         recordCmsAuditLog('FEEDBACK_DELETE', `Deleted customer review ID: ${reviewId}`, user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Review deleted successfully',
@@ -286,7 +292,7 @@ export async function POST(req) {
           if (!db.website_cms.published) db.website_cms.published = JSON.parse(JSON.stringify(db.website_cms.draft));
           db.website_cms.published.videoReviews = JSON.parse(JSON.stringify(updatedVideos));
         }
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: `Video feedback saved and updated live`,
@@ -305,7 +311,7 @@ export async function POST(req) {
           db.website_cms.published.videoReviews = (db.website_cms.published.videoReviews || []).filter(v => v.id !== videoId);
         }
         recordCmsAuditLog('VIDEO_FEEDBACK_DELETE', `Deleted video feedback ID: ${videoId}`, user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Video feedback deleted successfully',
@@ -335,7 +341,7 @@ export async function POST(req) {
           }
         }
         recordCmsAuditLog('HEADER_UPDATE', 'Updated website header, navigation links & announcement bar', user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Website header configuration saved and updated live',
@@ -359,7 +365,7 @@ export async function POST(req) {
           db.website_cms.published.footer = JSON.parse(JSON.stringify(db.website_cms.draft.footer));
         }
         recordCmsAuditLog('FOOTER_UPDATE', 'Updated website footer, hours, address, and social links', user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Website footer configuration saved and updated live',
@@ -370,7 +376,7 @@ export async function POST(req) {
       // 2. PUBLISH DRAFT TO LIVE WEBSITE WITH VERSION SNAPSHOT
       case 'PUBLISH': {
         const { summary } = payload || {};
-        const result = publishWebsiteCms(user, summary || 'Published updates to live website');
+        const result = await publishWebsiteCmsAsync(user, summary || 'Published updates to live website');
         return NextResponse.json({
           success: true,
           message: `Live website updated successfully (Version ${result.publishedVersion})`,
@@ -386,7 +392,7 @@ export async function POST(req) {
         if (!versionId) {
           return NextResponse.json({ success: false, error: 'Target Version ID is required' }, { status: 400 });
         }
-        const result = rollbackWebsiteVersion(versionId, user);
+        const result = await rollbackWebsiteVersionAsync(versionId, user);
         return NextResponse.json({
           success: true,
           message: result.message,
@@ -402,7 +408,7 @@ export async function POST(req) {
         }
         db.website_cms.draft.sections = sections;
         recordCmsAuditLog('UPDATE_SECTIONS', `Updated homepage section layout & order (${sections.length} sections)`, user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Homepage section order and visibility updated in draft',
@@ -418,7 +424,7 @@ export async function POST(req) {
         }
         db.website_cms.draft.heroSlides = slides;
         recordCmsAuditLog('UPDATE_HERO_SLIDES', `Updated hero banners (${slides.length} slides configured)`, user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Hero banners updated in draft',
@@ -434,7 +440,7 @@ export async function POST(req) {
         }
         db.website_cms.draft.buttons = buttons;
         recordCmsAuditLog('UPDATE_BUTTONS', `Updated website action buttons (${buttons.length} buttons)`, user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Action buttons updated in draft',
@@ -468,7 +474,7 @@ export async function POST(req) {
           recordCmsAuditLog('PAGE_CREATE', `Created new page: ${page.title} (${page.slug})`, user.name, user.role);
         }
 
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: `Page '${page.title}' saved successfully`,
@@ -487,7 +493,7 @@ export async function POST(req) {
         }
         db.website_cms.draft.pages = (db.website_cms.draft.pages || []).filter(p => p.id !== pageId);
         recordCmsAuditLog('PAGE_DELETE', `Deleted page: ${target?.title || pageId}`, user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Page deleted successfully',
@@ -517,7 +523,7 @@ export async function POST(req) {
         }
         db.website_cms.mediaLibrary.unshift(newMedia);
         recordCmsAuditLog('MEDIA_UPLOAD', `Uploaded image: ${newMedia.title} (${newMedia.category})`, user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Image uploaded to Media Library',
@@ -534,7 +540,7 @@ export async function POST(req) {
         const target = db.website_cms.mediaLibrary?.find(m => m.id === mediaId);
         db.website_cms.mediaLibrary = (db.website_cms.mediaLibrary || []).filter(m => m.id !== mediaId);
         recordCmsAuditLog('MEDIA_DELETE', `Deleted media: ${target?.title || mediaId}`, user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Media deleted from library',
@@ -553,7 +559,7 @@ export async function POST(req) {
           ...design,
         };
         recordCmsAuditLog('UPDATE_DESIGN', 'Updated website design styles, colors, and typography', user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Website design settings updated in draft',
@@ -572,7 +578,7 @@ export async function POST(req) {
           ...content,
         };
         recordCmsAuditLog('UPDATE_CONTENT', 'Updated website content, contact info, operating hours, and announcements', user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Website content updated in draft',
@@ -606,7 +612,7 @@ export async function POST(req) {
           recordCmsAuditLog('MENU_ITEM_CREATE', `Added new menu dish: ${itemRecord.title} (₹${itemRecord.price})`, user.name, user.role);
         }
 
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: `Dish '${itemRecord.title}' saved to restaurant menu`,
@@ -622,7 +628,7 @@ export async function POST(req) {
         const targetDish = db.menu?.find(d => d.id === dishId);
         db.menu = (db.menu || []).filter(d => d.id !== dishId);
         recordCmsAuditLog('MENU_ITEM_DELETE', `Deleted menu item: ${targetDish?.title || dishId}`, user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Dish removed from restaurant menu',
@@ -634,7 +640,7 @@ export async function POST(req) {
       case 'RESET_TO_DEFAULTS': {
         db.website_cms.draft = createInitialContentSnapshot();
         recordCmsAuditLog('RESET_DEFAULTS', 'Reset website draft to factory Chettinad Sattvic defaults', user.name, user.role);
-        saveDb(db);
+        await saveDbAsync(db);
         return NextResponse.json({
           success: true,
           message: 'Website draft restored to original factory defaults',

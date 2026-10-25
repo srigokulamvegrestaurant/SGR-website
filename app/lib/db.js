@@ -1412,6 +1412,201 @@ export function rollbackWebsiteVersion(versionId, user = { name: 'Admin', role: 
   };
 }
 
+// Retrieve Website CMS state Asynchronously with remote PG sync
+export async function getWebsiteCmsAsync() {
+  const db = await getDbAsync();
+  let needsSave = false;
+
+  if (!db.website_cms) {
+    db.website_cms = JSON.parse(JSON.stringify(DEFAULT_WEBSITE_CMS));
+    needsSave = true;
+  }
+
+  const initial = createInitialContentSnapshot();
+
+  // Ensure draft has all required collections
+  if (!db.website_cms.draft) {
+    db.website_cms.draft = JSON.parse(JSON.stringify(initial));
+    needsSave = true;
+  } else {
+    for (const [key, val] of Object.entries(initial)) {
+      if (db.website_cms.draft[key] === undefined) {
+        db.website_cms.draft[key] = JSON.parse(JSON.stringify(val));
+        needsSave = true;
+      }
+    }
+  }
+
+  // Ensure published has all required collections
+  if (!db.website_cms.published) {
+    db.website_cms.published = JSON.parse(JSON.stringify(initial));
+    needsSave = true;
+  } else {
+    for (const [key, val] of Object.entries(initial)) {
+      if (db.website_cms.published[key] === undefined) {
+        db.website_cms.published[key] = JSON.parse(JSON.stringify(val));
+        needsSave = true;
+      }
+    }
+  }
+
+  // Auto-migrate developer attribution and website url to AJ Nanjil Tech Solutions
+  ['draft', 'published'].forEach((target) => {
+    if (db.website_cms[target]?.footer) {
+      const f = db.website_cms[target].footer;
+      if (!f.developerUrl || f.developerUrl.includes('netlify') || f.developerUrl === 'https://ajtechsolutions.netlify.app/') {
+        f.developerUrl = 'https://ajnanjiltechsolutions.com/';
+        needsSave = true;
+      }
+      if (f.developerName !== 'AJ Nanjil Tech Solutions') {
+        f.developerName = 'AJ Nanjil Tech Solutions';
+        needsSave = true;
+      }
+      if (f.developerCreditText && f.developerCreditText.includes('ajtechsolutions')) {
+        f.developerCreditText = 'Designed & Developed with excellence by';
+        needsSave = true;
+      }
+    }
+  });
+
+  if (needsSave) {
+    await saveDbAsync(db);
+  }
+
+  return db.website_cms;
+}
+
+// Save Website Draft Asynchronously
+export async function saveWebsiteDraftAsync(draftData, user = { name: 'Admin', role: 'STORE_MANAGER' }) {
+  const db = await getDbAsync();
+  if (!db.website_cms) {
+    db.website_cms = JSON.parse(JSON.stringify(DEFAULT_WEBSITE_CMS));
+  }
+  db.website_cms.draft = {
+    ...db.website_cms.draft,
+    ...draftData,
+    updatedAt: new Date().toISOString(),
+    updatedBy: user.name || 'Admin',
+  };
+  recordCmsAuditLog('SAVE_DRAFT', 'Updated website draft configuration', user.name, user.role);
+  await saveDbAsync(db);
+  return db.website_cms;
+}
+
+// Save AND Publish Website CMS in 1 step Asynchronously
+export async function saveAndPublishWebsiteCmsAsync(data, user = { name: 'Admin', role: 'SUPER_ADMIN' }, changeSummary = 'Updated and published live website') {
+  const db = await getDbAsync();
+  if (!db.website_cms) {
+    db.website_cms = JSON.parse(JSON.stringify(DEFAULT_WEBSITE_CMS));
+  }
+  // Update draft
+  db.website_cms.draft = {
+    ...db.website_cms.draft,
+    ...data,
+    updatedAt: new Date().toISOString(),
+    updatedBy: user.name || 'Admin',
+  };
+
+  // Directly copy updated draft state to published
+  const snapshot = JSON.parse(JSON.stringify(db.website_cms.draft));
+  db.website_cms.published = snapshot;
+
+  const versionCount = (db.website_cms.versions?.length || 0) + 1;
+  const versionNum = `1.${versionCount}.0`;
+  const newVersion = {
+    id: `ver_${Date.now()}`,
+    versionNumber: versionNum,
+    timestamp: new Date().toISOString(),
+    publishedBy: user.name || 'Admin',
+    role: user.role || 'SUPER_ADMIN',
+    summary: changeSummary || 'Direct live website update',
+    snapshot,
+  };
+
+  if (!Array.isArray(db.website_cms.versions)) {
+    db.website_cms.versions = [];
+  }
+  db.website_cms.versions.unshift(newVersion);
+  if (db.website_cms.versions.length > 50) {
+    db.website_cms.versions = db.website_cms.versions.slice(0, 50);
+  }
+
+  recordCmsAuditLog('LIVE_UPDATE', `Live website updated (${versionNum}): ${changeSummary}`, user.name, user.role);
+  await saveDbAsync(db);
+  return {
+    success: true,
+    publishedVersion: versionNum,
+    published: db.website_cms.published,
+    draft: db.website_cms.draft,
+    versions: db.website_cms.versions,
+  };
+}
+
+// Publish Website CMS Asynchronously
+export async function publishWebsiteCmsAsync(user = { name: 'Admin', role: 'SUPER_ADMIN' }, changeSummary = 'Published changes to live customer website') {
+  const db = await getDbAsync();
+  if (!db.website_cms) {
+    db.website_cms = JSON.parse(JSON.stringify(DEFAULT_WEBSITE_CMS));
+  }
+  const snapshot = JSON.parse(JSON.stringify(db.website_cms.draft));
+  db.website_cms.published = snapshot;
+
+  const versionCount = (db.website_cms.versions?.length || 0) + 1;
+  const versionNum = `1.${versionCount}.0`;
+  const newVersion = {
+    id: `ver_${Date.now()}`,
+    versionNumber: versionNum,
+    timestamp: new Date().toISOString(),
+    publishedBy: user.name || 'Admin',
+    role: user.role || 'SUPER_ADMIN',
+    summary: changeSummary || 'Published website update',
+    snapshot,
+  };
+
+  if (!Array.isArray(db.website_cms.versions)) {
+    db.website_cms.versions = [];
+  }
+  db.website_cms.versions.unshift(newVersion);
+  if (db.website_cms.versions.length > 50) {
+    db.website_cms.versions = db.website_cms.versions.slice(0, 50);
+  }
+
+  recordCmsAuditLog('PUBLISH', `Live website published (Version ${versionNum}): ${changeSummary}`, user.name, user.role);
+  await saveDbAsync(db);
+  return {
+    success: true,
+    publishedVersion: versionNum,
+    published: db.website_cms.published,
+    versions: db.website_cms.versions,
+  };
+}
+
+// Rollback Website Version Asynchronously
+export async function rollbackWebsiteVersionAsync(versionId, user = { name: 'Admin', role: 'SUPER_ADMIN' }) {
+  const db = await getDbAsync();
+  if (!db.website_cms || !Array.isArray(db.website_cms.versions)) {
+    throw new Error('No version history available for rollback');
+  }
+  const targetVersion = db.website_cms.versions.find(v => v.id === versionId);
+  if (!targetVersion || !targetVersion.snapshot) {
+    throw new Error(`Version ${versionId} not found`);
+  }
+
+  const restoredSnapshot = JSON.parse(JSON.stringify(targetVersion.snapshot));
+  db.website_cms.published = restoredSnapshot;
+  db.website_cms.draft = JSON.parse(JSON.stringify(restoredSnapshot));
+
+  recordCmsAuditLog('ROLLBACK', `Restored live website to Version ${targetVersion.versionNumber} (${targetVersion.id})`, user.name, user.role);
+  await saveDbAsync(db);
+
+  return {
+    success: true,
+    message: `Restored live website to Version ${targetVersion.versionNumber}`,
+    restoredVersion: targetVersion.versionNumber,
+    cms: db.website_cms,
+  };
+}
+
 // Record CMS Audit Log
 export function recordCmsAuditLog(action, details, user = 'Admin', role = 'STORE_MANAGER') {
   const db = getDb();
