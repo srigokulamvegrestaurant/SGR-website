@@ -113,7 +113,7 @@ export async function POST(request) {
       managerPin,
     } = body;
 
-    const db = getDb();
+    const db = await getDbAsync();
     if (!db.menu) db.menu = [];
     if (!db.categories) db.categories = [];
     if (!db.menu_audit_logs) db.menu_audit_logs = [];
@@ -186,7 +186,7 @@ export async function POST(request) {
         role,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'MENU_UPDATED', action: 'ADD_ITEM', item: newItem });
 
       return NextResponse.json({
@@ -247,7 +247,7 @@ export async function POST(request) {
         role,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'MENU_UPDATED', action: 'UPDATE_ITEM', item: updated });
 
       return NextResponse.json({
@@ -275,7 +275,7 @@ export async function POST(request) {
         role,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       const evaluated = getEvaluatedMealSections(db.meal_sections);
       broadcast({ type: 'MEAL_SECTIONS_UPDATED', mealSections: evaluated });
@@ -311,7 +311,7 @@ export async function POST(request) {
         role,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'MENU_UPDATED', action: 'SET_AVAILABILITY', dishId: target.id, status: newStatus });
 
       return NextResponse.json({
@@ -338,7 +338,7 @@ export async function POST(request) {
         role,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'MENU_UPDATED', action: 'TOGGLE_FEATURED', dish: target });
       return NextResponse.json({ success: true, isFeatured: target.isFeatured });
     }
@@ -359,7 +359,7 @@ export async function POST(request) {
         role,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'MENU_UPDATED', action: 'TOGGLE_BESTSELLER', dish: target });
       return NextResponse.json({ success: true, isBestseller: target.isBestseller });
     }
@@ -403,7 +403,7 @@ export async function POST(request) {
         role,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'MENU_UPDATED', action: 'SET_OFFER', dishId: target.id, discount: target.discount });
 
       return NextResponse.json({ success: true, discount: target.discount });
@@ -430,7 +430,7 @@ export async function POST(request) {
         role,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'MENU_UPDATED', action: 'DELETE_ITEM', dishId });
       return NextResponse.json({ success: true, message: `Permanently deleted ${removed.title}` });
     }
@@ -452,7 +452,7 @@ export async function POST(request) {
         role,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'MENU_UPDATED', action: 'ARCHIVE_ITEM', dishId });
       return NextResponse.json({ success: true, message: `Archived ${target.title}` });
     }
@@ -474,7 +474,7 @@ export async function POST(request) {
         role,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'MENU_UPDATED', action: 'UNARCHIVE_ITEM', dishId });
       return NextResponse.json({ success: true, message: `Restored ${target.title}` });
     }
@@ -509,7 +509,7 @@ export async function POST(request) {
           role,
         });
 
-        saveDb(db);
+        await saveDbAsync(db);
         broadcast({ type: 'MENU_UPDATED', action: 'CATEGORY_CREATED', category: newCat });
         return NextResponse.json({ success: true, category: newCat });
       }
@@ -539,7 +539,7 @@ export async function POST(request) {
           role,
         });
 
-        saveDb(db);
+        await saveDbAsync(db);
         broadcast({ type: 'MENU_UPDATED', action: 'CATEGORY_UPDATED', category: db.categories[catIndex] });
         return NextResponse.json({ success: true, category: db.categories[catIndex] });
       }
@@ -562,7 +562,7 @@ export async function POST(request) {
             role,
           });
 
-          saveDb(db);
+          await saveDbAsync(db);
           broadcast({ type: 'MENU_UPDATED', action: 'CATEGORIES_REORDERED' });
           return NextResponse.json({ success: true, categories: db.categories });
         }
@@ -589,7 +589,7 @@ export async function POST(request) {
           role,
         });
 
-        saveDb(db);
+        await saveDbAsync(db);
         broadcast({ type: 'MENU_UPDATED', action: 'CATEGORY_DELETED', categoryId: id });
         return NextResponse.json({ success: true, message: `Deleted ${removedCat.name}` });
       }
@@ -701,7 +701,7 @@ export async function POST(request) {
         });
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'MENU_UPDATED', action: 'BULK_UPDATE', subAction, affectedCount });
       return NextResponse.json({ success: true, affectedCount, message: `Successfully updated ${affectedCount} items` });
     }
@@ -764,7 +764,7 @@ export async function POST(request) {
         role,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'MENU_UPDATED', action: 'IMPORT_MENU', count: importedCount });
       return NextResponse.json({ success: true, count: importedCount, message: `Imported ${importedCount} items successfully` });
     }
@@ -787,7 +787,7 @@ export async function POST(request) {
         role,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'MENU_UPDATED', action: 'LINK_RECIPE', dishId: target.id, recipeId });
       return NextResponse.json({ success: true, dish: target });
     }

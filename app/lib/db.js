@@ -961,6 +961,22 @@ export function getDb() {
           };
         });
       }
+      if (memoryStore && Array.isArray(memoryStore.menu)) {
+        const memImgMap = new Map();
+        memoryStore.menu.forEach(d => {
+          if (d.image) {
+            if (d.id) memImgMap.set(d.id, d.image);
+            if (d.title) memImgMap.set(d.title.trim().toLowerCase(), d.image);
+          }
+        });
+        loaded.menu = loaded.menu.map(d => {
+          if (!d.image) {
+            const match = (d.id && memImgMap.get(d.id)) || (d.title && memImgMap.get(d.title.trim().toLowerCase()));
+            if (match) return { ...d, image: match };
+          }
+          return d;
+        });
+      }
       memoryStore = loaded;
       if (needsSave) {
         saveDb(loaded);
@@ -1014,9 +1030,9 @@ export async function saveDbAsync(data) {
 
 export async function getDbAsync() {
   try {
-    // Fast check with 2.5s timeout so network lag never freezes requests
+    // Resilient check with 6s timeout so network lag never freezes requests
     const pgPromise = loadStateFromPg('restaurant_state');
-    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 2500));
+    const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 6000));
     const pgData = await Promise.race([pgPromise, timeoutPromise]);
     if (pgData && Array.isArray(pgData.menu) && pgData.menu.length > 0) {
       if (!Array.isArray(pgData.floor_plans) || pgData.floor_plans.length === 0) {
@@ -1025,11 +1041,53 @@ export async function getDbAsync() {
       if (!Array.isArray(pgData.tables) || pgData.tables.length === 0) {
         pgData.tables = JSON.parse(JSON.stringify(DEFAULT_TABLES));
       }
+
+      // Merge dish images so that a blank image in pgData never wipes out an existing image from memoryStore or disk
+      const existingImages = new Map();
+      if (memoryStore && Array.isArray(memoryStore.menu)) {
+        memoryStore.menu.forEach(d => {
+          if (d.image) {
+            if (d.id) existingImages.set(d.id, d.image);
+            if (d.title) existingImages.set(d.title.trim().toLowerCase(), d.image);
+          }
+        });
+      }
+      const targetFile = getDataFilePath();
+      if (fs.existsSync(targetFile)) {
+        try {
+          const diskParsed = JSON.parse(fs.readFileSync(targetFile, 'utf-8'));
+          if (diskParsed && Array.isArray(diskParsed.menu)) {
+            diskParsed.menu.forEach(d => {
+              if (d.image) {
+                if (d.id && !existingImages.has(d.id)) existingImages.set(d.id, d.image);
+                if (d.title && !existingImages.has(d.title.trim().toLowerCase())) existingImages.set(d.title.trim().toLowerCase(), d.image);
+              }
+            });
+          }
+        } catch (e) {}
+      }
+
+      let restoredImagesCount = 0;
+      pgData.menu = pgData.menu.map(d => {
+        if (!d.image) {
+          const match = (d.id && existingImages.get(d.id)) || (d.title && existingImages.get(d.title.trim().toLowerCase()));
+          if (match) {
+            restoredImagesCount++;
+            return { ...d, image: match };
+          }
+        }
+        return d;
+      });
+
       memoryStore = pgData;
       try {
-        const targetFile = getDataFilePath();
         fs.writeFileSync(targetFile, JSON.stringify(pgData, null, 2), 'utf-8');
       } catch (e) {}
+
+      if (restoredImagesCount > 0) {
+        saveStateToPg('restaurant_state', pgData).catch(() => {});
+      }
+
       return memoryStore;
     }
   } catch (err) {

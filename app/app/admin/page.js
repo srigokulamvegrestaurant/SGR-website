@@ -2638,10 +2638,16 @@ Status: SHIFT CLOSED & VERIFIED
 
         // Optimistically update the menu in state so the card displays the new image IMMEDIATELY
         if (data.item) {
-          setMenuItems(prev => prev.map(d => d.id === data.item.id ? { ...d, ...data.item } : d));
+          setMenuItems(prev => {
+            const exists = prev.some(d => d.id === data.item.id);
+            if (exists) {
+              return prev.map(d => d.id === data.item.id ? { ...d, ...data.item } : d);
+            }
+            return [data.item, ...prev];
+          });
         }
 
-        fetchMenu();
+        await fetchMenu();
         fetchPos();
       } else {
         showNotice(data.error || 'Failed to save delicacy', true);
@@ -14433,20 +14439,18 @@ Status: SHIFT CLOSED & VERIFIED
                     <input
                       type="text"
                       placeholder="https://..."
-                      value={dishFormData.image?.startsWith('data:') ? `[Optimized Uploaded Image (~${Math.round((dishFormData.image.length * 3) / 4 / 1024)} KB WebP)]` : (dishFormData.image || '')}
+                      value={dishFormData.image?.startsWith('data:') ? '' : (dishFormData.image || '')}
                       onChange={e => {
                         const val = e.target.value;
-                        if (!val.startsWith('[Optimized Uploaded Image')) {
-                          setDishFormData({ ...dishFormData, image: val });
-                          setImageUploadStatus('');
-                        }
+                        setDishFormData(prev => ({ ...prev, image: val }));
+                        setImageUploadStatus('');
                       }}
                       className={styles.posDiscountInput}
                       style={{ width: '100%', height: '36px' }}
                     />
                     {dishFormData.image?.startsWith('data:') && (
                       <div style={{ fontSize: '0.68rem', color: '#10b981', marginTop: '0.2rem' }}>
-                        ✓ High-res optimized image ready to save (~{Math.round((dishFormData.image.length * 3) / 4 / 1024)} KB). Click &quot;Save Changes&quot; below to finish.
+                        ✓ Uploaded optimized photo is active (~{Math.round((dishFormData.image.length * 3) / 4 / 1024)} KB WebP). To use a direct URL instead, paste or type it above.
                       </div>
                     )}
                   </div>
