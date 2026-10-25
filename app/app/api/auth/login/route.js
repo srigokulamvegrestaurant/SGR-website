@@ -3,7 +3,9 @@ import { NextResponse } from 'next/server';
 import crypto from 'crypto';
 import {
   getDb,
+  getDbAsync,
   saveDb,
+  saveDbAsync,
   createSession,
   validateSession,
   destroySession,
@@ -182,7 +184,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const { action, email, otp, sessionToken } = body;
-    const db = getDb();
+    const db = await getDbAsync();
     const callerIp = request.headers.get('x-forwarded-for') || '127.0.0.1';
     const userAgent = request.headers.get('user-agent') || 'Admin Terminal';
 
@@ -283,7 +285,7 @@ export async function POST(request) {
         user.otpAttempts = 0;
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       // Audit Log
       recordAuditLog({
@@ -366,7 +368,7 @@ export async function POST(request) {
         };
         db.users = db.users || [];
         db.users.unshift(user);
-        saveDb(db);
+        await saveDbAsync(db);
       }
 
       if (!user) {
@@ -453,7 +455,7 @@ export async function POST(request) {
       // If code genuinely expired
       if (isExpired) {
         user.otpAttempts = (user.otpAttempts || 0) + 1;
-        saveDb(db);
+        await saveDbAsync(db);
         const res = NextResponse.json({
           success: false,
           error: 'Verification code has expired. Please click "Resend Code" to generate a fresh OTP.',
@@ -468,7 +470,7 @@ export async function POST(request) {
 
         if (user.otpAttempts >= 5 && !isProtectedDeveloperEmail(user.email)) {
           user.otpLockoutUntil = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 min lockout
-          saveDb(db);
+          await saveDbAsync(db);
           recordAuditLog({
             user: user.fullName,
             role: user.role,
@@ -486,7 +488,7 @@ export async function POST(request) {
         }
 
         const remainingAttempts = Math.max(0, 5 - user.otpAttempts);
-        saveDb(db);
+        await saveDbAsync(db);
 
         return NextResponse.json({
           success: false,
@@ -502,7 +504,7 @@ export async function POST(request) {
       user.otpLockoutUntil = null;
       user.otpResendCount = 0;
       user.lastLoginAt = new Date().toISOString();
-      saveDb(db);
+      await saveDbAsync(db);
 
       // Create cryptographically signed session (self-contained & serverless-proof)
       const session = createSession(user, {
@@ -650,7 +652,7 @@ export async function GET(request) {
       }
     }
 
-    const db = getDb();
+    const db = await getDbAsync();
     // Return sanitized public list of active registered emails for staff convenience
     const staffList = (db.users || []).filter(u => u.isActive).map(u => ({
       fullName: u.fullName,
