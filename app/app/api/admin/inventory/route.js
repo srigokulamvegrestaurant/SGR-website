@@ -307,6 +307,7 @@ export async function POST(request) {
     // ─── ACTION 3: DELETE INGREDIENT ───────────────────────────────────────
     if (action === 'DELETE_INGREDIENT') {
       const targetId = body.itemId || body.id;
+      const itemId = targetId;
       const idx = db.inventory.findIndex(i => i.id === targetId);
       if (idx === -1) {
         return NextResponse.json({ success: false, error: 'Ingredient not found' }, { status: 404 });
