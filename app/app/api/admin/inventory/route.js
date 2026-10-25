@@ -249,6 +249,7 @@ export async function POST(request) {
         success: true,
         message: `Added new ingredient: ${newIngredient.name}`,
         ingredient: newIngredient,
+        item: newIngredient,
       });
     }
 
@@ -305,8 +306,8 @@ export async function POST(request) {
 
     // ─── ACTION 3: DELETE INGREDIENT ───────────────────────────────────────
     if (action === 'DELETE_INGREDIENT') {
-      const { itemId } = body;
-      const idx = db.inventory.findIndex(i => i.id === itemId);
+      const targetId = body.itemId || body.id;
+      const idx = db.inventory.findIndex(i => i.id === targetId);
       if (idx === -1) {
         return NextResponse.json({ success: false, error: 'Ingredient not found' }, { status: 404 });
       }

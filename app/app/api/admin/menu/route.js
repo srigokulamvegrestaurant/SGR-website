@@ -101,6 +101,7 @@ export async function POST(request) {
       action = 'ADD_ITEM',
       item,
       dishId,
+      id,
       status,
       discount,
       categoryData,
@@ -411,11 +412,24 @@ export async function POST(request) {
 
     // ─── 6. DELETE OR ARCHIVE DELICACIES ────────────────────────────────────
     if (action === 'DELETE_ITEM') {
-      if (role !== 'DEVELOPER_ADMIN' && role !== 'SUPER_ADMIN' && managerPin !== '1234') {
+      const targetDishId = dishId || id || item?.id;
+      const authHeader = request.headers.get('authorization') || '';
+      const token = authHeader.replace(/^Bearer\s+/i, '');
+      let isDevAdmin = role === 'DEVELOPER_ADMIN' || role === 'SUPER_ADMIN';
+      if (!isDevAdmin && token) {
+        try {
+          const tokenPayload = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+          if (tokenPayload.role === 'DEVELOPER_ADMIN' || tokenPayload.role === 'SUPER_ADMIN') {
+            isDevAdmin = true;
+          }
+        } catch (e) {}
+      }
+
+      if (!isDevAdmin && managerPin !== '1234') {
         return NextResponse.json({ success: false, error: 'Unauthorized: Manager PIN (1234) required to permanently delete menu items' }, { status: 403 });
       }
 
-      const index = db.menu.findIndex(d => d.id === dishId);
+      const index = db.menu.findIndex(d => d.id === targetDishId);
       if (index === -1) return NextResponse.json({ success: false, error: 'Dish not found' }, { status: 404 });
 
       const removed = db.menu[index];
@@ -431,7 +445,7 @@ export async function POST(request) {
       });
 
       await saveDbAsync(db);
-      broadcast({ type: 'MENU_UPDATED', action: 'DELETE_ITEM', dishId });
+      broadcast({ type: 'MENU_UPDATED', action: 'DELETE_ITEM', dishId: targetDishId });
       return NextResponse.json({ success: true, message: `Permanently deleted ${removed.title}` });
     }
 

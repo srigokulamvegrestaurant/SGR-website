@@ -254,7 +254,7 @@ export async function POST(request) {
     }
 
     // ─── 1. Update Table Status (Operational Lifecycle) ───
-    if (action === 'UPDATE_STATUS') {
+    if (action === 'UPDATE_STATUS' || action === 'CHANGE_STATUS') {
       const { tableNumber, newStatus } = body;
       const table = db.tables.find(t => String(t.tableNumber) === String(tableNumber));
       if (!table) return NextResponse.json({ success: false, error: 'Table not found' }, { status: 404 });
