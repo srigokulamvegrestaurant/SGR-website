@@ -138,6 +138,77 @@ function renderOtpHtml({ otp, recipientName = 'Valued Guest', type = 'LOGIN', ro
 }
 
 /**
+ * Dispatch email via Resend HTTPS REST API (Port 443 - Never blocked by Railway)
+ */
+async function sendViaResend({ to, subject, html, text, fromName }) {
+  const apiKey = process.env.RESEND_API_KEY?.trim();
+  if (!apiKey) return null;
+
+  try {
+    const fromAddress = process.env.RESEND_FROM || `${fromName || 'Sri Gokulam'} <onboarding@resend.dev>`;
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: fromAddress,
+        to: [to],
+        subject,
+        html,
+        text,
+      }),
+    });
+
+    const data = await res.json();
+    if (res.ok && data.id) {
+      console.log(`[EMAIL-RESEND-SUCCESS] Sent OTP to ${to} via Resend (ID: ${data.id})`);
+      return { success: true, messageId: data.id };
+    }
+    console.warn('[EMAIL-RESEND-WARN] Resend response:', data);
+  } catch (err) {
+    console.error('[EMAIL-RESEND-ERROR] Failed to send via Resend:', err.message);
+  }
+  return null;
+}
+
+/**
+ * Dispatch email via Brevo HTTPS REST API (Port 443 - Never blocked by Railway)
+ */
+async function sendViaBrevo({ to, subject, html, text, fromName, fromEmail }) {
+  const apiKey = process.env.BREVO_API_KEY?.trim();
+  if (!apiKey) return null;
+
+  try {
+    const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+      method: 'POST',
+      headers: {
+        'api-key': apiKey,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        sender: { name: fromName || 'Sri Gokulam Veg Restaurant', email: fromEmail || 'srigokulamvegrestaurant@gmail.com' },
+        to: [{ email: to }],
+        subject,
+        htmlContent: html,
+        textContent: text,
+      }),
+    });
+
+    const data = await res.json();
+    if (res.ok && (data.messageId || data.messageIds)) {
+      console.log(`[EMAIL-BREVO-SUCCESS] Sent OTP to ${to} via Brevo (ID: ${data.messageId || data.messageIds[0]})`);
+      return { success: true, messageId: data.messageId || data.messageIds[0] };
+    }
+    console.warn('[EMAIL-BREVO-WARN] Brevo response:', data);
+  } catch (err) {
+    console.error('[EMAIL-BREVO-ERROR] Failed to send via Brevo:', err.message);
+  }
+  return null;
+}
+
+/**
  * Dispatch OTP Email to Recipient
  *
  * @param {Object} options
@@ -153,9 +224,28 @@ export async function sendOtpEmail({ to, otp, recipientName = 'Guest', type = 'L
     return { success: false, error: 'Recipient email is required.' };
   }
 
+  const fromName = process.env.SMTP_FROM_NAME || 'Sri Gokulam Veg Restaurant';
+  const fromAddress = process.env.SMTP_USER || 'srigokulamvegrestaurant@gmail.com';
+  const subject = `${otp} is your Sri Gokulam verification code`;
+  const text = `Vanakkam ${recipientName},\n\nYour Sri Gokulam verification code is: ${otp}\n\nThis code expires in 5 minutes.\n\nNever share this code with anyone.\n\nSri Gokulam Veg Restaurant, Karaikudi`;
+  const html = renderOtpHtml({ otp, recipientName, type, role });
+
+  // 1. Try Resend HTTPS REST API (Highest deliverability on cloud containers, port 443)
+  const resendResult = await sendViaResend({ to, subject, html, text, fromName });
+  if (resendResult && resendResult.success) {
+    return resendResult;
+  }
+
+  // 2. Try Brevo HTTPS REST API (Port 443)
+  const brevoResult = await sendViaBrevo({ to, subject, html, text, fromName, fromEmail: fromAddress });
+  if (brevoResult && brevoResult.success) {
+    return brevoResult;
+  }
+
+  // 3. Fallback to Nodemailer SMTP
   const mailer = getTransporter();
 
-  // If SMTP is not yet configured, fall back to console logging gracefully for dev
+  // If SMTP is not configured, fall back to console logging
   if (!mailer) {
     console.log(
       `[EMAIL-SIMULATION] SMTP not configured. OTP for ${to} (${recipientName}): ${otp}`
@@ -168,15 +258,12 @@ export async function sendOtpEmail({ to, otp, recipientName = 'Guest', type = 'L
   }
 
   try {
-    const fromName = process.env.SMTP_FROM_NAME || 'Sri Gokulam Veg Restaurant';
-    const fromAddress = process.env.SMTP_USER;
-
     const info = await mailer.sendMail({
       from: `"${fromName}" <${fromAddress}>`,
       to,
-      subject: `${otp} is your Sri Gokulam verification code`,
-      text: `Vanakkam ${recipientName},\n\nYour Sri Gokulam verification code is: ${otp}\n\nThis code expires in 5 minutes.\n\nNever share this code with anyone.\n\nSri Gokulam Veg Restaurant, Karaikudi`,
-      html: renderOtpHtml({ otp, recipientName, type, role }),
+      subject,
+      text,
+      html,
     });
 
     console.log(`[EMAIL-DISPATCH-SUCCESS] Sent OTP to ${to} (Message ID: ${info.messageId})`);
