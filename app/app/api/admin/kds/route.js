@@ -1,6 +1,5 @@
-// app/api/admin/kds/route.js - Comprehensive Kitchen Display System (KDS) & KOT Engine
 import { NextResponse } from 'next/server';
-import { getDb, saveDb, categorizeStation, generateKotReceiptText } from '@/lib/db';
+import { getDb, getDbAsync, saveDb, saveDbAsync, categorizeStation, generateKotReceiptText } from '@/lib/db';
 import { broadcast } from '@/app/api/events/route';
 
 // Deduct inventory ingredients based on recipes (Master Plan 7.6)
@@ -34,7 +33,7 @@ function deductRecipeIngredients(db, itemName, quantity = 1) {
 
 export async function GET(request) {
   try {
-    const db = getDb();
+    const db = await getDbAsync();
     const { searchParams } = new URL(request.url);
     const stationFilter = searchParams.get('station') || 'ALL'; // 'ALL', 'DOSA', 'TIFFIN', 'MEALS', 'SNACKS', 'BEVERAGES'
     const view = searchParams.get('view') || 'ACTIVE'; // 'ACTIVE' or 'HISTORY'
@@ -185,6 +184,12 @@ export async function GET(request) {
         otp: p.otp,
         createdAt: p.createdAt,
       })),
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
     });
   } catch (error) {
     console.error('KDS GET error:', error);
@@ -205,7 +210,7 @@ export async function POST(request) {
       staffName = 'Selvam (Head Cook)',
       managerPin = '',
     } = body;
-    const db = getDb();
+    const db = await getDbAsync();
     db.kots = db.kots || [];
 
     // Find ticket by id or kotNumber
@@ -272,7 +277,7 @@ export async function POST(request) {
         else if (newStatus === 'PREPARING') parentOrder.status = 'IN_KITCHEN';
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       // Broadcast state change across all connected POS, KDS & Waiter tablets
       try {
@@ -330,7 +335,7 @@ export async function POST(request) {
         parentOrder.cancellationReason = reason.trim();
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast({
@@ -373,7 +378,7 @@ export async function POST(request) {
         printCount: ticket.printCount,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,

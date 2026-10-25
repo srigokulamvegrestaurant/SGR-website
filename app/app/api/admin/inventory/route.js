@@ -1,6 +1,5 @@
-// app/api/admin/inventory/route.js - Enterprise Inventory, Supplier & Food Costing Engine
 import { NextResponse } from 'next/server';
-import { getDb, saveDb } from '@/lib/db';
+import { getDb, getDbAsync, saveDb, saveDbAsync } from '@/lib/db';
 import { broadcast } from '@/app/api/events/route';
 
 // Clean initial inventory seeds
@@ -47,7 +46,7 @@ function enrichRecipe(recipe, inventoryList, menuList) {
 
 export async function GET(request) {
   try {
-    const db = getDb();
+    const db = await getDbAsync();
 
     // Ensure inventory collections exist as arrays
     if (!Array.isArray(db.suppliers)) db.suppliers = [];
@@ -176,6 +175,12 @@ export async function GET(request) {
         lowStockAlerts: lowStockAlerts.concat(outOfStockAlerts),
         expiringAlerts: expiringSoonList.concat(expiredList),
       },
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
     });
   } catch (error) {
     console.error('Inventory GET error:', error);
@@ -187,7 +192,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const { action } = body;
-    const db = getDb();
+    const db = await getDbAsync();
     db.inventory = db.inventory || [];
     db.suppliers = db.suppliers || [];
     db.purchase_orders = db.purchase_orders || [];
@@ -237,7 +242,7 @@ export async function POST(request) {
         balanceAfter: newIngredient.currentStock,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'INVENTORY_UPDATED', itemId: newId, action: 'ADD_INGREDIENT' });
 
       return NextResponse.json({
@@ -288,7 +293,7 @@ export async function POST(request) {
         });
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'INVENTORY_UPDATED', itemId: item.id, action: 'UPDATE_INGREDIENT' });
 
       return NextResponse.json({
@@ -308,7 +313,7 @@ export async function POST(request) {
 
       const deletedName = db.inventory[idx].name;
       db.inventory.splice(idx, 1);
-      saveDb(db);
+      await saveDbAsync(db);
 
       broadcast({ type: 'INVENTORY_UPDATED', itemId, action: 'DELETE_INGREDIENT' });
 
@@ -373,7 +378,7 @@ export async function POST(request) {
         balanceAfter: item.currentStock,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'INVENTORY_UPDATED', itemId: item.id, action: 'STOCK_ADJUSTMENT' });
 
       return NextResponse.json({
@@ -430,7 +435,7 @@ export async function POST(request) {
       };
 
       db.purchase_orders.push(newPO);
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'PURCHASE_ORDER_CREATED', poId: newPO.id });
 
       return NextResponse.json({
@@ -492,7 +497,7 @@ export async function POST(request) {
         }
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'PURCHASE_ORDER_RECEIVED', poId: po.id });
 
       return NextResponse.json({
@@ -526,7 +531,7 @@ export async function POST(request) {
       };
 
       db.suppliers.push(newSupplier);
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -550,7 +555,7 @@ export async function POST(request) {
       if (paymentStatus) supp.paymentStatus = paymentStatus;
       if (balanceDue !== undefined) supp.balanceDue = Number(balanceDue);
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -580,7 +585,7 @@ export async function POST(request) {
         db.recipes.push(existing);
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'RECIPES_UPDATED' });
 
       return NextResponse.json({
@@ -614,7 +619,7 @@ export async function POST(request) {
         balanceAfter: item.currentStock,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
       broadcast({ type: 'INVENTORY_UPDATED', itemId: item.id, action: 'RESTOCK' });
 
       return NextResponse.json({

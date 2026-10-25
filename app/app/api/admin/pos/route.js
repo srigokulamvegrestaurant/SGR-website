@@ -1,6 +1,5 @@
-// app/api/admin/pos/route.js - Comprehensive High-Speed Touch POS & ESC/POS Engine
 import { NextResponse } from 'next/server';
-import { getDb, saveDb, categorizeStation, deductRecipeBom, recordAuditLog, recordCustomerTransaction } from '@/lib/db';
+import { getDb, getDbAsync, saveDb, saveDbAsync, categorizeStation, deductRecipeBom, recordAuditLog, recordCustomerTransaction } from '@/lib/db';
 import { broadcast } from '@/app/api/events/route';
 import { generateThermalReceiptText, DEFAULT_BILL_SLIP_FORMAT } from '@/lib/thermalSlipFormatter';
 
@@ -8,7 +7,7 @@ export { generateThermalReceiptText };
 
 export async function GET(request) {
   try {
-    const db = getDb();
+    const db = await getDbAsync();
     const { searchParams } = new URL(request.url);
     const tableId = searchParams.get('tableId');
 
@@ -100,6 +99,12 @@ export async function GET(request) {
       qrOrders: db.qr_orders || [],
       refundLogs: db.refund_logs || [],
       settings: db.settings,
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
     });
   } catch (error) {
     console.error('POS GET error:', error);
@@ -111,7 +116,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const { action } = body;
-    const db = getDb();
+    const db = await getDbAsync();
 
     // ──────────────────────────────────────────────────────────────────────────
     // ACTION 1: PUNCH KOT & SEND TO KITCHEN STATIONS
@@ -219,7 +224,7 @@ export async function POST(request) {
         }
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       // Broadcast real-time SSE event for KDS & Table displays
       try {
@@ -425,7 +430,7 @@ export async function POST(request) {
       });
 
       newBill.thermalSlip = thermalReceipt;
-      saveDb(db);
+      await saveDbAsync(db);
 
       // Broadcast SSE
       try {
@@ -651,7 +656,7 @@ export async function POST(request) {
         detail: `Manual bill #${billNumber} generated for ${customer.name || 'Walk-in'} (Total: ₹${totalAmount}).`,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       // SSE broadcast
       try {
@@ -785,7 +790,7 @@ export async function POST(request) {
         detail: `Bill #${bill.billNumber} amended before print by ${callerName} (Net: ₹${bill.totalAmount}).`,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -853,7 +858,7 @@ export async function POST(request) {
       };
       db.refund_logs.unshift(logEntry);
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast('BILL_VOIDED', { billNumber, tableNumber, reason });
@@ -892,7 +897,7 @@ export async function POST(request) {
       };
       db.refund_logs.unshift(refundLog);
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -917,7 +922,7 @@ export async function POST(request) {
         heldAt: new Date().toISOString(),
       };
       db.held_orders.unshift(held);
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({ success: true, message: 'Order placed on hold', heldOrder: held });
     }
@@ -931,7 +936,7 @@ export async function POST(request) {
       }
 
       const resumed = db.held_orders.splice(index, 1)[0];
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({ success: true, message: 'Order resumed successfully', resumedOrder: resumed });
     }
@@ -982,7 +987,7 @@ export async function POST(request) {
         table.activeOrderId = orderId;
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast('QR_ORDER_ACCEPTED', { qrOrderId, tableNumber: tPad });
@@ -1039,7 +1044,7 @@ export async function POST(request) {
         shift.status = 'CLOSED';
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
       return NextResponse.json({ success: true, message: `Shift operation '${shiftAction}' updated`, shift });
     }
 

@@ -582,7 +582,7 @@ export default function AdminPage() {
   // ─── Data Fetching Loaders ──────────────────────────────────────────────
   const fetchAnalytics = useCallback(async (period = selectedPeriod) => {
     try {
-      const res = await fetch(`/api/admin/analytics?period=${period}`);
+      const res = await fetch(`/api/admin/analytics?period=${period}&t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.success) {
         setAnalytics(data);
@@ -597,7 +597,7 @@ export default function AdminPage() {
 
   const fetchPos = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/pos');
+      const res = await fetch(`/api/admin/pos?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.success) {
         setPosData(data);
@@ -625,7 +625,7 @@ export default function AdminPage() {
 
   const fetchKds = useCallback(async (station = kdsStation, view = kdsView, status = kdsHistoryStatus) => {
     try {
-      const res = await fetch(`/api/admin/kds?station=${station}&view=${view}&status=${status}`);
+      const res = await fetch(`/api/admin/kds?station=${station}&view=${view}&status=${status}&t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.success) {
         setKdsTickets(data.tickets || []);
@@ -708,7 +708,8 @@ export default function AdminPage() {
       if (invSupplierFilter && invSupplierFilter !== 'ALL') query.set('supplier', invSupplierFilter);
       if (invStockStatusFilter && invStockStatusFilter !== 'ALL') query.set('stockStatus', invStockStatusFilter);
 
-      const res = await fetch(`/api/admin/inventory?${query.toString()}`);
+      query.set('t', Date.now().toString());
+      const res = await fetch(`/api/admin/inventory?${query.toString()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.success) {
         setInventory(data.inventory || []);
@@ -728,11 +729,11 @@ export default function AdminPage() {
 
   const fetchDevHub = useCallback(async () => {
     try {
-      const res = await fetch('/api/admin/features');
+      const res = await fetch(`/api/admin/features?t=${Date.now()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.success) setDevSettings(data.settings);
 
-      const staffRes = await fetch('/api/auth/login');
+      const staffRes = await fetch(`/api/auth/login?t=${Date.now()}`, { cache: 'no-store' });
       const staffData = await staffRes.json();
       if (staffData.success) setStaffUsers(staffData.users);
     } catch (e) {
@@ -789,7 +790,8 @@ export default function AdminPage() {
       if (ordersFilter && ordersFilter !== 'ALL') query.set('filter', ordersFilter);
       if (ordersSearch) query.set('search', ordersSearch);
 
-      const res = await fetch(`/api/admin/orders?${query.toString()}`);
+      query.set('t', Date.now().toString());
+      const res = await fetch(`/api/admin/orders?${query.toString()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.success) {
         setOrdersList(data.orders || []);
@@ -810,7 +812,8 @@ export default function AdminPage() {
       if (crmSearch) query.set('search', crmSearch);
       if (crmSortBy) query.set('sort', crmSortBy);
 
-      const res = await fetch(`/api/admin/crm?${query.toString()}`);
+      query.set('t', Date.now().toString());
+      const res = await fetch(`/api/admin/crm?${query.toString()}`, { cache: 'no-store' });
       const data = await res.json();
       if (data.success) {
         setCrmCustomers(data.customers || []);

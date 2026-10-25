@@ -1,6 +1,5 @@
-// app/api/admin/crm/route.js - Comprehensive Customer CRM & Loyalty Management Engine
 import { NextResponse } from 'next/server';
-import { getDb, saveDb } from '@/lib/db';
+import { getDb, getDbAsync, saveDb, saveDbAsync } from '@/lib/db';
 import { broadcast } from '@/app/api/events/route';
 
 // Initial clean state for CRM
@@ -34,12 +33,12 @@ export async function GET(request) {
     const search = (searchParams.get('search') || '').trim().toLowerCase();
     const sortBy = searchParams.get('sort') || 'recent'; // 'recent', 'visits', 'spend', 'points'
 
-    const db = getDb();
+    const db = await getDbAsync();
 
     // Ensure customers collection is initialized as an array
     if (!Array.isArray(db.customers)) {
       db.customers = [];
-      saveDb(db);
+      await saveDbAsync(db);
     }
 
     let customers = db.customers || [];
@@ -135,6 +134,12 @@ export async function GET(request) {
       },
       segmentDistribution,
       topCustomers,
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
     });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -145,7 +150,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const { action, staffName = 'Floor Captain', role = 'STORE_MANAGER' } = body;
-    const db = getDb();
+    const db = await getDbAsync();
     db.customers = db.customers || [];
 
     // ──────────────────────────────────────────────────────────────────────────
@@ -218,7 +223,7 @@ export async function POST(request) {
       };
 
       db.customers.unshift(newCust);
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast({
@@ -250,7 +255,7 @@ export async function POST(request) {
       if (anniversary !== undefined) cust.anniversary = anniversary;
       if (segment) cust.segment = segment;
 
-      saveDb(db);
+      await saveDbAsync(db);
       return NextResponse.json({ success: true, message: 'Profile updated successfully', customer: cust });
     }
 
@@ -277,7 +282,7 @@ export async function POST(request) {
         type,
       };
       cust.notes.unshift(newNote);
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({ success: true, message: 'Note added to customer profile', note: newNote, customer: cust });
     }
@@ -328,7 +333,7 @@ export async function POST(request) {
       }
 
       cust.loyaltyTier = evaluateLoyaltyTier(cust.loyaltyPoints);
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({
         success: true,
@@ -361,7 +366,7 @@ export async function POST(request) {
       };
 
       cust.feedback.unshift(newFb);
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({ success: true, message: 'Customer feedback recorded successfully', feedback: newFb, customer: cust });
     }
@@ -396,7 +401,7 @@ export async function POST(request) {
       };
 
       cust.promotions.unshift(newOffer);
-      saveDb(db);
+      await saveDbAsync(db);
 
       return NextResponse.json({ success: true, message: `Promo code ${code} issued to ${cust.name}`, offer: newOffer, customer: cust });
     }
@@ -412,7 +417,7 @@ export async function POST(request) {
       }
 
       cust.segment = newSegment;
-      saveDb(db);
+      await saveDbAsync(db);
       return NextResponse.json({ success: true, message: `Segment updated to ${newSegment}`, customer: cust });
     }
 
@@ -427,7 +432,7 @@ export async function POST(request) {
       }
 
       const deleted = db.customers.splice(index, 1)[0];
-      saveDb(db);
+      await saveDbAsync(db);
       return NextResponse.json({ success: true, message: `Customer ${deleted.name} removed from CRM directory` });
     }
 

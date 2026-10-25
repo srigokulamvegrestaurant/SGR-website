@@ -1,6 +1,5 @@
-// app/api/admin/orders/route.js - Comprehensive Live Order Management Engine
 import { NextResponse } from 'next/server';
-import { getDb, saveDb, categorizeStation, generateKotReceiptText, deductRecipeBom } from '@/lib/db';
+import { getDb, getDbAsync, saveDb, saveDbAsync, categorizeStation, generateKotReceiptText, deductRecipeBom } from '@/lib/db';
 import { broadcast } from '@/app/api/events/route';
 import { generateThermalReceiptText } from '@/app/api/admin/pos/route';
 
@@ -25,7 +24,7 @@ export async function GET(request) {
     const filter = searchParams.get('filter') || 'ALL'; // 'ALL', 'QR', 'POS', 'PENDING', 'PREPARING', 'READY', 'COMPLETED', 'CANCELLED'
     const search = (searchParams.get('search') || '').trim().toLowerCase();
 
-    const db = getDb();
+    const db = await getDbAsync();
     const rawOrders = db.orders || [];
 
     const now = Date.now();
@@ -138,6 +137,12 @@ export async function GET(request) {
       tables: db.tables || [],
       menu: db.menu || [],
       settings: db.settings || {},
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
     });
   } catch (error) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });
@@ -148,7 +153,7 @@ export async function POST(request) {
   try {
     const body = await request.json();
     const { action, authorizedBy = 'Cashier/Admin', role = 'CASHIER' } = body;
-    const db = getDb();
+    const db = await getDbAsync();
 
     // ──────────────────────────────────────────────────────────────────────────
     // 1. ACTION: VERIFY OTP (Waitstaff / Cashier verification)
@@ -196,7 +201,7 @@ export async function POST(request) {
         }
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast({
@@ -248,7 +253,7 @@ export async function POST(request) {
         });
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast({
@@ -298,7 +303,7 @@ export async function POST(request) {
       order.lastEditedBy = staffName;
       order.lastEditedAt = new Date().toISOString();
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast({
@@ -359,7 +364,7 @@ export async function POST(request) {
         }
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast({
@@ -430,7 +435,7 @@ export async function POST(request) {
         if (tbl) tbl.status = 'BILL_GENERATED';
       }
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast({
@@ -516,7 +521,7 @@ export async function POST(request) {
         settings: db.settings,
       });
 
-      saveDb(db);
+      await saveDbAsync(db);
 
       try {
         broadcast({

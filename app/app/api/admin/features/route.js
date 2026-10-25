@@ -22,6 +22,12 @@ export async function GET() {
         totalOrders: (db.orders || []).length,
         totalBills: (db.bills || []).length,
       },
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
     });
   } catch (error) {
     console.error('Features GET error:', error);

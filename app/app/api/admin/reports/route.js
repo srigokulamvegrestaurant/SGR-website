@@ -1,6 +1,5 @@
-// app/api/admin/reports/route.js - Comprehensive Sri Gokulam Reports & Analytics API
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { getDb, getDbAsync } from '@/lib/db';
 
 export const dynamic = 'force-dynamic';
 
@@ -13,7 +12,7 @@ export async function GET(request) {
     const exportFormat = searchParams.get('export'); // 'csv', 'json'
     const exportType = searchParams.get('exportType') || 'sales'; // 'sales', 'menu', 'expenses', 'orders', 'staff', 'tables', 'inventory'
 
-    const db = getDb();
+    const db = await getDbAsync();
     const bills = db.bills || [];
     const orders = db.orders || [];
     const expenses = db.expenses || [];
@@ -689,6 +688,12 @@ export async function GET(request) {
         avgTurnsPerDay: 4.4,
       },
       automatedInsights,
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
     });
   } catch (error) {
     console.error('Reports API error:', error);

@@ -108,7 +108,13 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
   const fetchSettings = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/admin/settings?auditModule=${auditModuleFilter}&auditSearch=${encodeURIComponent(auditSearch)}`);
+      const res = await fetch(`/api/admin/settings?auditModule=${auditModuleFilter}&auditSearch=${encodeURIComponent(auditSearch)}&t=${Date.now()}`, {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache',
+        },
+      });
       const data = await res.json();
       if (data.success) {
         setSettings(data.settings || {});
@@ -135,7 +141,13 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
     let active = true;
     const load = async () => {
       try {
-        const res = await fetch(`/api/admin/settings?auditModule=${auditModuleFilter}&auditSearch=${encodeURIComponent(auditSearch)}`);
+        const res = await fetch(`/api/admin/settings?auditModule=${auditModuleFilter}&auditSearch=${encodeURIComponent(auditSearch)}&t=${Date.now()}`, {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+          },
+        });
         const data = await res.json();
         if (active && data.success) {
           setSettings(data.settings || {});
@@ -207,7 +219,9 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
         setInitialSettings(JSON.parse(JSON.stringify(data.settings)));
         showToast('success', data.message || `Saved ${sectionToSave.replace('_', ' ')} settings`);
         // Refresh audit logs
-        const auditRes = await fetch(`/api/admin/settings?auditModule=${auditModuleFilter}&auditSearch=${encodeURIComponent(auditSearch)}`);
+        const auditRes = await fetch(`/api/admin/settings?auditModule=${auditModuleFilter}&auditSearch=${encodeURIComponent(auditSearch)}&t=${Date.now()}`, {
+          cache: 'no-store',
+        });
         const auditJson = await auditRes.json();
         if (auditJson.success) {
           setAuditLogs(auditJson.auditLogs || []);

@@ -1,13 +1,12 @@
-// app/api/admin/analytics/route.js - Comprehensive Dashboard & Sales Analytics API
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { getDb, getDbAsync } from '@/lib/db';
 
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const period = searchParams.get('period') || 'today'; // 'today', 'yesterday', 'week', 'month', 'custom'
 
-    const db = getDb();
+    const db = await getDbAsync();
     const bills = db.bills || [];
     const orders = db.orders || [];
     const inventory = db.inventory || [];
@@ -224,6 +223,12 @@ export async function GET(request) {
       recentActivities,
       notifications,
       lowStockItems: lowStockAlerts,
+    }, {
+      headers: {
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
     });
   } catch (error) {
     console.error('Analytics API error:', error);
