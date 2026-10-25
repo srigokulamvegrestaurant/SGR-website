@@ -19,7 +19,7 @@ yarn-error.log*
 .DS_Store
 
 # Environment variables
-.env
+.env*
 .env*.local
 
 # Agents & ide temporary files
