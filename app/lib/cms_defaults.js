@@ -303,10 +303,9 @@ export const DEFAULT_HEADER_CONFIG = {
   navLinks: [
     { id: 'nav_home', label: 'Home', href: '#', isVisible: true, isExternal: false, order: 1 },
     { id: 'nav_specials', label: 'Our Specials', href: '#specials', isVisible: true, isExternal: false, order: 2 },
-    { id: 'nav_signature', label: 'Signature Dishes', href: '#signature', isVisible: true, isExternal: false, order: 3 },
-    { id: 'nav_menu', label: 'Full Menu', href: '#menu', isVisible: true, isExternal: false, order: 4 },
-    { id: 'nav_table_qr', label: 'Table QR Dine-In', href: '#table-qr', isVisible: true, isExternal: false, order: 5 },
-    { id: 'nav_contact', label: 'Contact', href: '#contact', isVisible: true, isExternal: false, order: 6 },
+    { id: 'nav_menu', label: 'Full Menu', href: '#menu', isVisible: true, isExternal: false, order: 3 },
+    { id: 'nav_table_qr', label: 'Table QR Dine-In', href: '#table-qr', isVisible: true, isExternal: false, order: 4 },
+    { id: 'nav_contact', label: 'Contact', href: '#contact', isVisible: true, isExternal: false, order: 5 },
   ],
   headerActionButtons: ['btn_order_now', 'btn_qr_dine_in'],
 };

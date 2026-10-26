@@ -6,7 +6,6 @@ import styles from './Header.module.css';
 const NAV_LINKS = [
   { label: 'Home', href: '/', active: true },
   { label: 'Our Specials', href: '/#specials' },
-  { label: 'Signature Dishes', href: '/#signature' },
   { label: 'Full Menu', href: '/#menu' },
   { label: 'Why Choose Us', href: '/choose-us' },
   { label: 'About', href: '/about' },
@@ -83,6 +82,7 @@ export default function Header({
     if (href.includes('/waiter') || href.includes('/admin')) return false;
     if (label.includes('waiter') || label.includes('staff') || label.includes('admin')) return false;
     if (id.includes('waiter') || id.includes('admin') || id.includes('staff')) return false;
+    if (label.includes('signature') || href.includes('signature') || id.includes('signature')) return false;
     return true;
   });
 
