@@ -18,6 +18,26 @@ const nextConfig = {
         permanent: true,
       },
       {
+        source: '/about',
+        destination: '/#about',
+        permanent: true,
+      },
+      {
+        source: '/about-us',
+        destination: '/#about',
+        permanent: true,
+      },
+      {
+        source: '/choose-us',
+        destination: '/#about',
+        permanent: true,
+      },
+      {
+        source: '/why-choose-us',
+        destination: '/#about',
+        permanent: true,
+      },
+      {
         source: '/specials',
         destination: '/#specials',
         permanent: true,

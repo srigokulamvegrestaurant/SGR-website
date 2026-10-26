@@ -119,7 +119,9 @@ export default function ChooseUsSection({ onOpenReservationModal }) {
 
   return (
     <section className={styles.chooseUsSection} id="choose-us">
-      {/* Anchor for backward compatibility with old link */}
+      {/* Anchors for smooth hash scrolling */}
+      <span id="why-choose-us" className={styles.invisibleAnchor} />
+      <span id="about-us" className={styles.invisibleAnchor} />
       <span id="table-qr" className={styles.invisibleAnchor} />
 
       <div className={styles.container}>

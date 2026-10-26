@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import styles from './Header.module.css';
 
 const NAV_LINKS = [
-  { label: 'Home', href: '/', active: true },
+  { label: 'Home', href: '/' },
   { label: 'Our Specials', href: '/#specials' },
   { label: 'Our Menu', href: '/#menu' },
-  { label: 'About Us', href: '/about' },
+  { label: 'About Us', href: '/#about' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -23,8 +23,24 @@ export default function Header({
 }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [customer, setCustomer] = useState(null);
+  const [activeHash, setActiveHash] = useState('');
   const headerWrapperRef = useRef(null);
   const [drawerTop, setDrawerTop] = useState(64);
+
+  // Synchronize hash for active link indicator
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const syncActiveHash = () => {
+      setActiveHash(window.location.hash || '');
+    };
+    syncActiveHash();
+    window.addEventListener('hashchange', syncActiveHash);
+    window.addEventListener('popstate', syncActiveHash);
+    return () => {
+      window.removeEventListener('hashchange', syncActiveHash);
+      window.removeEventListener('popstate', syncActiveHash);
+    };
+  }, []);
 
   // Measure fixed header height for layout spacer and mobile drawer positioning
   useEffect(() => {
@@ -92,8 +108,8 @@ export default function Header({
     if (label.includes('menu') || id.includes('menu') || href.includes('menu')) {
       return { ...link, label: 'Our Menu', href: '/#menu' };
     }
-    if (label === 'about' || id.includes('about')) {
-      return { ...link, label: 'About Us', href: '/about' };
+    if (label === 'about' || id.includes('about') || label.includes('about') || href.includes('choose')) {
+      return { ...link, label: 'About Us', href: '/#about' };
     }
     return link;
   });
@@ -102,7 +118,7 @@ export default function Header({
   const hasAbout = filteredNavLinks.some(l => (l.label || '').toLowerCase().includes('about'));
   if (!hasAbout) {
     const contactIdx = filteredNavLinks.findIndex(l => (l.label || '').toLowerCase().includes('contact'));
-    const aboutLink = { id: 'nav_about', label: 'About Us', href: '/about', isVisible: true };
+    const aboutLink = { id: 'nav_about', label: 'About Us', href: '/#about', isVisible: true };
     if (contactIdx > -1) {
       filteredNavLinks.splice(contactIdx, 0, aboutLink);
     } else {
@@ -195,6 +211,90 @@ export default function Header({
     }
   };
 
+  const isLinkActive = (link) => {
+    const href = (link.href || '').toLowerCase();
+    const label = (link.label || '').toLowerCase();
+
+    if (activeHash) {
+      if (activeHash === '#about' || activeHash === '#choose-us' || activeHash === '#why-choose-us') {
+        return label.includes('about') || href.includes('about') || href.includes('choose');
+      }
+      if (activeHash === '#specials' || activeHash === '#signature') {
+        return label.includes('special');
+      }
+      if (activeHash === '#menu') {
+        return label.includes('menu');
+      }
+      if (activeHash === '#contact') {
+        return label.includes('contact');
+      }
+      if (href.includes(activeHash)) {
+        return true;
+      }
+      return false;
+    }
+
+    if (typeof window !== 'undefined' && window.location.pathname === '/') {
+      return href === '/' || label === 'home';
+    }
+
+    if (typeof window !== 'undefined' && href === window.location.pathname) {
+      return true;
+    }
+
+    return !!link.active;
+  };
+
+  const handleNavClick = (link, safeHref, e) => {
+    const label = (link.label || '').toLowerCase();
+    const href = (safeHref || '').toLowerCase();
+
+    setMobileMenuOpen(false);
+
+    if (label.includes('qr') || href.includes('table-qr')) {
+      if (e && e.preventDefault) e.preventDefault();
+      if (onOpenQrModal) onOpenQrModal();
+      return;
+    }
+
+    if (href.includes('#')) {
+      const hashId = href.split('#')[1];
+      setActiveHash(`#${hashId}`);
+
+      if (typeof window !== 'undefined' && window.location.pathname === '/') {
+        let el = document.getElementById(hashId);
+        if (!el) {
+          if (hashId === 'specials' || hashId === 'signature') {
+            el = document.getElementById('specials') || document.getElementById('menu');
+          } else if (hashId === 'about' || hashId === 'choose-us' || hashId === 'why-choose-us' || hashId === 'about-us') {
+            el = document.getElementById('about') || document.getElementById('choose-us');
+          } else if (hashId === 'contact') {
+            el = document.getElementById('contact');
+          }
+        }
+
+        if (el) {
+          if (e && e.preventDefault) e.preventDefault();
+          el.scrollIntoView({ behavior: 'smooth' });
+          window.history.pushState(null, '', `/#${hashId}`);
+          return;
+        }
+      } else {
+        if (e && e.preventDefault) e.preventDefault();
+        window.location.href = `/#${hashId}`;
+        return;
+      }
+    } else if (href === '/' || href === '') {
+      setActiveHash('');
+      if (typeof window !== 'undefined' && window.location.pathname === '/') {
+        if (e && e.preventDefault) e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.history.pushState(null, '', '/');
+        return;
+      }
+    }
+  };
+
   return (
     <>
       {/* Fixed Top Restaurant Branding & Navigation Bar */}
@@ -232,40 +332,17 @@ export default function Header({
               </div>
             </a>
 
-            {/* Desktop Navigation Links */}
+            {/* Desktop Navigation Links (Centrally Positioned) */}
             <ul className={styles.navLinksList}>
               {activeNavLinks.map((link) => {
                 const safeHref = link.href.startsWith('#') ? `/${link.href}` : link.href;
+                const active = isLinkActive(link);
                 return (
                   <li key={link.label}>
                     <a
                       href={safeHref}
-                      className={link.active ? styles.activeLink : ''}
-                      onClick={(e) => {
-                        const label = (link.label || '').toLowerCase();
-                        const href = (safeHref || '').toLowerCase();
-                        if (label.includes('qr') || href.includes('table-qr')) {
-                          if (e && e.preventDefault) e.preventDefault();
-                          if (onOpenQrModal) onOpenQrModal();
-                          return;
-                        }
-                        if (href.includes('#')) {
-                          const hashId = href.split('#')[1];
-                          if (typeof window !== 'undefined' && window.location.pathname === '/') {
-                            const el = document.getElementById(hashId) || (hashId === 'specials' || hashId === 'signature' ? document.getElementById('menu') : null);
-                            if (el) {
-                              if (e && e.preventDefault) e.preventDefault();
-                              el.scrollIntoView({ behavior: 'smooth' });
-                              window.history.pushState(null, '', `/#${hashId}`);
-                              return;
-                            }
-                          } else {
-                            if (e && e.preventDefault) e.preventDefault();
-                            window.location.href = `/#${hashId}`;
-                            return;
-                          }
-                        }
-                      }}
+                      className={active ? styles.activeLink : ''}
+                      onClick={(e) => handleNavClick(link, safeHref, e)}
                     >
                       {link.label}
                     </a>
@@ -274,52 +351,55 @@ export default function Header({
               })}
             </ul>
 
-            {/* Action Buttons */}
-            <div className={styles.headerActions}>
-              {headerButtons.map((btn) => (
-                <button
-                  key={btn.id || btn.key || btn.name}
-                  type="button"
-                  className={btn.key === 'qrDineIn' ? styles.btnQrCta : styles.btnGoldCta}
-                  style={{
-                    backgroundColor: btn.bgColor || undefined,
-                    color: btn.textColor || undefined,
-                  }}
-                  onClick={(e) => handleButtonClick(btn, e)}
-                >
-                  {btn.icon && <span>{btn.icon}</span>} {btn.text}
-                </button>
-              ))}
-            </div>
+            {/* Right Action & Account Group */}
+            <div className={styles.headerRightSection}>
+              {/* Action Buttons */}
+              <div className={styles.headerActions}>
+                {headerButtons.map((btn) => (
+                  <button
+                    key={btn.id || btn.key || btn.name}
+                    type="button"
+                    className={btn.key === 'qrDineIn' ? styles.btnQrCta : styles.btnGoldCta}
+                    style={{
+                      backgroundColor: btn.bgColor || undefined,
+                      color: btn.textColor || undefined,
+                    }}
+                    onClick={(e) => handleButtonClick(btn, e)}
+                  >
+                    {btn.icon && <span>{btn.icon}</span>} {btn.text}
+                  </button>
+                ))}
+              </div>
 
-            {/* Customer Account / Login CTA & Mobile Hamburger (Grouped on right) */}
-            <div className={styles.headerRightGroup}>
-              {customer ? (
-                <a href="/account" className={styles.btnAccountCta} title="View Profile, Orders & Bills">
-                  <span>👤</span> <span className={styles.accountText}>{customer.name ? customer.name.split(' ')[0] : 'My Account'}</span>
-                </a>
-              ) : (
-                <button
-                  type="button"
-                  className={styles.btnAccountCta}
-                  onClick={onOpenCustomerAuth || (() => { window.location.href = '/account'; })}
-                  title="Customer Sign In & Orders"
-                >
-                  <span>👤</span> <span className={styles.accountText}>Login / Account</span>
-                </button>
-              )}
+              {/* Customer Account / Login CTA & Mobile Hamburger */}
+              <div className={styles.headerRightGroup}>
+                {customer ? (
+                  <a href="/account" className={styles.btnAccountCta} title="View Profile, Orders & Bills">
+                    <span>👤</span> <span className={styles.accountText}>{customer.name ? customer.name.split(' ')[0] : 'My Account'}</span>
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    className={styles.btnAccountCta}
+                    onClick={onOpenCustomerAuth || (() => { window.location.href = '/account'; })}
+                    title="Customer Sign In & Orders"
+                  >
+                    <span>👤</span> <span className={styles.accountText}>Login / Account</span>
+                  </button>
+                )}
 
-              {/* Mobile Hamburger */}
-              <button
-                className={`${styles.hamburger} ${mobileMenuOpen ? styles.hamburgerOpen : ''}`}
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                aria-label="Toggle menu"
-                aria-expanded={mobileMenuOpen}
-              >
-                <span></span>
-                <span></span>
-                <span></span>
-              </button>
+                {/* Mobile Hamburger */}
+                <button
+                  className={`${styles.hamburger} ${mobileMenuOpen ? styles.hamburgerOpen : ''}`}
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  aria-label="Toggle menu"
+                  aria-expanded={mobileMenuOpen}
+                >
+                  <span></span>
+                  <span></span>
+                  <span></span>
+                </button>
+              </div>
             </div>
           </div>
         </header>
@@ -349,37 +429,13 @@ export default function Header({
         <nav className={styles.mobileNav}>
           {activeNavLinks.map((link) => {
             const safeHref = link.href.startsWith('#') ? `/${link.href}` : link.href;
+            const active = isLinkActive(link);
             return (
               <a
                 key={link.label}
                 href={safeHref}
-                className={link.active ? styles.activeLink : ''}
-                onClick={(e) => {
-                  const label = (link.label || '').toLowerCase();
-                  const href = (safeHref || '').toLowerCase();
-                  setMobileMenuOpen(false);
-                  if (label.includes('qr') || href.includes('table-qr')) {
-                    if (e && e.preventDefault) e.preventDefault();
-                    if (onOpenQrModal) onOpenQrModal();
-                    return;
-                  }
-                  if (href.includes('#')) {
-                    const hashId = href.split('#')[1];
-                    if (typeof window !== 'undefined' && window.location.pathname === '/') {
-                      const el = document.getElementById(hashId) || (hashId === 'specials' || hashId === 'signature' ? document.getElementById('menu') : null);
-                      if (el) {
-                        if (e && e.preventDefault) e.preventDefault();
-                        el.scrollIntoView({ behavior: 'smooth' });
-                        window.history.pushState(null, '', `/#${hashId}`);
-                        return;
-                      }
-                    } else {
-                      if (e && e.preventDefault) e.preventDefault();
-                      window.location.href = `/#${hashId}`;
-                      return;
-                    }
-                  }
-                }}
+                className={active ? styles.activeLink : ''}
+                onClick={(e) => handleNavClick(link, safeHref, e)}
               >
                 {link.label}
               </a>

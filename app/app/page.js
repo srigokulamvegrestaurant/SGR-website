@@ -105,7 +105,10 @@ export default function Home() {
     const handleScrollToHash = () => {
       const hash = window.location.hash.replace('#', '');
       if (!hash) return;
-      const el = document.getElementById(hash) || (hash === 'specials' || hash === 'signature' ? document.getElementById('menu') : null);
+      const el = document.getElementById(hash) ||
+        (hash === 'specials' || hash === 'signature' ? (document.getElementById('specials') || document.getElementById('menu')) : null) ||
+        (hash === 'about' || hash === 'choose-us' || hash === 'why-choose-us' || hash === 'about-us' ? (document.getElementById('about') || document.getElementById('choose-us')) : null) ||
+        (hash === 'contact' ? document.getElementById('contact') : null);
       if (el) {
         el.scrollIntoView({ behavior: 'smooth' });
       }
@@ -341,10 +344,12 @@ export default function Home() {
           case 'chooseUs':
           case 'tableQr':
             return (
-              <ChooseUsSection
-                key="chooseUs"
-                onOpenReservationModal={() => setReservationModalOpen(true)}
-              />
+              <div key="about-anchor" id="about" style={{ scrollMarginTop: '90px' }}>
+                <ChooseUsSection
+                  key="chooseUs"
+                  onOpenReservationModal={() => setReservationModalOpen(true)}
+                />
+              </div>
             );
           case 'reviews':
             return (

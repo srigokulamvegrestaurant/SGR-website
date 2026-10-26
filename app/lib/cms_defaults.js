@@ -148,7 +148,7 @@ export const DEFAULT_PAGES = [
   {
     id: 'page_choose_us',
     title: 'Why Choose Us',
-    slug: '/choose-us',
+    slug: '/#about',
     status: 'PUBLISHED',
     isSystem: false,
     inNav: true,
@@ -161,7 +161,7 @@ export const DEFAULT_PAGES = [
   {
     id: 'page_about',
     title: 'About Us & Heritage',
-    slug: '/about',
+    slug: '/#about',
     status: 'PUBLISHED',
     isSystem: false,
     inNav: true,
@@ -304,7 +304,7 @@ export const DEFAULT_HEADER_CONFIG = {
     { id: 'nav_home', label: 'Home', href: '/', isVisible: true, isExternal: false, order: 1 },
     { id: 'nav_specials', label: 'Our Specials', href: '/#specials', isVisible: true, isExternal: false, order: 2 },
     { id: 'nav_menu', label: 'Our Menu', href: '/#menu', isVisible: true, isExternal: false, order: 3 },
-    { id: 'nav_about', label: 'About Us', href: '/about', isVisible: true, isExternal: false, order: 4 },
+    { id: 'nav_about', label: 'About Us', href: '/#about', isVisible: true, isExternal: false, order: 4 },
     { id: 'nav_contact', label: 'Contact', href: '/contact', isVisible: true, isExternal: false, order: 5 },
   ],
   headerActionButtons: ['btn_order_now', 'btn_qr_dine_in'],
@@ -341,7 +341,7 @@ export const DEFAULT_FOOTER_CONFIG = {
   quickLinks: [
     { id: 'ql_home', label: 'Home', href: '/', isVisible: true },
     { id: 'ql_menu', label: 'Our Menu', href: '/#menu', isVisible: true },
-    { id: 'ql_about', label: 'About Us & Heritage', href: '/about', isVisible: true },
+    { id: 'ql_about', label: 'About Us & Heritage', href: '/#about', isVisible: true },
     { id: 'ql_gallery', label: 'Photo Gallery', href: '/gallery', isVisible: true },
     { id: 'ql_contact', label: 'Contact Us', href: '/#contact', isVisible: true },
     { id: 'ql_catering', label: 'Catering & Bulk Orders', href: '/catering', isVisible: true },
