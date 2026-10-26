@@ -17,6 +17,26 @@ const nextConfig = {
         destination: '/#menu',
         permanent: true,
       },
+      {
+        source: '/specials',
+        destination: '/#specials',
+        permanent: true,
+      },
+      {
+        source: '/special',
+        destination: '/#specials',
+        permanent: true,
+      },
+      {
+        source: '/our-specials',
+        destination: '/#specials',
+        permanent: true,
+      },
+      {
+        source: '/our-special',
+        destination: '/#specials',
+        permanent: true,
+      },
     ];
   },
 };

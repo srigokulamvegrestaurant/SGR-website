@@ -208,34 +208,44 @@ export default function Header({
 
             {/* Desktop Navigation Links */}
             <ul className={styles.navLinksList}>
-              {activeNavLinks.map((link) => (
-                <li key={link.label}>
-                  <a
-                    href={link.href}
-                    className={link.active ? styles.activeLink : ''}
-                    onClick={(e) => {
-                      const label = (link.label || '').toLowerCase();
-                      const href = (link.href || '').toLowerCase();
-                      if (label.includes('qr') || href.includes('table-qr')) {
-                        if (e && e.preventDefault) e.preventDefault();
-                        if (onOpenQrModal) onOpenQrModal();
-                        return;
-                      }
-                      if (href.includes('#')) {
-                        const hashId = href.split('#')[1];
-                        const el = document.getElementById(hashId);
-                        if (el) {
+              {activeNavLinks.map((link) => {
+                const safeHref = link.href.startsWith('#') ? `/${link.href}` : link.href;
+                return (
+                  <li key={link.label}>
+                    <a
+                      href={safeHref}
+                      className={link.active ? styles.activeLink : ''}
+                      onClick={(e) => {
+                        const label = (link.label || '').toLowerCase();
+                        const href = (safeHref || '').toLowerCase();
+                        if (label.includes('qr') || href.includes('table-qr')) {
                           if (e && e.preventDefault) e.preventDefault();
-                          el.scrollIntoView({ behavior: 'smooth' });
-                          window.history.pushState(null, '', `/#${hashId}`);
+                          if (onOpenQrModal) onOpenQrModal();
+                          return;
                         }
-                      }
-                    }}
-                  >
-                    {link.label}
-                  </a>
-                </li>
-              ))}
+                        if (href.includes('#')) {
+                          const hashId = href.split('#')[1];
+                          if (typeof window !== 'undefined' && window.location.pathname === '/') {
+                            const el = document.getElementById(hashId) || (hashId === 'specials' || hashId === 'signature' ? document.getElementById('menu') : null);
+                            if (el) {
+                              if (e && e.preventDefault) e.preventDefault();
+                              el.scrollIntoView({ behavior: 'smooth' });
+                              window.history.pushState(null, '', `/#${hashId}`);
+                              return;
+                            }
+                          } else {
+                            if (e && e.preventDefault) e.preventDefault();
+                            window.location.href = `/#${hashId}`;
+                            return;
+                          }
+                        }
+                      }}
+                    >
+                      {link.label}
+                    </a>
+                  </li>
+                );
+              })}
             </ul>
 
             {/* Action Buttons */}
@@ -311,34 +321,44 @@ export default function Header({
         style={mobileMenuOpen ? { top: `${drawerTop}px`, maxHeight: `calc(100vh - ${drawerTop}px)` } : {}}
       >
         <nav className={styles.mobileNav}>
-          {activeNavLinks.map((link) => (
-            <a
-              key={link.label}
-              href={link.href}
-              className={link.active ? styles.activeLink : ''}
-              onClick={(e) => {
-                const label = (link.label || '').toLowerCase();
-                const href = (link.href || '').toLowerCase();
-                setMobileMenuOpen(false);
-                if (label.includes('qr') || href.includes('table-qr')) {
-                  if (e && e.preventDefault) e.preventDefault();
-                  if (onOpenQrModal) onOpenQrModal();
-                  return;
-                }
-                if (href.includes('#')) {
-                  const hashId = href.split('#')[1];
-                  const el = document.getElementById(hashId);
-                  if (el) {
+          {activeNavLinks.map((link) => {
+            const safeHref = link.href.startsWith('#') ? `/${link.href}` : link.href;
+            return (
+              <a
+                key={link.label}
+                href={safeHref}
+                className={link.active ? styles.activeLink : ''}
+                onClick={(e) => {
+                  const label = (link.label || '').toLowerCase();
+                  const href = (safeHref || '').toLowerCase();
+                  setMobileMenuOpen(false);
+                  if (label.includes('qr') || href.includes('table-qr')) {
                     if (e && e.preventDefault) e.preventDefault();
-                    el.scrollIntoView({ behavior: 'smooth' });
-                    window.history.pushState(null, '', `/#${hashId}`);
+                    if (onOpenQrModal) onOpenQrModal();
+                    return;
                   }
-                }
-              }}
-            >
-              {link.label}
-            </a>
-          ))}
+                  if (href.includes('#')) {
+                    const hashId = href.split('#')[1];
+                    if (typeof window !== 'undefined' && window.location.pathname === '/') {
+                      const el = document.getElementById(hashId) || (hashId === 'specials' || hashId === 'signature' ? document.getElementById('menu') : null);
+                      if (el) {
+                        if (e && e.preventDefault) e.preventDefault();
+                        el.scrollIntoView({ behavior: 'smooth' });
+                        window.history.pushState(null, '', `/#${hashId}`);
+                        return;
+                      }
+                    } else {
+                      if (e && e.preventDefault) e.preventDefault();
+                      window.location.href = `/#${hashId}`;
+                      return;
+                    }
+                  }
+                }}
+              >
+                {link.label}
+              </a>
+            );
+          })}
         </nav>
         <div className={styles.mobileActions}>
           {headerButtons.map((btn) => (

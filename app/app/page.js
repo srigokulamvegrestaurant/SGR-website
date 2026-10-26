@@ -99,6 +99,27 @@ export default function Home() {
     }
   }, []);
 
+  // Smooth scroll to target section when landing on or changing hashes (e.g. #specials, #menu, #contact)
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const handleScrollToHash = () => {
+      const hash = window.location.hash.replace('#', '');
+      if (!hash) return;
+      const el = document.getElementById(hash) || (hash === 'specials' || hash === 'signature' ? document.getElementById('menu') : null);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+      }
+    };
+
+    const timer = setTimeout(handleScrollToHash, 300);
+    window.addEventListener('hashchange', handleScrollToHash);
+
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('hashchange', handleScrollToHash);
+    };
+  }, []);
+
   // Fetch published CMS configuration in real time with cache-busting and live polling
   useEffect(() => {
     let ignore = false;
@@ -288,19 +309,23 @@ export default function Home() {
             return <MarqueeTicker key="ticker" items={cms?.content?.marqueeItems} />;
           case 'specials':
             return (
-              <OurSpecials
-                key="specials"
-                categories={cms?.content?.specialCategories}
-                onSelectCategory={handleSelectSpecialCategory}
-              />
+              <div key="specials-anchor" id="specials" style={{ scrollMarginTop: '90px' }}>
+                <OurSpecials
+                  key="specials"
+                  categories={cms?.content?.specialCategories}
+                  onSelectCategory={handleSelectSpecialCategory}
+                />
+              </div>
             );
           case 'sensory':
             return (
-              <SensoryDishes
-                key="sensory"
-                onAddToCart={handleAddToCart}
-                items={cms?.sensoryDishes || (Array.isArray(liveMenu) ? liveMenu.filter(i => (i.isBestseller || i.featured) && i.image) : [])}
-              />
+              <div key="signature-anchor" id="signature" style={{ scrollMarginTop: '90px' }}>
+                <SensoryDishes
+                  key="sensory"
+                  onAddToCart={handleAddToCart}
+                  items={cms?.sensoryDishes || (Array.isArray(liveMenu) ? liveMenu.filter(i => (i.isBestseller || i.featured) && i.image) : [])}
+                />
+              </div>
             );
           case 'menu':
             return (
