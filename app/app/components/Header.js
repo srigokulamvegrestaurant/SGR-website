@@ -6,9 +6,8 @@ import styles from './Header.module.css';
 const NAV_LINKS = [
   { label: 'Home', href: '/', active: true },
   { label: 'Our Specials', href: '/#specials' },
-  { label: 'Full Menu', href: '/#menu' },
-  { label: 'Why Choose Us', href: '/choose-us' },
-  { label: 'About', href: '/about' },
+  { label: 'Our Menu', href: '/#menu' },
+  { label: 'About Us', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ];
 
@@ -74,7 +73,7 @@ export default function Header({
   }, []);
 
   const rawNavLinks = (Array.isArray(navLinks) && navLinks.length > 0) ? navLinks : NAV_LINKS;
-  const activeNavLinks = rawNavLinks.filter((link) => {
+  const filteredNavLinks = rawNavLinks.filter((link) => {
     if (link.isVisible === false) return false;
     const href = (link.href || '').toLowerCase();
     const label = (link.label || '').toLowerCase();
@@ -83,8 +82,35 @@ export default function Header({
     if (label.includes('waiter') || label.includes('staff') || label.includes('admin')) return false;
     if (id.includes('waiter') || id.includes('admin') || id.includes('staff')) return false;
     if (label.includes('signature') || href.includes('signature') || id.includes('signature')) return false;
+    if (label.includes('qr') || href.includes('table-qr') || id.includes('table_qr')) return false;
+    if (label.includes('choose') || href.includes('choose-us') || id.includes('choose')) return false;
     return true;
+  }).map((link) => {
+    const label = (link.label || '').toLowerCase();
+    const id = (link.id || '').toLowerCase();
+    const href = (link.href || '').toLowerCase();
+    if (label.includes('menu') || id.includes('menu') || href.includes('menu')) {
+      return { ...link, label: 'Our Menu', href: '/#menu' };
+    }
+    if (label === 'about' || id.includes('about')) {
+      return { ...link, label: 'About Us', href: '/about' };
+    }
+    return link;
   });
+
+  // Ensure About Us is in the list before Contact if not present
+  const hasAbout = filteredNavLinks.some(l => (l.label || '').toLowerCase().includes('about'));
+  if (!hasAbout) {
+    const contactIdx = filteredNavLinks.findIndex(l => (l.label || '').toLowerCase().includes('contact'));
+    const aboutLink = { id: 'nav_about', label: 'About Us', href: '/about', isVisible: true };
+    if (contactIdx > -1) {
+      filteredNavLinks.splice(contactIdx, 0, aboutLink);
+    } else {
+      filteredNavLinks.push(aboutLink);
+    }
+  }
+
+  const activeNavLinks = filteredNavLinks;
 
   const isExcludedHeaderButton = (b) => {
     const text = `${b.name || ''} ${b.text || ''} ${b.link || ''} ${b.key || ''} ${b.id || ''}`.toLowerCase();
