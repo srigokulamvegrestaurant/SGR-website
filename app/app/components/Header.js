@@ -7,7 +7,7 @@ const NAV_LINKS = [
   { label: 'Home', href: '/', active: true },
   { label: 'Our Specials', href: '/#specials' },
   { label: 'Signature Dishes', href: '/#signature' },
-  { label: 'Full Menu', href: '/menu' },
+  { label: 'Full Menu', href: '/#menu' },
   { label: 'Why Choose Us', href: '/choose-us' },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
@@ -219,6 +219,16 @@ export default function Header({
                       if (label.includes('qr') || href.includes('table-qr')) {
                         if (e && e.preventDefault) e.preventDefault();
                         if (onOpenQrModal) onOpenQrModal();
+                        return;
+                      }
+                      if (href.includes('#')) {
+                        const hashId = href.split('#')[1];
+                        const el = document.getElementById(hashId);
+                        if (el) {
+                          if (e && e.preventDefault) e.preventDefault();
+                          el.scrollIntoView({ behavior: 'smooth' });
+                          window.history.pushState(null, '', `/#${hashId}`);
+                        }
                       }
                     }}
                   >
@@ -313,6 +323,16 @@ export default function Header({
                 if (label.includes('qr') || href.includes('table-qr')) {
                   if (e && e.preventDefault) e.preventDefault();
                   if (onOpenQrModal) onOpenQrModal();
+                  return;
+                }
+                if (href.includes('#')) {
+                  const hashId = href.split('#')[1];
+                  const el = document.getElementById(hashId);
+                  if (el) {
+                    if (e && e.preventDefault) e.preventDefault();
+                    el.scrollIntoView({ behavior: 'smooth' });
+                    window.history.pushState(null, '', `/#${hashId}`);
+                  }
                 }
               }}
             >

@@ -10,6 +10,15 @@ const nextConfig = {
   experimental: {
     cpus: 2,
   },
+  async redirects() {
+    return [
+      {
+        source: '/menu',
+        destination: '/#menu',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;
