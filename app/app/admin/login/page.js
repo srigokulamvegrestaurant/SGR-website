@@ -25,7 +25,6 @@ export default function AdminLoginPage() {
   const [otpExpirySeconds, setOtpExpirySeconds] = useState(300); // 5 minutes
   const [resendCooldownSeconds, setResendCooldownSeconds] = useState(0); // 30s cooldown
   const [resendsRemaining, setResendsRemaining] = useState(3);
-  const [devOtpPreview, setDevOtpPreview] = useState('');
   const [authenticatedUser, setAuthenticatedUser] = useState(null);
 
   // Ref array for 6 OTP input boxes
@@ -132,7 +131,6 @@ export default function AdminLoginPage() {
         setOtpExpirySeconds(data.expiresInSeconds || 300);
         setResendCooldownSeconds(30);
         setResendsRemaining(data.resendsRemaining !== undefined ? data.resendsRemaining : 2);
-        setDevOtpPreview(data.devOtp || '');
         setOtpDigits(['', '', '', '', '', '']);
         setSuccessMsg(data.message || `One-time code dispatched to ${cleanEmail}`);
         if (data.otpTicket) {
@@ -300,11 +298,6 @@ export default function AdminLoginPage() {
     }
   };
 
-  // Quick auto-fill helper for developer preview
-  const handleAutoFillDevOtp = () => {
-    if (!devOtpPreview) return;
-    handlePastedCode(devOtpPreview);
-  };
 
   return (
     <div className={styles.loginWrapper}>
@@ -441,28 +434,6 @@ export default function AdminLoginPage() {
               </button>
             </div>
 
-            {/* Development Mode Security Preview */}
-            {devOtpPreview && (
-              <div className={styles.devOtpBanner}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                  <span>🔐</span>
-                  <div>
-                    <span style={{ fontSize: '0.72rem', color: '#c084fc', textTransform: 'uppercase', fontWeight: 800 }}>
-                      Dev OTP Preview
-                    </span>
-                    <div className={styles.devOtpCode}>{devOtpPreview}</div>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className={styles.btnSecondary}
-                  onClick={handleAutoFillDevOtp}
-                  style={{ background: 'rgba(124, 58, 237, 0.3)', borderColor: '#a855f7', color: '#ffffff' }}
-                >
-                  ⚡ Auto-Fill
-                </button>
-              </div>
-            )}
 
             <label className={styles.label} style={{ textAlign: 'center', marginBottom: '0.5rem' }}>
               Enter 6-Digit Verification Code
