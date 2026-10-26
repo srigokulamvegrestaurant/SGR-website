@@ -13,11 +13,11 @@ export default function Footer({ content, design, pages, footerConfig }) {
     dinner: '6:30 PM – 10:30 PM',
     note: 'Open All 7 Days a Week',
   };
-  const phone = cfg.primaryPhone || '+91 98765 43210';
-  const email = cfg.email || 'contact@srigokulamveg.com';
+  const phone = cfg.primaryPhone || '+91 73583 25113';
+  const email = cfg.email || 'srigokulamvegrestaurant@gmail.com';
   const address = cfg.addressLine1
-    ? `${cfg.addressLine1}, ${cfg.addressLine2 || 'Karaikudi, Tamil Nadu'}`
-    : 'Heritage High Street, Karaikudi, Sivaganga District, Tamil Nadu 630001';
+    ? `${cfg.addressLine1}, ${cfg.addressLine2 || 'Sekkalai, Karaikudi, Tamil Nadu 630003'}`
+    : 'Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai, Sekkalai, Karaikudi, Tamil Nadu 630003';
   const social = cfg.social || {};
   const complianceText = cfg.complianceText || 'All Rights Reserved © 2026 Sri Gokulam Veg Restaurant';
   const rawDevCredit = cfg.developerCreditText || 'Designed & Developed with excellence by';
@@ -45,31 +45,21 @@ export default function Footer({ content, design, pages, footerConfig }) {
 
           {/* Social Links Icons */}
           <div style={{ marginTop: '0.85rem', display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-            {social.instagram && (
-              <a href={social.instagram} target="_blank" rel="noopener noreferrer" title="Instagram" style={{ color: '#f59e0b', fontSize: '1.25rem', textDecoration: 'none' }}>
-                📸
-              </a>
-            )}
-            {social.facebook && (
-              <a href={social.facebook} target="_blank" rel="noopener noreferrer" title="Facebook" style={{ color: '#60a5fa', fontSize: '1.25rem', textDecoration: 'none' }}>
-                📘
-              </a>
-            )}
-            {social.youtube && (
-              <a href={social.youtube} target="_blank" rel="noopener noreferrer" title="YouTube" style={{ color: '#ef4444', fontSize: '1.25rem', textDecoration: 'none' }}>
-                ▶️
-              </a>
-            )}
-            {social.whatsapp && (
-              <a href={social.whatsapp} target="_blank" rel="noopener noreferrer" title="WhatsApp Order" style={{ color: '#10b981', fontSize: '1.25rem', textDecoration: 'none' }}>
-                💬
-              </a>
-            )}
-            {social.maps && (
-              <a href={social.maps} target="_blank" rel="noopener noreferrer" title="Google Maps Location" style={{ color: '#38bdf8', fontSize: '1.25rem', textDecoration: 'none' }}>
-                🗺️
-              </a>
-            )}
+            <a href={social.instagram || 'https://www.instagram.com/srigokulamvegrestaurant/'} target="_blank" rel="noopener noreferrer" title="Instagram" style={{ color: '#f59e0b', fontSize: '1.25rem', textDecoration: 'none' }}>
+              📸
+            </a>
+            <a href={social.facebook || 'https://facebook.com/srigokulamveg'} target="_blank" rel="noopener noreferrer" title="Facebook" style={{ color: '#60a5fa', fontSize: '1.25rem', textDecoration: 'none' }}>
+              📘
+            </a>
+            <a href={social.youtube || 'https://youtube.com/@srigokulamveg'} target="_blank" rel="noopener noreferrer" title="YouTube" style={{ color: '#ef4444', fontSize: '1.25rem', textDecoration: 'none' }}>
+              ▶️
+            </a>
+            <a href={social.whatsapp || 'https://wa.me/917358325113'} target="_blank" rel="noopener noreferrer" title="WhatsApp Order" style={{ color: '#10b981', fontSize: '1.25rem', textDecoration: 'none' }}>
+              💬
+            </a>
+            <a href={social.maps || 'https://maps.app.goo.gl/AhGsiW8B385tBdxx7'} target="_blank" rel="noopener noreferrer" title="Google Maps Location" style={{ color: '#38bdf8', fontSize: '1.25rem', textDecoration: 'none' }}>
+              🗺️
+            </a>
           </div>
 
           {footerLinks.length > 0 && (
@@ -102,10 +92,10 @@ export default function Footer({ content, design, pages, footerConfig }) {
         <div className={styles.infoCol}>
           <h5 className={styles.colTitle}>Karaikudi Location</h5>
           <p className={styles.colText}>
-            <strong>Sri Gokulam Heritage Dining Hall</strong><br />
+            <strong>{cfg.locationTitle || cfg.branchName || 'Sri Gokulam Veg Restaurant'}</strong><br />
             {address}<br />
-            📞 Phone: <strong>{phone}</strong><br />
-            ✉️ Email: <strong>{email}</strong>
+            📞 Phone: <strong><a href={`tel:${phone.replace(/\s+/g, '')}`} style={{ color: 'inherit', textDecoration: 'none' }}>{phone}</a></strong><br />
+            ✉️ Email: <strong><a href={`mailto:${email}`} style={{ color: 'inherit', textDecoration: 'none' }}>{email}</a></strong>
           </p>
         </div>
       </div>

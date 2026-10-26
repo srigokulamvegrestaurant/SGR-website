@@ -113,7 +113,7 @@ export default function CateringPage() {
             </p>
             <div style={{ display: 'flex', gap: '14px', justifyContent: 'center', flexWrap: 'wrap' }}>
               <a
-                href="tel:+919443123456"
+                href="tel:+917358325113"
                 style={{
                   background: '#d97706',
                   color: '#000',
@@ -127,10 +127,10 @@ export default function CateringPage() {
                   gap: '8px',
                 }}
               >
-                📞 Call: +91 94431 23456
+                📞 Call: +91 73583 25113
               </a>
               <a
-                href="https://wa.me/919443123456?text=Vanakkam%2C%20I%20would%20like%20to%20inquire%20about%20catering%20services%20from%20Sri%20Gokulam."
+                href="https://wa.me/917358325113?text=Vanakkam%2C%20I%20would%20like%20to%20inquire%20about%20catering%20services%20from%20Sri%20Gokulam."
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{

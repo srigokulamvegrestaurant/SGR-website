@@ -176,7 +176,7 @@ function TableReservationDialog({ onClose, onReservationConfirmed }) {
 
               <div className={styles.callNotice}>
                 💡 Please arrive 10 minutes prior to your time slot. Need modifications? Call{' '}
-                <strong>+91 98765 43210</strong>.
+                <strong><a href="tel:+917358325113" style={{ color: 'inherit', textDecoration: 'none' }}>+91 73583 25113</a></strong>.
               </div>
 
               <button className={styles.submitBtn} onClick={onClose}>

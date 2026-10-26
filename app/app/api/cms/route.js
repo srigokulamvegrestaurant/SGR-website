@@ -38,7 +38,42 @@ export async function GET() {
           b.icon = '📅';
           b.action = 'reservation';
         }
+        if (b.key === 'contactUs' || b.action === 'tel') {
+          b.target = 'tel:+917358325113';
+        }
+        if (b.key === 'btn_whatsapp' || b.action === 'whatsapp') {
+          b.target = 'https://wa.me/917358325113';
+        }
       });
+    }
+
+    // Guarantee official contact, address, phone and social info
+    if (published) {
+      if (published.header) {
+        published.header.announcementPhone = '+91 73583 25113';
+      }
+      if (published.footer) {
+        published.footer.locationTitle = 'Sri Gokulam Veg Restaurant';
+        published.footer.addressLine1 = 'Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai';
+        published.footer.addressLine2 = 'Sekkalai, Karaikudi, Tamil Nadu 630003';
+        published.footer.phonePrimary = '+91 73583 25113';
+        published.footer.phoneSecondary = '+91 73583 25113';
+        published.footer.email = 'srigokulamvegrestaurant@gmail.com';
+        published.footer.googleMapsUrl = 'https://maps.app.goo.gl/AhGsiW8B385tBdxx7';
+        if (!published.footer.socialLinks) published.footer.socialLinks = {};
+        published.footer.socialLinks.instagram = 'https://www.instagram.com/srigokulamvegrestaurant/';
+        published.footer.socialLinks.whatsapp = 'https://wa.me/917358325113';
+        published.footer.socialLinks.googleMaps = 'https://maps.app.goo.gl/AhGsiW8B385tBdxx7';
+      }
+      if (published.content) {
+        published.content.announcementPhone = '+91 73583 25113';
+        published.content.primaryPhone = '+91 73583 25113';
+        published.content.secondaryPhone = '+91 73583 25113';
+        published.content.email = 'srigokulamvegrestaurant@gmail.com';
+        published.content.address = 'Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai, Sekkalai, Karaikudi, Tamil Nadu 630003';
+        published.content.googleMapsLink = 'https://maps.app.goo.gl/AhGsiW8B385tBdxx7';
+        published.content.instagramLink = 'https://www.instagram.com/srigokulamvegrestaurant/';
+      }
     }
 
     return NextResponse.json(

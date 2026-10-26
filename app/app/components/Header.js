@@ -205,9 +205,9 @@ export default function Header({
         window.open(btn.link, btn.target || '_blank');
       }
     } else if (act === 'tel') {
-      window.location.assign(btn.link || 'tel:+919876543210');
+      window.location.assign(btn.link || 'tel:+917358325113');
     } else if (act === 'whatsapp') {
-      window.open(btn.link || 'https://wa.me/919443123456', '_blank');
+      window.open(btn.link || 'https://wa.me/917358325113', '_blank');
     }
   };
 
@@ -309,7 +309,7 @@ export default function Header({
               </span>
             </div>
             <div className={styles.announcementRight}>
-              <span>📞 Table Reservations &amp; Orders: <strong>{announcement?.announcementPhone || announcement?.primaryPhone || '+91 98765 43210'}</strong></span>
+              <span>📞 Table Reservations &amp; Orders: <strong><a href={`tel:${((announcement?.announcementPhone || announcement?.primaryPhone || '+91 73583 25113')).replace(/\s+/g, '')}`} style={{ color: 'inherit', textDecoration: 'none' }}>{announcement?.announcementPhone || announcement?.primaryPhone || '+91 73583 25113'}</a></strong></span>
             </div>
           </div>
         )}

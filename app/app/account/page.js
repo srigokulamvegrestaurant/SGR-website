@@ -777,7 +777,7 @@ export default function CustomerAccountPage() {
                       <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
                         Ref #{res.id?.slice(-8).toUpperCase()}
                       </div>
-                      <a href="tel:+919876543210" style={{ fontSize: '0.85rem', fontWeight: 700, color: '#d97706', textDecoration: 'none' }}>
+                      <a href="tel:+917358325113" style={{ fontSize: '0.85rem', fontWeight: 700, color: '#d97706', textDecoration: 'none' }}>
                         📞 Modify / Call
                       </a>
                     </div>
@@ -918,7 +918,7 @@ export default function CustomerAccountPage() {
 ========================================
        SRI GOKULAM VEG RESTAURANT
     Pure Vegetarian & Sattvic Cuisine
-       Karaikudi - 630001, TN
+   Mudiyarasan Rd, Karaikudi - 630003
 ========================================
 Bill No: ${selectedSlip.billNumber}
 Date   : ${new Date(selectedSlip.createdAt || Date.now()).toLocaleString('en-IN')}

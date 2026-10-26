@@ -357,9 +357,15 @@ export default function ReviewsSection({ customerReviews, videoReviews }) {
               <p className={styles.googleDesc}>Help Karaikudi travelers discover authentic pure ghee Sattvic food by sharing your review on Google Maps.</p>
             </div>
           </div>
-          <button className={styles.btnGoogleMaps} onClick={handleOpenAddReview}>
+          <a
+            href="https://maps.app.goo.gl/AhGsiW8B385tBdxx7"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.btnGoogleMaps}
+            style={{ textDecoration: 'none' }}
+          >
             <span>⭐</span> Rate Us on Google Maps
-          </button>
+          </a>
         </div>
       </div>
 

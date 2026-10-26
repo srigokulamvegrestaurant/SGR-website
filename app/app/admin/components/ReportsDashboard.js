@@ -1588,7 +1588,7 @@ export default function ReportsDashboard({ initialPeriod = 'today' }) {
               <div style={{ textAlign: 'center', borderBottom: '2px solid #000', paddingBottom: '1rem', marginBottom: '1rem' }}>
                 <h2 style={{ margin: 0, fontSize: '1.4rem', fontWeight: 900 }}>SRI GOKULAM VEG RESTAURANT</h2>
                 <p style={{ margin: '0.2rem 0', fontSize: '0.85rem' }}>Authentic Chettinad Delicacies &amp; Pure Vegetarian Dining</p>
-                <p style={{ margin: '0.1rem 0', fontSize: '0.8rem' }}>Mudiyarasan Salai, Near Bharat Petroleum Bunk, Karaikudi - 630003 | Ph: +91 94431 23456</p>
+                <p style={{ margin: '0.1rem 0', fontSize: '0.8rem' }}>Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai, Sekkalai, Karaikudi - 630003 | Ph: +91 73583 25113</p>
                 <p style={{ margin: '0.1rem 0', fontSize: '0.8rem' }}>GSTIN: 33AABCS1234F1Z8 | FSSAI: 12423018000456</p>
                 <div style={{ marginTop: '0.5rem', fontWeight: 700, fontSize: '0.9rem', textTransform: 'uppercase' }}>
                   EXECUTIVE PERFORMANCE &amp; SALES AUDIT REPORT

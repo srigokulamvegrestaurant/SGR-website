@@ -17,8 +17,8 @@ export default function JsonLd() {
     ],
     description:
       'Authentic Chettinad Sattvic Pure Vegetarian Restaurant in Karaikudi. Specializing in Raja Chettinad Plantain Leaf Meals, Crispy Ghee Roast Dosas, Kuzhi Paniyaram, and Kumbakonam Filter Coffee.',
-    telephone: '+919443123456',
-    email: 'contact@srigokulam.com',
+    telephone: '+91 73583 25113',
+    email: 'srigokulamvegrestaurant@gmail.com',
     priceRange: '₹₹ (₹60 - ₹350)',
     currenciesAccepted: 'INR',
     paymentAccepted: 'Cash, UPI, Credit Card, Debit Card, PhonePe, Google Pay',
@@ -33,10 +33,13 @@ export default function JsonLd() {
     ],
     acceptsReservations: 'True',
     menu: `${baseUrl}/#menu`,
-    hasMap: 'https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Mudiyarasan+Salai+Near+Bharat+Petroleum+Karaikudi',
+    hasMap: 'https://maps.app.goo.gl/AhGsiW8B385tBdxx7',
+    sameAs: [
+      'https://www.instagram.com/srigokulamvegrestaurant/',
+    ],
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Mudiyarasan Salai, Near Bharat Petroleum Bunk and Thevar Silai',
+      streetAddress: 'Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai, Sekkalai',
       addressLocality: 'Karaikudi',
       addressRegion: 'Tamil Nadu',
       postalCode: '630003',
@@ -117,7 +120,7 @@ export default function JsonLd() {
         name: 'Where is Sri Gokulam Veg Restaurant located in Karaikudi?',
         acceptedAnswer: {
           '@type': 'Answer',
-          text: 'Sri Gokulam Veg Restaurant is located on Mudiyarasan Salai, Near Bharat Petroleum Bunk and Thevar Silai, Karaikudi, Tamil Nadu - 630003, India.',
+          text: 'Sri Gokulam Veg Restaurant is located at Sri Gokulam Veg Restaurant, Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai, Sekkalai, Karaikudi, Tamil Nadu 630003.',
         },
       },
       {

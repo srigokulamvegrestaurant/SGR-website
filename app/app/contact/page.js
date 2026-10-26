@@ -62,13 +62,13 @@ export default function ContactPage() {
               <h2 style={{ fontSize: '20px', color: '#fef3c7', margin: '0 0 10px 0' }}>Restaurant Address</h2>
               <p style={{ color: '#d6d3d1', lineHeight: 1.6, margin: '0 0 16px 0', fontSize: '15px' }}>
                 <strong>Sri Gokulam Veg Restaurant</strong><br />
-                Mudiyarasan Salai,<br />
-                Near Bharat Petroleum Bunk and Thevar Silai,<br />
-                Karaikudi, Sivaganga District,<br />
+                Mudiyarasan Rd,<br />
+                near Bharat Petroleum Bunk and Thevar Silai,<br />
+                Sekkalai, Karaikudi,<br />
                 Tamil Nadu - 630003, India.
               </p>
               <a
-                href="https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Mudiyarasan+Salai+Near+Bharat+Petroleum+Karaikudi"
+                href="https://maps.app.goo.gl/AhGsiW8B385tBdxx7"
                 target="_blank"
                 rel="noopener noreferrer"
                 style={{
@@ -124,7 +124,7 @@ export default function ContactPage() {
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                 <a
-                  href="tel:+919443123456"
+                  href="tel:+917358325113"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -138,10 +138,12 @@ export default function ContactPage() {
                     fontWeight: 600,
                   }}
                 >
-                  📱 +91 94431 23456
+                  📞 Phone: +91 73583 25113
                 </a>
                 <a
-                  href="tel:+919876543210"
+                  href="https://wa.me/917358325113"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -155,7 +157,24 @@ export default function ContactPage() {
                     fontWeight: 600,
                   }}
                 >
-                  📞 +91 98765 43210
+                  💬 WhatsApp: +91 73583 25113
+                </a>
+                <a
+                  href="mailto:srigokulamvegrestaurant@gmail.com"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px 16px',
+                    background: '#292524',
+                    borderRadius: '8px',
+                    color: '#fef3c7',
+                    textDecoration: 'none',
+                    fontSize: '15px',
+                    fontWeight: 600,
+                  }}
+                >
+                  ✉️ Email: srigokulamvegrestaurant@gmail.com
                 </a>
                 <button
                   onClick={() => setReservationModalOpen(true)}

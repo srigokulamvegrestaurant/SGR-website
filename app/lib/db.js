@@ -145,7 +145,7 @@ const SEED_DATA = {
       id: 'usr_owner_main',
       fullName: 'Sri Gokulam Admin',
       email: 'srigokulamvegrestaurant@gmail.com',
-      phone: '+91 98765 00000',
+      phone: '+91 73583 25113',
       role: 'DEVELOPER_ADMIN',
       isActive: true,
       isProtected: true,
@@ -214,8 +214,8 @@ const SEED_DATA = {
     serviceChargePercent: 0,
     gstin: '33AABCS1234F1Z8',
     fssai: '12423018000456',
-    address: 'Mudiyarasan Salai, Near Bharat Petroleum Bunk and Thevar Silai, Karaikudi - 630003',
-    phone: '+91 94431 23456',
+    address: 'Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai, Sekkalai, Karaikudi, Tamil Nadu 630003',
+    phone: '+91 73583 25113',
 
     // 1. Restaurant Profile
     profile: {
@@ -223,16 +223,16 @@ const SEED_DATA = {
       restaurantNameTamil: 'ஸ்ரீ கோகுலம் சைவ உணவகம்',
       tagline: 'Authentic Chettinad Sattvic Culinary Heritage',
       logoUrl: '/restaurant_logo.jpg',
-      address: 'Mudiyarasan Salai, Near Bharat Petroleum Bunk and Thevar Silai, Karaikudi, Tamil Nadu - 630003',
+      address: 'Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai, Sekkalai, Karaikudi, Tamil Nadu 630003',
       city: 'Karaikudi',
       district: 'Sivaganga District',
       state: 'Tamil Nadu',
       pincode: '630003',
-      primaryPhone: '+91 94431 23456',
-      secondaryPhone: '+91 98765 43210',
-      whatsappPhone: '+91 94431 23456',
-      email: 'contact@srigokulam.com',
-      supportEmail: 'support@srigokulam.com',
+      primaryPhone: '+91 73583 25113',
+      secondaryPhone: '+91 73583 25113',
+      whatsappPhone: '+91 73583 25113',
+      email: 'srigokulamvegrestaurant@gmail.com',
+      supportEmail: 'srigokulamvegrestaurant@gmail.com',
       gstin: '33AABCS1234F1Z8',
       fssai: '12423018000456',
       panCin: 'AABCS1234F',
@@ -548,9 +548,9 @@ const SEED_DATA = {
       },
       aboutSummary: 'Sri Gokulam Veg Restaurant brings the sacred vegetarian culinary traditions of Chettinad and Tamil Nadu. Every dish is cooked in brass and cast-iron cookware using wood-pressed oils and pure nattu pasu ghee.',
       socialLinks: {
-        instagram: 'https://instagram.com/srigokulam_veg',
+        instagram: 'https://www.instagram.com/srigokulamvegrestaurant/',
         facebook: 'https://facebook.com/srigokulamveg',
-        googleMaps: 'https://maps.google.com/?q=Sri+Gokulam+Veg+Restaurant+Mudiyarasan+Salai+Near+Bharat+Petroleum+Karaikudi',
+        googleMaps: 'https://maps.app.goo.gl/AhGsiW8B385tBdxx7',
         youtube: 'https://youtube.com/@srigokulamveg',
       },
       footerCopyright: '© 2026 Sri Gokulam Veg Restaurant. Crafted by AJ Nanjil Tech Solutions.',
@@ -850,6 +850,16 @@ export function getDb() {
           fullName: 'AJ Tech Solutions',
           email: 'info.ajtechsolutions@gmail.com',
           phone: '+91 98765 43210',
+          role: 'DEVELOPER_ADMIN',
+          isActive: true,
+          isProtected: true,
+          createdAt: '2026-10-15T00:00:00.000Z'
+        },
+        {
+          id: 'usr_owner_main',
+          fullName: 'Sri Gokulam Admin',
+          email: 'srigokulamvegrestaurant@gmail.com',
+          phone: '+91 73583 25113',
           role: 'DEVELOPER_ADMIN',
           isActive: true,
           isProtected: true,
@@ -1285,6 +1295,34 @@ export function getWebsiteCms() {
         f.developerCreditText = 'Designed & Developed with excellence by';
         needsSave = true;
       }
+      f.addressLine1 = 'Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai';
+      f.addressLine2 = 'Sekkalai, Karaikudi, Tamil Nadu 630003';
+      f.primaryPhone = '+91 73583 25113';
+      f.secondaryPhone = '+91 73583 25113';
+      f.email = 'srigokulamvegrestaurant@gmail.com';
+      if (!f.social) f.social = {};
+      f.social.instagram = 'https://www.instagram.com/srigokulamvegrestaurant/';
+      f.social.whatsapp = 'https://wa.me/917358325113';
+      f.social.maps = 'https://maps.app.goo.gl/AhGsiW8B385tBdxx7';
+      needsSave = true;
+    }
+    if (db.website_cms[target]?.header) {
+      db.website_cms[target].header.announcementPhone = '+91 73583 25113';
+      needsSave = true;
+    }
+    if (db.website_cms[target]?.content) {
+      const c = db.website_cms[target].content;
+      c.announcementPhone = '+91 73583 25113';
+      c.primaryPhone = '+91 73583 25113';
+      c.secondaryPhone = '+91 73583 25113';
+      c.email = 'srigokulamvegrestaurant@gmail.com';
+      c.addressLine1 = 'Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai';
+      c.addressLine2 = 'Sekkalai, Karaikudi, Tamil Nadu 630003';
+      if (!c.social) c.social = {};
+      c.social.instagram = 'https://www.instagram.com/srigokulamvegrestaurant/';
+      c.social.whatsapp = 'https://wa.me/917358325113';
+      c.social.maps = 'https://maps.app.goo.gl/AhGsiW8B385tBdxx7';
+      needsSave = true;
     }
   });
 
@@ -1482,6 +1520,34 @@ export async function getWebsiteCmsAsync() {
         f.developerCreditText = 'Designed & Developed with excellence by';
         needsSave = true;
       }
+      f.addressLine1 = 'Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai';
+      f.addressLine2 = 'Sekkalai, Karaikudi, Tamil Nadu 630003';
+      f.primaryPhone = '+91 73583 25113';
+      f.secondaryPhone = '+91 73583 25113';
+      f.email = 'srigokulamvegrestaurant@gmail.com';
+      if (!f.social) f.social = {};
+      f.social.instagram = 'https://www.instagram.com/srigokulamvegrestaurant/';
+      f.social.whatsapp = 'https://wa.me/917358325113';
+      f.social.maps = 'https://maps.app.goo.gl/AhGsiW8B385tBdxx7';
+      needsSave = true;
+    }
+    if (db.website_cms[target]?.header) {
+      db.website_cms[target].header.announcementPhone = '+91 73583 25113';
+      needsSave = true;
+    }
+    if (db.website_cms[target]?.content) {
+      const c = db.website_cms[target].content;
+      c.announcementPhone = '+91 73583 25113';
+      c.primaryPhone = '+91 73583 25113';
+      c.secondaryPhone = '+91 73583 25113';
+      c.email = 'srigokulamvegrestaurant@gmail.com';
+      c.addressLine1 = 'Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai';
+      c.addressLine2 = 'Sekkalai, Karaikudi, Tamil Nadu 630003';
+      if (!c.social) c.social = {};
+      c.social.instagram = 'https://www.instagram.com/srigokulamvegrestaurant/';
+      c.social.whatsapp = 'https://wa.me/917358325113';
+      c.social.maps = 'https://maps.app.goo.gl/AhGsiW8B385tBdxx7';
+      needsSave = true;
     }
   });
 

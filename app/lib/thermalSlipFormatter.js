@@ -5,11 +5,11 @@ export const DEFAULT_BILL_SLIP_FORMAT = {
   restaurantNameEnglish: 'SRI GOKULAM VEG RESTAURANT',
   restaurantNameTamil: 'ஸ்ரீ கோகுலம் சைவ உணவகம்',
   tagline: 'Authentic Pure Vegetarian Chettinad',
-  addressLine1: 'Main Road, Near Kovil',
-  addressLine2: 'Karaikudi, Chettinad, Tamil Nadu - 630001',
-  phonePrimary: '+91 94431 23456',
-  phoneSecondary: '+91 98765 43210',
-  email: 'contact@srigokulam.com',
+  addressLine1: 'Mudiyarasan Rd, near Bharat Petroleum Bunk and Thevar Silai',
+  addressLine2: 'Sekkalai, Karaikudi, Tamil Nadu - 630003',
+  phonePrimary: '+91 73583 25113',
+  phoneSecondary: '+91 73583 25113',
+  email: 'srigokulamvegrestaurant@gmail.com',
   website: 'https://www.srigokulamvegrestaurant.com',
   gstin: '33AABCS1234F1Z8',
   fssaiNumber: '12423018000456',
@@ -127,7 +127,7 @@ export function generateThermalReceiptText({
   if (addr1) receipt += `${centerText(addr1, width)}\n`;
   if (fmt.addressLine2) receipt += `${centerText(fmt.addressLine2, width)}\n`;
 
-  const phoneStr = fmt.phonePrimary || settings?.phone || '+91 94431 23456';
+  const phoneStr = fmt.phonePrimary || settings?.phone || '+91 73583 25113';
   receipt += `${centerText(`Phone: ${phoneStr}`, width)}\n`;
 
   // 5. GSTIN & FSSAI

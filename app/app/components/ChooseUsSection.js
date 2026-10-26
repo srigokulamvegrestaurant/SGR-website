@@ -242,8 +242,8 @@ export default function ChooseUsSection({ onOpenReservationModal }) {
                 <span>📋 Explore Full Menu</span>
               </a>
 
-              <a href="tel:+919876543210" className={styles.btnCall}>
-                <span>📞 +91 98765 43210</span>
+              <a href="tel:+917358325113" className={styles.btnCall}>
+                <span>📞 +91 73583 25113</span>
               </a>
             </div>
           </div>
