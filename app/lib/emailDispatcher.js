@@ -145,7 +145,19 @@ async function sendViaResend({ to, subject, html, text, fromName }) {
   if (!apiKey) return null;
 
   try {
-    const fromAddress = process.env.RESEND_FROM || `${fromName || 'Sri Gokulam'} <onboarding@resend.dev>`;
+    let rawFrom = (process.env.RESEND_FROM || '').trim();
+    // Strip all quotes (single, double, backticks) that may come from environment variable configurations
+    rawFrom = rawFrom.replace(/["'`]/g, '').trim();
+
+    // If empty, or sandbox onboarding, or unverified gmail domain, default to verified custom domain:
+    let fromAddress = rawFrom;
+    if (!fromAddress || fromAddress.includes('onboarding@resend.dev') || fromAddress.includes('@gmail.com') || !fromAddress.includes('@')) {
+      fromAddress = 'Sri Gokulam Veg Restaurant <admin@srigokulamvegrestaurant.com>';
+    } else if (!fromAddress.includes('<') && fromAddress.includes('@')) {
+      // Pure email address like admin@srigokulamvegrestaurant.com -> wrap with display name
+      fromAddress = `${fromName || 'Sri Gokulam Veg Restaurant'} <${fromAddress}>`;
+    }
+
     const res = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -163,7 +175,7 @@ async function sendViaResend({ to, subject, html, text, fromName }) {
 
     const data = await res.json();
     if (res.ok && data.id) {
-      console.log(`[EMAIL-RESEND-SUCCESS] Sent OTP to ${to} via Resend (ID: ${data.id})`);
+      console.log(`[EMAIL-RESEND-SUCCESS] Sent OTP to ${to} via Resend (ID: ${data.id}) from ${fromAddress}`);
       return { success: true, messageId: data.id };
     }
     console.warn('[EMAIL-RESEND-WARN] Resend response:', data);
