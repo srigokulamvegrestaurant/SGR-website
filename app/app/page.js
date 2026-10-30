@@ -161,9 +161,20 @@ export default function Home() {
     }
     fetchCms();
 
-    // Check for CMS changes every 3.5 seconds or when user focuses window
-    const interval = setInterval(fetchCms, 3500);
-    const onFocus = () => fetchCms();
+    // Check for CMS changes every 60 seconds (throttled to conserve network bandwidth & database egress)
+    let lastCmsFetch = Date.now();
+    const interval = setInterval(() => {
+      lastCmsFetch = Date.now();
+      fetchCms();
+    }, 60000);
+
+    const onFocus = () => {
+      // Only refetch on focus if at least 30s passed since the last fetch
+      if (Date.now() - lastCmsFetch > 30000) {
+        lastCmsFetch = Date.now();
+        fetchCms();
+      }
+    };
     window.addEventListener('focus', onFocus);
 
     return () => {

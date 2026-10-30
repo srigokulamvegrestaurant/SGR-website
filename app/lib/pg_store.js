@@ -54,10 +54,39 @@ async function ensureAppStateTable(client) {
         value JSONB NOT NULL,
         updated_at TIMESTAMPTZ DEFAULT NOW()
       );
+      ALTER TABLE public.app_state ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW();
     `);
     tableEnsured = true;
   } catch (e) {
     console.warn('Warning: Could not verify public.app_state table:', e.message);
+  }
+}
+
+/**
+ * Fetch only the timestamp metadata of the state without downloading the heavy JSON payload.
+ * Extremely efficient: ~30 bytes data transfer vs hundreds of kilobytes.
+ * @param {string} key - Key name (e.g. 'restaurant_state')
+ * @returns {Promise<{updatedAt: number}|null>}
+ */
+export async function getAppStateMetadata(key = 'restaurant_state') {
+  const p = getPgPool();
+  if (!p) return null;
+
+  let client = null;
+  try {
+    client = await p.connect();
+    await ensureAppStateTable(client);
+    const res = await client.query('SELECT updated_at FROM public.app_state WHERE key = $1 LIMIT 1', [key]);
+    if (res.rows && res.rows.length > 0) {
+      const ts = res.rows[0].updated_at ? new Date(res.rows[0].updated_at).getTime() : 0;
+      return { updatedAt: ts };
+    }
+    return null;
+  } catch (err) {
+    console.warn(`[PG Store] Could not check timestamp metadata for ${key}:`, err.message);
+    return null;
+  } finally {
+    if (client) client.release();
   }
 }
 
@@ -74,9 +103,13 @@ export async function loadStateFromPg(key = 'restaurant_state') {
   try {
     client = await p.connect();
     await ensureAppStateTable(client);
-    const res = await client.query('SELECT value FROM public.app_state WHERE key = $1 LIMIT 1', [key]);
+    const res = await client.query('SELECT value, updated_at FROM public.app_state WHERE key = $1 LIMIT 1', [key]);
     if (res.rows && res.rows.length > 0 && res.rows[0].value) {
-      return res.rows[0].value;
+      const val = res.rows[0].value;
+      if (val && typeof val === 'object' && res.rows[0].updated_at) {
+        val._pgUpdatedAt = new Date(res.rows[0].updated_at).getTime();
+      }
+      return val;
     }
     return null;
   } catch (err) {
@@ -91,30 +124,33 @@ export async function loadStateFromPg(key = 'restaurant_state') {
  * Save state to PostgreSQL asynchronously
  * @param {string} key - Key name (e.g. 'restaurant_state')
  * @param {Object} data - JavaScript Object to save
- * @returns {Promise<boolean>}
+ * @returns {Promise<{success: boolean, updatedAt?: number}>}
  */
 export async function saveStateToPg(key = 'restaurant_state', data) {
-  if (!data) return false;
+  if (!data) return { success: false };
   const p = getPgPool();
-  if (!p) return false;
+  if (!p) return { success: false };
 
   let client = null;
   try {
     client = await p.connect();
     await ensureAppStateTable(client);
     const jsonStr = JSON.stringify(data);
-    await client.query(
+    const res = await client.query(
       `INSERT INTO public.app_state (key, value, updated_at)
        VALUES ($1, $2::jsonb, NOW())
        ON CONFLICT (key) DO UPDATE
-       SET value = EXCLUDED.value, updated_at = NOW()`,
+       SET value = EXCLUDED.value, updated_at = NOW()
+       RETURNING updated_at`,
       [key, jsonStr]
     );
-    return true;
+    const ts = res.rows && res.rows[0]?.updated_at ? new Date(res.rows[0].updated_at).getTime() : Date.now();
+    return { success: true, updatedAt: ts };
   } catch (err) {
     console.warn(`[PG Store] Could not save ${key} to Postgres:`, err.message);
-    return false;
+    return { success: false };
   } finally {
     if (client) client.release();
   }
 }
+

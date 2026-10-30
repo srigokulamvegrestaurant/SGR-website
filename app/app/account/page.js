@@ -108,8 +108,8 @@ export default function CustomerAccountPage() {
   useEffect(() => {
     if (token) {
       fetchCustomerData(token);
-      // Auto-poll active orders every 4 seconds
-      const timer = setInterval(() => fetchCustomerData(token), 4000);
+      // Auto-poll active orders every 15 seconds
+      const timer = setInterval(() => fetchCustomerData(token), 15000);
       return () => clearInterval(timer);
     }
   }, [token, fetchCustomerData]);

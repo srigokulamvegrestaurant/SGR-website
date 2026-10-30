@@ -38,7 +38,8 @@ export default function CustomerDisplay() {
     };
 
     loadPos();
-    const interval = setInterval(loadPos, 3000);
+    // Gentle fallback poll every 15s (instant updates arrive via SSE EventSource below)
+    const interval = setInterval(loadPos, 15000);
 
     // SSE Realtime
     let evt = null;

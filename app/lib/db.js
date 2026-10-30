@@ -9,7 +9,7 @@ import { DEFAULT_WEBSITE_CMS, createInitialContentSnapshot } from './cms_default
 import { DEFAULT_BILL_SLIP_FORMAT } from './thermalSlipFormatter.js';
 import { DEFAULT_MEAL_SECTIONS } from './meal_sections.js';
 import { OFFICIAL_MENU_ITEMS } from './menu_pdf_items.js';
-import { loadStateFromPg, saveStateToPg } from './pg_store.js';
+import { loadStateFromPg, saveStateToPg, getAppStateMetadata } from './pg_store.js';
 
 // Default protected Developer Admin email addresses (Permanently protected from modification, demotion, deactivation, or deletion)
 export const PROTECTED_DEVELOPER_EMAILS = [
@@ -1017,11 +1017,21 @@ export function getDb() {
   return memoryStore;
 }
 
+// Multi-Tier Supabase In-Memory Cache to prevent high egress data transfer
+let lastPgSyncTime = 0;
+let lastKnownPgUpdatedAt = 0;
+const PG_CACHE_TTL_MS = 45 * 1000; // 45 seconds TTL: eliminates redundant Supabase downloads while keeping state fresh
+
+export function invalidatePgCache() {
+  lastPgSyncTime = 0;
+}
+
 export function saveDb(data) {
   if (data && data.settings) {
     syncLegacySettings(data.settings);
   }
   memoryStore = data;
+  lastPgSyncTime = Date.now();
   try {
     ensureDataStore();
     const targetFile = getDataFilePath();
@@ -1030,7 +1040,11 @@ export function saveDb(data) {
     console.error('Error saving data store to disk:', err);
   }
   // Asynchronously sync to PostgreSQL so images & dishes persist across serverless containers
-  saveStateToPg('restaurant_state', data).catch(() => {});
+  saveStateToPg('restaurant_state', data).then((res) => {
+    if (res && res.updatedAt) {
+      lastKnownPgUpdatedAt = res.updatedAt;
+    }
+  }).catch(() => {});
   return memoryStore;
 }
 
@@ -1039,6 +1053,7 @@ export async function saveDbAsync(data) {
     syncLegacySettings(data.settings);
   }
   memoryStore = data;
+  lastPgSyncTime = Date.now();
   try {
     ensureDataStore();
     const targetFile = getDataFilePath();
@@ -1047,20 +1062,54 @@ export async function saveDbAsync(data) {
     console.error('Error saving data store to disk:', err);
   }
   try {
-    await saveStateToPg('restaurant_state', data);
+    const res = await saveStateToPg('restaurant_state', data);
+    if (res && res.updatedAt) {
+      lastKnownPgUpdatedAt = res.updatedAt;
+    }
   } catch (err) {
     console.warn('Warning: Postgres async save failed:', err.message);
   }
   return memoryStore;
 }
 
-export async function getDbAsync() {
+export async function getDbAsync(options = {}) {
+  const force = options?.force === true;
+  const now = Date.now();
+
+  // Tier 1: In-memory cache hit (0ms latency, 0 bytes network egress)
+  if (!force && memoryStore && Array.isArray(memoryStore.menu) && memoryStore.menu.length > 0 && (now - lastPgSyncTime < PG_CACHE_TTL_MS)) {
+    return memoryStore;
+  }
+
   try {
-    // Resilient check with 6s timeout so network lag never freezes requests
+    // Tier 2: Check timestamp metadata only (~30 bytes query) if cache is expired but memoryStore exists
+    if (!force && memoryStore && Array.isArray(memoryStore.menu) && memoryStore.menu.length > 0 && lastKnownPgUpdatedAt > 0) {
+      try {
+        const metaPromise = getAppStateMetadata('restaurant_state');
+        const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 2500));
+        const meta = await Promise.race([metaPromise, timeoutPromise]);
+
+        if (meta && meta.updatedAt && meta.updatedAt <= lastKnownPgUpdatedAt) {
+          // No changes in database! Renew TTL and serve from memory without downloading heavy payload
+          lastPgSyncTime = now;
+          return memoryStore;
+        }
+      } catch (e) {
+        // Fallback to checking full or memoryStore
+      }
+    }
+
+    // Tier 3: Fetch full state when empty, forced, or remote state was updated
     const pgPromise = loadStateFromPg('restaurant_state');
     const timeoutPromise = new Promise(resolve => setTimeout(() => resolve(null), 6000));
     const pgData = await Promise.race([pgPromise, timeoutPromise]);
     if (pgData && Array.isArray(pgData.menu) && pgData.menu.length > 0) {
+      lastPgSyncTime = now;
+      if (pgData._pgUpdatedAt) {
+        lastKnownPgUpdatedAt = pgData._pgUpdatedAt;
+        delete pgData._pgUpdatedAt;
+      }
+
       if (!Array.isArray(pgData.floor_plans) || pgData.floor_plans.length === 0) {
         pgData.floor_plans = JSON.parse(JSON.stringify(DEFAULT_FLOOR_PLANS));
       }
