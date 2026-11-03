@@ -74,17 +74,7 @@ export default function MenuSection({
     if (Array.isArray(liveMenu) && liveMenu.length > 0) {
       return liveMenu.map((item) => {
         const dishTitle = item.title || item.name || '';
-        let dishImg = item.image || '';
-        if (dishImg && typeof window !== 'undefined') {
-          try {
-            if (item.id) localStorage.setItem('sgr_dish_img_' + item.id, dishImg);
-            if (dishTitle) localStorage.setItem('sgr_dish_img_' + dishTitle, dishImg);
-          } catch (e) {}
-        } else if (!dishImg && typeof window !== 'undefined') {
-          try {
-            dishImg = (item.id ? localStorage.getItem('sgr_dish_img_' + item.id) : '') || (dishTitle ? localStorage.getItem('sgr_dish_img_' + dishTitle) : '') || '';
-          } catch (e) {}
-        }
+        const dishImg = item.image || '';
         return {
           id: item.id,
           title: dishTitle,
@@ -356,7 +346,7 @@ export default function MenuSection({
       ) : displayedItems.length > 0 ? (
         <div className={styles.menuGrid}>
           {displayedItems.map((item) => {
-            const customImg = item.image || (typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + item.id) || localStorage.getItem('sgr_dish_img_' + (item.title || item.name)) || '') : '');
+            const customImg = item.image || '';
             const hasCustomImage = Boolean(customImg);
             const fallbackIcon = getFallbackIconForDish(item.title, item.category, item.mealSection);
 

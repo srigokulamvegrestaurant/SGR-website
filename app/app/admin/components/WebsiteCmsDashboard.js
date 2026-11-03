@@ -4070,7 +4070,39 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Desktop Image URL *</label>
+                <label className={styles.formLabel}>Upload File to GitHub CDN</label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    try {
+                      showNotice('Uploading file to GitHub CDN...', 'info');
+                      const fd = new FormData();
+                      fd.append('file', file);
+                      fd.append('dishTitle', newMediaData.title || file.name);
+                      fd.append('category', newMediaData.category || 'Dishes');
+                      fd.append('folder', 'cms');
+                      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+                      const d = await res.json();
+                      if (d.success) {
+                        setNewMediaData(prev => ({ ...prev, desktopUrl: d.url }));
+                        showNotice('✅ Uploaded to GitHub CDN! CDN URL populated.');
+                      } else {
+                        showNotice(d.error || 'Upload failed', 'error');
+                      }
+                    } catch (err) {
+                      showNotice('Failed to upload file to GitHub CDN', 'error');
+                    }
+                  }}
+                  className={styles.formInput}
+                  style={{ padding: '0.35rem' }}
+                />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label className={styles.formLabel}>Desktop Image URL * (or paste direct CDN URL)</label>
                 <input
                   type="text"
                   value={newMediaData.desktopUrl}

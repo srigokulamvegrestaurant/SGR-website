@@ -3,7 +3,7 @@
   "menu": [
     {
       "id": "dish_bf_01",
-      "image": "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600",
+      "image": "",
       "price": 0,
       "title": "Mini Tiffin",
       "status": "AVAILABLE",

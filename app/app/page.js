@@ -133,24 +133,14 @@ export default function Home() {
         if (!ignore && data.success) {
           if (data.cms) setCms(data.cms);
           if (Array.isArray(data.menu)) {
-            const rawMenu = data.menu;
-            const hydratedMenu = rawMenu.map((item) => {
-              if (item.image && typeof window !== 'undefined') {
-                try {
-                  localStorage.setItem('sgr_dish_img_' + item.id, item.image);
-                  if (item.title) localStorage.setItem('sgr_dish_img_' + item.title, item.image);
-                } catch (e) {}
-                return item;
-              }
-              if (!item.image && typeof window !== 'undefined') {
-                try {
-                  const localImg = localStorage.getItem('sgr_dish_img_' + item.id) || localStorage.getItem('sgr_dish_img_' + item.title);
-                  if (localImg) return { ...item, image: localImg };
-                } catch (e) {}
-              }
-              return item;
-            });
-            setLiveMenu(hydratedMenu);
+            if (typeof window !== 'undefined') {
+              try {
+                Object.keys(localStorage).forEach((k) => {
+                  if (k.startsWith('sgr_dish_img_')) localStorage.removeItem(k);
+                });
+              } catch (e) {}
+            }
+            setLiveMenu(data.menu);
           }
           if (Array.isArray(data.categories)) setLiveCategories(data.categories);
           if (Array.isArray(data.mealSections)) setLiveMealSections(data.mealSections);

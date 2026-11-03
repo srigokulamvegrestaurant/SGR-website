@@ -754,23 +754,14 @@ export default function AdminPage() {
       const data = await res.json();
       if (data.success) {
         const rawItems = data.allMenu || data.menu || [];
-        const hydratedItems = rawItems.map(item => {
-          if (item.image && typeof window !== 'undefined') {
-            try {
-              localStorage.setItem('sgr_dish_img_' + item.id, item.image);
-              if (item.title) localStorage.setItem('sgr_dish_img_' + item.title, item.image);
-            } catch (e) {}
-            return item;
-          }
-          if (!item.image && typeof window !== 'undefined') {
-            try {
-              const localImg = localStorage.getItem('sgr_dish_img_' + item.id) || localStorage.getItem('sgr_dish_img_' + item.title);
-              if (localImg) return { ...item, image: localImg };
-            } catch (e) {}
-          }
-          return item;
-        });
-        setMenuItems(hydratedItems);
+        if (typeof window !== 'undefined') {
+          try {
+            Object.keys(localStorage).forEach((k) => {
+              if (k.startsWith('sgr_dish_img_')) localStorage.removeItem(k);
+            });
+          } catch (e) {}
+        }
+        setMenuItems(rawItems);
         setCategoriesList(data.categories || []);
         setMenuAuditLogs(data.auditLogs || []);
         if (Array.isArray(data.mealSections)) setMealSections(data.mealSections);
@@ -2524,7 +2515,6 @@ Status: SHIFT CLOSED & VERIFIED
     setDishModalMode(mode);
     setDishFormTab('INFO');
     if (mode === 'EDIT' && dish) {
-      const localDishImg = typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + dish.id) || localStorage.getItem('sgr_dish_img_' + dish.title) || '') : '';
       setDishFormData({
         id: dish.id,
         title: dish.title || '',
@@ -2534,7 +2524,7 @@ Status: SHIFT CLOSED & VERIFIED
         price: dish.price !== undefined && dish.price !== null ? dish.price : '',
         portionSize: dish.portionSize || 'Standard (1 Person)',
         prepTime: dish.prepTime || 10,
-        image: dish.image || localDishImg || '',
+        image: dish.image || '',
         description: dish.description || '',
         station: dish.station || 'TIFFIN',
         available: dish.available !== false,
@@ -3048,12 +3038,38 @@ Status: SHIFT CLOSED & VERIFIED
       const compressedDataUrl = await compressImageFile(file, 800, 800, 0.80);
       const estSizeKb = Math.round((compressedDataUrl.length * 3) / 4 / 1024);
 
-      setDishFormData(prev => ({ ...prev, image: compressedDataUrl }));
-      setImageUploadStatus(`Photo ready (${estSizeKb} KB)`);
-      showNotice(`✅ Photo optimized successfully (${estSizeKb} KB)`);
+      setImageUploadStatus('Uploading to GitHub CDN...');
+
+      // 2. Publish to GitHub CDN via upload endpoint
+      const uploadRes = await fetch('/api/admin/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          image: compressedDataUrl,
+          dishTitle: dishFormData.title || dishFormData.tamilTitle || file.name,
+          category: dishFormData.category || '',
+          mealSection: dishFormData.mealSection || '',
+          folder: 'dishes',
+        }),
+      });
+
+      const uploadData = await uploadRes.json();
+      if (!uploadData.success) {
+        throw new Error(uploadData.error || 'Upload to GitHub CDN failed');
+      }
+
+      setDishFormData(prev => ({ ...prev, image: uploadData.url }));
+
+      if (uploadData.provider === 'github_cdn') {
+        setImageUploadStatus(`Live on GitHub CDN (${Math.round((uploadData.sizeBytes || file.size) / 1024)} KB WebP)`);
+        showNotice(`✅ Image live on GitHub CDN! Edge cached via jsDelivr.`);
+      } else {
+        setImageUploadStatus(`Ready (${Math.round((uploadData.sizeBytes || file.size) / 1024)} KB WebP)`);
+        showNotice(uploadData.notice || `✅ Photo processed successfully (${estSizeKb} KB)`);
+      }
     } catch (err) {
       console.error('Image processing error:', err);
-      showNotice('Failed to process image: ' + (err.message || 'Unknown error'), true);
+      showNotice('Failed to upload image: ' + (err.message || 'Unknown error'), true);
       setImageUploadStatus('Image processing failed');
     } finally {
       setImageUploading(false);
@@ -14419,7 +14435,7 @@ Status: SHIFT CLOSED & VERIFIED
                     </div>
                     <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)' }}>
-                        UPLOAD FOOD PHOTO (JPG, PNG, WEBP — AUTO OPTIMIZED):
+                        UPLOAD TO GITHUB CDN (AUTO WEBP OPTIMIZED):
                       </label>
                       <input
                         type="file"
@@ -14429,19 +14445,19 @@ Status: SHIFT CLOSED & VERIFIED
                         className={styles.posDiscountInput}
                         style={{ width: '100%', height: '36px', padding: '0.3rem' }}
                       />
-                      <div style={{ fontSize: '0.7rem', color: imageUploading ? '#3b82f6' : (imageUploadStatus.includes('ready') ? '#10b981' : 'var(--text-muted)') }}>
-                        {imageUploading ? '⏳ Compressing & optimizing photo...' : (imageUploadStatus || 'Client-side canvas compression resizes photos to high-res WebP for instant save and speed.')}
+                      <div style={{ fontSize: '0.7rem', color: imageUploading ? '#3b82f6' : (imageUploadStatus.includes('Live') || imageUploadStatus.includes('Ready') || imageUploadStatus.includes('ready') ? '#10b981' : 'var(--text-muted)') }}>
+                        {imageUploading ? '⏳ Uploading to GitHub & generating CDN link...' : (imageUploadStatus || 'Client-side compression publishes photos to GitHub jsDelivr CDN (zero Supabase database egress impact).')}
                       </div>
                     </div>
                   </div>
 
                   <div>
                     <label style={{ fontSize: '0.75rem', fontWeight: 800, color: 'var(--text-primary)', display: 'block', marginBottom: '0.25rem' }}>
-                      OR DIRECT PHOTO URL:
+                      OR DIRECT PHOTO URL / CDN LINK:
                     </label>
                     <input
                       type="text"
-                      placeholder="https://..."
+                      placeholder="https://cdn.jsdelivr.net/gh/... or https://..."
                       value={dishFormData.image?.startsWith('data:') ? '' : (dishFormData.image || '')}
                       onChange={e => {
                         const val = e.target.value;
@@ -14451,9 +14467,15 @@ Status: SHIFT CLOSED & VERIFIED
                       className={styles.posDiscountInput}
                       style={{ width: '100%', height: '36px' }}
                     />
+                    {dishFormData.image?.includes('cdn.jsdelivr.net') && (
+                      <div style={{ fontSize: '0.68rem', color: '#10b981', marginTop: '0.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <span>⚡ Serving via High-Speed jsDelivr GitHub CDN. Zero database egress impact.</span>
+                        <a href={dishFormData.image} target="_blank" rel="noopener noreferrer" style={{ color: '#38bdf8', textDecoration: 'underline' }}>View file ↗</a>
+                      </div>
+                    )}
                     {dishFormData.image?.startsWith('data:') && (
-                      <div style={{ fontSize: '0.68rem', color: '#10b981', marginTop: '0.2rem' }}>
-                        ✓ Uploaded optimized photo is active (~{Math.round((dishFormData.image.length * 3) / 4 / 1024)} KB WebP). To use a direct URL instead, paste or type it above.
+                      <div style={{ fontSize: '0.68rem', color: '#f59e0b', marginTop: '0.2rem' }}>
+                        ⚠️ Embedded Base64 image detected (~{Math.round((dishFormData.image.length * 3) / 4 / 1024)} KB). Upload a file above to move it to GitHub CDN and eliminate database egress!
                       </div>
                     )}
                   </div>

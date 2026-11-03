@@ -987,22 +987,6 @@ export function getDb() {
           };
         });
       }
-      if (memoryStore && Array.isArray(memoryStore.menu)) {
-        const memImgMap = new Map();
-        memoryStore.menu.forEach(d => {
-          if (d.image) {
-            if (d.id) memImgMap.set(d.id, d.image);
-            if (d.title) memImgMap.set(d.title.trim().toLowerCase(), d.image);
-          }
-        });
-        loaded.menu = loaded.menu.map(d => {
-          if (!d.image) {
-            const match = (d.id && memImgMap.get(d.id)) || (d.title && memImgMap.get(d.title.trim().toLowerCase()));
-            if (match) return { ...d, image: match };
-          }
-          return d;
-        });
-      }
       memoryStore = loaded;
       if (needsSave) {
         saveDb(loaded);
@@ -1117,51 +1101,11 @@ export async function getDbAsync(options = {}) {
         pgData.tables = JSON.parse(JSON.stringify(DEFAULT_TABLES));
       }
 
-      // Merge dish images so that a blank image in pgData never wipes out an existing image from memoryStore or disk
-      const existingImages = new Map();
-      if (memoryStore && Array.isArray(memoryStore.menu)) {
-        memoryStore.menu.forEach(d => {
-          if (d.image) {
-            if (d.id) existingImages.set(d.id, d.image);
-            if (d.title) existingImages.set(d.title.trim().toLowerCase(), d.image);
-          }
-        });
-      }
-      const targetFile = getDataFilePath();
-      if (fs.existsSync(targetFile)) {
-        try {
-          const diskParsed = JSON.parse(fs.readFileSync(targetFile, 'utf-8'));
-          if (diskParsed && Array.isArray(diskParsed.menu)) {
-            diskParsed.menu.forEach(d => {
-              if (d.image) {
-                if (d.id && !existingImages.has(d.id)) existingImages.set(d.id, d.image);
-                if (d.title && !existingImages.has(d.title.trim().toLowerCase())) existingImages.set(d.title.trim().toLowerCase(), d.image);
-              }
-            });
-          }
-        } catch (e) {}
-      }
-
-      let restoredImagesCount = 0;
-      pgData.menu = pgData.menu.map(d => {
-        if (!d.image) {
-          const match = (d.id && existingImages.get(d.id)) || (d.title && existingImages.get(d.title.trim().toLowerCase()));
-          if (match) {
-            restoredImagesCount++;
-            return { ...d, image: match };
-          }
-        }
-        return d;
-      });
-
       memoryStore = pgData;
+      const targetFile = getDataFilePath();
       try {
         fs.writeFileSync(targetFile, JSON.stringify(pgData, null, 2), 'utf-8');
       } catch (e) {}
-
-      if (restoredImagesCount > 0) {
-        saveStateToPg('restaurant_state', pgData).catch(() => {});
-      }
 
       return memoryStore;
     }
