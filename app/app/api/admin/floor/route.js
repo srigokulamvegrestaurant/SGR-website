@@ -32,8 +32,8 @@ export function getBaseUrl(request) {
 export async function GET(request) {
   try {
     const db = await getDbAsync();
-    const tables = (Array.isArray(db.tables) && db.tables.length > 0) ? db.tables : DEFAULT_TABLES;
-    const floorPlans = (Array.isArray(db.floor_plans) && db.floor_plans.length > 0) ? db.floor_plans : DEFAULT_FLOOR_PLANS;
+    const tables = Array.isArray(db.tables) ? db.tables : DEFAULT_TABLES;
+    const floorPlans = Array.isArray(db.floor_plans) ? db.floor_plans : DEFAULT_FLOOR_PLANS;
     const orders = db.orders || [];
     const kots = db.kots || [];
     const reservations = db.reservations || [];
@@ -169,8 +169,8 @@ export async function POST(request) {
     const body = await request.json();
     const { action } = body;
     const db = await getDbAsync();
-    db.floor_plans = (Array.isArray(db.floor_plans) && db.floor_plans.length > 0) ? db.floor_plans : JSON.parse(JSON.stringify(DEFAULT_FLOOR_PLANS));
-    db.tables = (Array.isArray(db.tables) && db.tables.length > 0) ? db.tables : JSON.parse(JSON.stringify(DEFAULT_TABLES));
+    db.floor_plans = Array.isArray(db.floor_plans) ? db.floor_plans : JSON.parse(JSON.stringify(DEFAULT_FLOOR_PLANS));
+    db.tables = Array.isArray(db.tables) ? db.tables : JSON.parse(JSON.stringify(DEFAULT_TABLES));
     db.reservations = db.reservations || [];
     db.waitlist = db.waitlist || [];
     db.session_logs = db.session_logs || [];

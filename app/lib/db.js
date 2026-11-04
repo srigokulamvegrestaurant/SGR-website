@@ -938,14 +938,14 @@ export function getDb() {
         }
       }
 
-      // Auto-migrate: populate floor_plans if missing
-      if (!Array.isArray(loaded.floor_plans) || loaded.floor_plans.length === 0) {
+      // Auto-migrate: populate floor_plans only if completely uninitialized (null/undefined)
+      if (!Array.isArray(loaded.floor_plans)) {
         loaded.floor_plans = JSON.parse(JSON.stringify(DEFAULT_FLOOR_PLANS));
         needsSave = true;
       }
 
-      // Auto-migrate: populate default dining tables if missing
-      if (!Array.isArray(loaded.tables) || loaded.tables.length === 0) {
+      // Auto-migrate: populate default dining tables only if completely uninitialized (null/undefined)
+      if (!Array.isArray(loaded.tables)) {
         loaded.tables = JSON.parse(JSON.stringify(DEFAULT_TABLES));
         needsSave = true;
       }
@@ -1094,10 +1094,10 @@ export async function getDbAsync(options = {}) {
         delete pgData._pgUpdatedAt;
       }
 
-      if (!Array.isArray(pgData.floor_plans) || pgData.floor_plans.length === 0) {
+      if (!Array.isArray(pgData.floor_plans)) {
         pgData.floor_plans = JSON.parse(JSON.stringify(DEFAULT_FLOOR_PLANS));
       }
-      if (!Array.isArray(pgData.tables) || pgData.tables.length === 0) {
+      if (!Array.isArray(pgData.tables)) {
         pgData.tables = JSON.parse(JSON.stringify(DEFAULT_TABLES));
       }
 

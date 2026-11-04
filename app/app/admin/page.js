@@ -237,11 +237,7 @@ export default function AdminPage() {
   const [, setKdsTimerTick] = useState(0);
 
   // Floor plan & Table Management states (20 Requirements)
-  const [floorPlans, setFloorPlans] = useState([
-    { id: 'GROUND_FLOOR', name: 'Ground Floor Dining', tamilName: 'தரைத்தளம் சாப்பாட்டு கூடம்', icon: '🏛️', description: 'Main traditional Chettinad dining area with open counter', floorLevel: 0 },
-    { id: 'AC_HALL', name: 'AC Royal Hall', tamilName: 'ஏசி ராயல் ஹால்', icon: '❄️', description: 'Air-conditioned premium family dining hall', floorLevel: 1 },
-    { id: 'VERANDA', name: 'Chettinad Veranda', tamilName: 'செட்டிநாடு வராண்டா', icon: '🌿', description: 'Traditional open-air courtyard and garden seating', floorLevel: 0 },
-  ]);
+  const [floorPlans, setFloorPlans] = useState([]);
   const [showAddFloorPlanModal, setShowAddFloorPlanModal] = useState(false);
   const [newFloorPlanForm, setNewFloorPlanForm] = useState({
     name: '',
@@ -254,7 +250,7 @@ export default function AdminPage() {
   const [deletePlanPin, setDeletePlanPin] = useState('');
   const [isDeletingPlan, setIsDeletingPlan] = useState(false);
 
-  const [floorSections, setFloorSections] = useState({ GROUND_FLOOR: [], AC_HALL: [], VERANDA: [] });
+  const [floorSections, setFloorSections] = useState({});
   const [floorStats, setFloorStats] = useState({});
   const [floorTables, setFloorTables] = useState([]);
   const [floorReservations, setFloorReservations] = useState([]);
@@ -659,7 +655,7 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (data.success) {
-        if (Array.isArray(data.floorPlans) && data.floorPlans.length > 0) {
+        if (Array.isArray(data.floorPlans)) {
           setFloorPlans(data.floorPlans);
           if (typeof window !== 'undefined') {
             try {
@@ -5213,11 +5209,7 @@ Status: SHIFT CLOSED & VERIFIED
                 >
                   All Sections
                 </button>
-                {(floorPlans.length > 0 ? floorPlans : [
-                  { id: 'GROUND_FLOOR', name: 'Ground Floor', icon: '🏛️' },
-                  { id: 'AC_HALL', name: 'AC Royal Hall', icon: '❄️' },
-                  { id: 'VERANDA', name: 'Chettinad Veranda', icon: '🌿' },
-                ]).map(sec => (
+                {floorPlans.map(sec => (
                   <button
                     key={sec.id}
                     type="button"
@@ -5368,11 +5360,24 @@ Status: SHIFT CLOSED & VERIFIED
               </div>
             )}
 
-            {(floorPlans.length > 0 ? floorPlans : [
-              { id: 'GROUND_FLOOR', name: 'Ground Floor Chettinad Dining', tamilName: 'தரைத்தளம்', icon: '🏛️' },
-              { id: 'AC_HALL', name: 'AC Royal Dining Hall', tamilName: 'ஏசி ராயல் ஹால்', icon: '❄️' },
-              { id: 'VERANDA', name: 'Traditional Courtyard / Veranda', tamilName: 'வராண்டா', icon: '🌿' },
-            ]).map(floorPlan => {
+            {floorPlans.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '3.5rem 1.5rem', background: 'var(--bg-card, #ffffff)', borderRadius: '12px', border: '1px dashed var(--border-subtle, #cbd5e1)', margin: '1rem 0' }}>
+                <div style={{ fontSize: '2.75rem', marginBottom: '0.75rem' }}>🏛️</div>
+                <h3 style={{ fontSize: '1.2rem', fontWeight: 800, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>No Floor Plans Found</h3>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', maxWidth: '420px', margin: '0 auto 1.25rem' }}>
+                  You have deleted or not yet configured any dining floor plans. Click the button below to create your dining sections.
+                </p>
+                <button
+                  type="button"
+                  className={styles.btnFloorAction}
+                  onClick={() => setShowAddFloorPlanModal(true)}
+                  style={{ background: 'rgba(16, 185, 129, 0.2)', color: '#10b981', borderColor: '#10b981', padding: '0.6rem 1.25rem', fontSize: '0.9rem' }}
+                >
+                  ➕ Create Floor Plan
+                </button>
+              </div>
+            ) : (
+              floorPlans.map(floorPlan => {
               const secKey = floorPlan.id || floorPlan.sectionId;
               if (floorFilterSection !== 'ALL' && floorFilterSection !== secKey) return null;
               const secTables = floorTables.filter(tbl => {
@@ -5700,7 +5705,7 @@ Status: SHIFT CLOSED & VERIFIED
                   )}
                 </div>
               );
-            })}
+            }))}
 
             {/* ─── Slide-Over Table Inspector Drawer (Requirements 6, 7, 8, 9, 10, 11, 12, 17) ─── */}
             {floorSelectedTable && (
@@ -12720,15 +12725,15 @@ Status: SHIFT CLOSED & VERIFIED
                   className={styles.posSelectField}
                   style={{ width: '100%', height: '36px' }}
                 >
-                  {(floorPlans.length > 0 ? floorPlans : [
-                    { id: 'GROUND_FLOOR', name: 'Ground Floor Chettinad Dining', icon: '🏛️' },
-                    { id: 'AC_HALL', name: 'AC Royal Dining Hall', icon: '❄️' },
-                    { id: 'VERANDA', name: 'Traditional Courtyard / Veranda', icon: '🌿' },
-                  ]).map(fp => (
-                    <option key={fp.id} value={fp.id}>
-                      {fp.icon || '📍'} {fp.name}
-                    </option>
-                  ))}
+                  {floorPlans.length > 0 ? (
+                    floorPlans.map(fp => (
+                      <option key={fp.id} value={fp.id}>
+                        {fp.icon || '📍'} {fp.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="" disabled>No floor plans created yet</option>
+                  )}
                 </select>
               </div>
 
@@ -12839,15 +12844,15 @@ Status: SHIFT CLOSED & VERIFIED
                   className={styles.posSelectField}
                   style={{ width: '100%', height: '36px' }}
                 >
-                  {(floorPlans.length > 0 ? floorPlans : [
-                    { id: 'GROUND_FLOOR', name: 'Ground Floor Chettinad Dining', icon: '🏛️' },
-                    { id: 'AC_HALL', name: 'AC Royal Dining Hall', icon: '❄️' },
-                    { id: 'VERANDA', name: 'Traditional Courtyard / Veranda', icon: '🌿' },
-                  ]).map(fp => (
-                    <option key={fp.id} value={fp.id}>
-                      {fp.icon || '📍'} {fp.name}
-                    </option>
-                  ))}
+                  {floorPlans.length > 0 ? (
+                    floorPlans.map(fp => (
+                      <option key={fp.id} value={fp.id}>
+                        {fp.icon || '📍'} {fp.name}
+                      </option>
+                    ))
+                  ) : (
+                    <option value="" disabled>No floor plans created yet</option>
+                  )}
                 </select>
               </div>
 

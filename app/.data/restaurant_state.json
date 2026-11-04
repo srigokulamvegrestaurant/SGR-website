@@ -4611,98 +4611,7 @@
   ],
   "orders": [],
   "shifts": [],
-  "tables": [
-    {
-      "id": "tbl_01",
-      "shape": "SQUARE",
-      "status": "AVAILABLE",
-      "section": "GROUND_FLOOR",
-      "capacity": 4,
-      "tableNumber": "01",
-      "assignedWaiter": "Murugan (Floor Captain)"
-    },
-    {
-      "id": "tbl_02",
-      "shape": "SQUARE",
-      "status": "AVAILABLE",
-      "section": "GROUND_FLOOR",
-      "capacity": 4,
-      "tableNumber": "02",
-      "assignedWaiter": "Murugan (Floor Captain)"
-    },
-    {
-      "id": "tbl_03",
-      "shape": "ROUND",
-      "status": "AVAILABLE",
-      "section": "GROUND_FLOOR",
-      "capacity": 2,
-      "tableNumber": "03",
-      "assignedWaiter": "Murugan (Floor Captain)"
-    },
-    {
-      "id": "tbl_04",
-      "shape": "RECTANGLE",
-      "status": "AVAILABLE",
-      "section": "GROUND_FLOOR",
-      "capacity": 6,
-      "tableNumber": "04",
-      "assignedWaiter": "Murugan (Floor Captain)"
-    },
-    {
-      "id": "tbl_05",
-      "shape": "SQUARE",
-      "status": "AVAILABLE",
-      "section": "AC_HALL",
-      "capacity": 4,
-      "tableNumber": "05",
-      "assignedWaiter": "Rajan (POS Cashier)"
-    },
-    {
-      "id": "tbl_06",
-      "shape": "SQUARE",
-      "status": "AVAILABLE",
-      "section": "AC_HALL",
-      "capacity": 4,
-      "tableNumber": "06",
-      "assignedWaiter": "Rajan (POS Cashier)"
-    },
-    {
-      "id": "tbl_07",
-      "shape": "RECTANGLE",
-      "status": "AVAILABLE",
-      "section": "AC_HALL",
-      "capacity": 6,
-      "tableNumber": "07",
-      "assignedWaiter": "Rajan (POS Cashier)"
-    },
-    {
-      "id": "tbl_08",
-      "shape": "ROUND",
-      "status": "AVAILABLE",
-      "section": "VERANDA",
-      "capacity": 2,
-      "tableNumber": "08",
-      "assignedWaiter": "Murugan (Floor Captain)"
-    },
-    {
-      "id": "tbl_09",
-      "shape": "SQUARE",
-      "status": "AVAILABLE",
-      "section": "VERANDA",
-      "capacity": 4,
-      "tableNumber": "09",
-      "assignedWaiter": "Murugan (Floor Captain)"
-    },
-    {
-      "id": "tbl_10",
-      "shape": "SQUARE",
-      "status": "AVAILABLE",
-      "section": "VERANDA",
-      "capacity": 4,
-      "tableNumber": "10",
-      "assignedWaiter": "Murugan (Floor Captain)"
-    }
-  ],
+  "tables": [],
   "recipes": [],
   "expenses": [],
   "sessions": [],
@@ -5325,35 +5234,7 @@
       "displayOrder": 13
     }
   ],
-  "floor_plans": [
-    {
-      "id": "GROUND_FLOOR",
-      "icon": "🏛️",
-      "name": "Ground Floor Dining",
-      "isDefault": true,
-      "tamilName": "தரைத்தளம் சாப்பாட்டு கூடம்",
-      "floorLevel": 0,
-      "description": "Main traditional Chettinad dining area with open counter"
-    },
-    {
-      "id": "AC_HALL",
-      "icon": "❄️",
-      "name": "AC Royal Hall",
-      "isDefault": true,
-      "tamilName": "ஏசி ராயல் ஹால்",
-      "floorLevel": 1,
-      "description": "Air-conditioned premium family dining hall"
-    },
-    {
-      "id": "VERANDA",
-      "icon": "🌿",
-      "name": "Chettinad Veranda",
-      "isDefault": true,
-      "tamilName": "செட்டிநாடு வராண்டா",
-      "floorLevel": 0,
-      "description": "Traditional open-air courtyard and breezy garden seating"
-    }
-  ],
+  "floor_plans": [],
   "held_orders": [],
   "refund_logs": [],
   "website_cms": {
