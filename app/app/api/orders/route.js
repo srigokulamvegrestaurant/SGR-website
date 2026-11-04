@@ -88,6 +88,10 @@ export async function POST(request) {
       stationItems[station].push(item);
     });
 
+    const isStaffPunch = Boolean(body.isStaffPunch || body.verifiedBy);
+    const initialStatus = isStaffPunch ? 'cooking' : (body.status || 'otp_pending');
+    const staffName = body.verifiedBy || (isStaffPunch ? 'Captain Murugan (Floor Lead)' : null);
+
     const newOrder = {
       id: kotId,
       orderId: kotId,
@@ -107,17 +111,32 @@ export async function POST(request) {
       sgst,
       totalAmount,
       stationRouting: stationItems,
-      status: 'otp_pending', // 'otp_pending' | 'cooking' | 'plating' | 'served' | 'completed'
+      status: initialStatus, // 'otp_pending' | 'cooking' | 'plating' | 'served' | 'completed'
       prepTimeMinutes: 12,
       createdAt: new Date().toISOString(),
       placedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      verifiedBy: null,
-      verifiedAt: null,
+      verifiedBy: staffName,
+      verifiedAt: isStaffPunch ? new Date().toISOString() : null,
     };
 
     // Store in orders list
     if (!db.orders) db.orders = [];
     db.orders.unshift(newOrder);
+
+    // If add-on order, merge items into active parent order for unified billing
+    if (body.isAddon && body.parentOrderId) {
+      const parentOrder = (db.orders || []).find(
+        (o) => o.orderId === body.parentOrderId || o.id === body.parentOrderId
+      );
+      if (parentOrder) {
+        parentOrder.items = [...(parentOrder.items || []), ...items];
+        parentOrder.subtotal = Math.round(((parentOrder.subtotal || 0) + subtotal) * 100) / 100;
+        parentOrder.cgst = Math.round(((parentOrder.cgst || 0) + cgst) * 100) / 100;
+        parentOrder.sgst = Math.round(((parentOrder.sgst || 0) + sgst) * 100) / 100;
+        parentOrder.totalAmount = Math.round(((parentOrder.totalAmount || 0) + totalAmount) * 100) / 100;
+        parentOrder.updatedAt = new Date().toISOString();
+      }
+    }
 
     // Update table statuses to OCCUPIED if dining in
     if (tables && tables.length > 0) {
@@ -145,18 +164,31 @@ export async function POST(request) {
 
     await saveDbAsync(db);
 
-    // Broadcast real-time event to all connected waiter devices
+    // Broadcast real-time event to all connected waiter & KDS devices
     try {
-      broadcast({
-        type: 'NEW_ORDER_OTP_PENDING',
-        orderId: newOrder.orderId,
-        table: newOrder.tables[0] || 'Takeaway',
-        guestName: newOrder.guestName,
-        guestCount: newOrder.guestCount,
-        itemCount: newOrder.items.length,
-        totalAmount: newOrder.totalAmount,
-        message: `🔔 New order ${newOrder.tables[0] ? `at Table #${newOrder.tables[0]}` : '(Takeaway)'} — ${newOrder.guestName} (${newOrder.items.length} items). OTP pending!`,
-      });
+      if (initialStatus === 'cooking') {
+        broadcast({
+          type: 'ORDER_STATUS_UPDATE',
+          orderId: newOrder.orderId,
+          table: newOrder.tables[0] || 'Takeaway',
+          newStatus: 'cooking',
+          verifiedBy: newOrder.verifiedBy,
+          itemCount: newOrder.items.length,
+          totalAmount: newOrder.totalAmount,
+          message: `🔥 Direct KOT fired for Table #${newOrder.tables[0]} by ${newOrder.verifiedBy} (${newOrder.items.length} items)!`,
+        });
+      } else {
+        broadcast({
+          type: 'NEW_ORDER_OTP_PENDING',
+          orderId: newOrder.orderId,
+          table: newOrder.tables[0] || 'Takeaway',
+          guestName: newOrder.guestName,
+          guestCount: newOrder.guestCount,
+          itemCount: newOrder.items.length,
+          totalAmount: newOrder.totalAmount,
+          message: `🔔 New order ${newOrder.tables[0] ? `at Table #${newOrder.tables[0]}` : '(Takeaway)'} — ${newOrder.guestName} (${newOrder.items.length} items). OTP pending!`,
+        });
+      }
     } catch (e) { /* SSE not yet initialized, silent */ }
 
     return NextResponse.json({
