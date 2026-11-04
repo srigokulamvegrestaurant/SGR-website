@@ -1683,6 +1683,7 @@ Status: SHIFT CLOSED & VERIFIED
         body: JSON.stringify({
           action: 'DELETE_FLOOR_PLAN',
           id: floorPlanToDelete.id,
+          floorPlanId: floorPlanToDelete.id,
           managerPin: deletePlanPin || '1234',
         }),
       });

@@ -216,12 +216,14 @@ export async function POST(request) {
 
     // ─── 0B. Delete Floor Plan with Confirmation ───
     if (action === 'DELETE_FLOOR_PLAN') {
-      const { floorPlanId, managerPin } = body;
+      const floorPlanId = body.floorPlanId || body.id;
+      const { managerPin } = body;
       if (!floorPlanId) {
         return NextResponse.json({ success: false, error: 'Floor plan ID is required' }, { status: 400 });
       }
 
-      if (managerPin && managerPin !== '1234' && managerPin !== '4321') {
+      const validPins = ['1234', '4321', String(db.settings?.orders?.managerPin || '').trim()].filter(Boolean);
+      if (managerPin && !validPins.includes(String(managerPin).trim())) {
         return NextResponse.json({ success: false, error: 'Invalid Manager PIN' }, { status: 403 });
       }
 
@@ -376,7 +378,8 @@ export async function POST(request) {
     // ─── 5. Delete / Deactivate Table (Requirement 3 & 20) ───
     if (action === 'DELETE_TABLE') {
       const { tableNumber, managerPin } = body;
-      if (managerPin !== '1234') {
+      const validPins = ['1234', '4321', String(db.settings?.orders?.managerPin || '').trim()].filter(Boolean);
+      if (managerPin && !validPins.includes(String(managerPin).trim())) {
         return NextResponse.json({ success: false, error: 'Invalid Manager PIN for table deletion' }, { status: 403 });
       }
 
