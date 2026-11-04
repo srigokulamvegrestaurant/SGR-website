@@ -35,8 +35,43 @@ function sanitizeSettingsForClient(settings) {
     if (cloned.integrations.email) {
       cloned.integrations.email.apiKey = maskSecret(cloned.integrations.email.apiKey);
     }
-    if (cloned.integrations.githubCdn) {
-      cloned.integrations.githubCdn.token = maskSecret(cloned.integrations.githubCdn.token);
+    if (!cloned.integrations.githubCdn) {
+      cloned.integrations.githubCdn = {};
+    }
+    const rawGithubToken = cloned.integrations.githubCdn.token || process.env.GITHUB_TOKEN || '';
+    cloned.integrations.githubCdn.token = maskSecret(rawGithubToken);
+    if (!cloned.integrations.githubCdn.owner) {
+      cloned.integrations.githubCdn.owner = process.env.GITHUB_OWNER || 'srigokulamvegrestaurant';
+    }
+    if (!cloned.integrations.githubCdn.branch) {
+      cloned.integrations.githubCdn.branch = process.env.GITHUB_BRANCH || 'main';
+    }
+    if (!cloned.integrations.githubCdn.repos) {
+      cloned.integrations.githubCdn.repos = {
+        tiffin: {
+          name: process.env.GITHUB_REPO_TIFFIN || 'SGR-Menu-Tiffin-img',
+          role: 'Morning Tiffin, Idli, Dosa, Pongal, Vada Delicacies',
+          category: 'Tiffin / Breakfast',
+        },
+        lunch: {
+          name: process.env.GITHUB_REPO_LUNCH || 'SGR-Menu-Lunch-img',
+          role: 'Midday Raja Meals, Rice Varieties, Thali & Gravies',
+          category: 'Meals / Lunch',
+        },
+        snacks: {
+          name: process.env.GITHUB_REPO_SNACKS || 'SGR-Menu-Snacks-img',
+          role: 'Evening Snacks, Filter Coffee, Tea, Savories & Sweets',
+          category: 'Snacks / Beverages',
+        },
+        dinner: {
+          name: process.env.GITHUB_REPO_DINNER || process.env.GITHUB_REPO || 'SGR-Menu-Image',
+          role: 'Evening Dinner, Multi-course Platters, Hero Banners & Fallbacks',
+          category: 'Dinner / General',
+        },
+      };
+    }
+    if (!Array.isArray(cloned.integrations.githubCdn.customRepos)) {
+      cloned.integrations.githubCdn.customRepos = [];
     }
   }
 
@@ -591,29 +626,184 @@ export async function POST(request) {
 
       // 6.4 GitHub CDN Test
       if (integrationName === 'githubCdn') {
-        const token = config?.token && !config.token.includes('••••')
-          ? config.token
-          : db.settings.integrations.githubCdn?.token || '';
-        const repo = config?.repo || db.settings.integrations.githubCdn?.repo || '';
+        const token = (
+          config?.token && !config.token.includes('••••')
+            ? config.token
+            : db.settings?.integrations?.githubCdn?.token || process.env.GITHUB_TOKEN || ''
+        ).trim();
 
-        if (!token || !repo) {
+        const owner = (
+          config?.owner ||
+          db.settings?.integrations?.githubCdn?.owner ||
+          process.env.GITHUB_OWNER ||
+          'srigokulamvegrestaurant'
+        ).trim();
+
+        const branch = (
+          config?.branch ||
+          db.settings?.integrations?.githubCdn?.branch ||
+          process.env.GITHUB_BRANCH ||
+          'main'
+        ).trim();
+
+        const reposConfig = config?.repos || db.settings?.integrations?.githubCdn?.repos || {
+          tiffin: {
+            name: process.env.GITHUB_REPO_TIFFIN || 'SGR-Menu-Tiffin-img',
+            role: 'Morning Tiffin, Idli, Dosa, Pongal, Vada Delicacies',
+            category: 'Tiffin / Breakfast',
+          },
+          lunch: {
+            name: process.env.GITHUB_REPO_LUNCH || 'SGR-Menu-Lunch-img',
+            role: 'Midday Raja Meals, Rice Varieties, Thali & Gravies',
+            category: 'Meals / Lunch',
+          },
+          snacks: {
+            name: process.env.GITHUB_REPO_SNACKS || 'SGR-Menu-Snacks-img',
+            role: 'Evening Snacks, Filter Coffee, Tea, Savories & Sweets',
+            category: 'Snacks / Beverages',
+          },
+          dinner: {
+            name: process.env.GITHUB_REPO_DINNER || process.env.GITHUB_REPO || 'SGR-Menu-Image',
+            role: 'Evening Dinner, Multi-course Platters, Hero Banners & Fallbacks',
+            category: 'Dinner / General',
+          },
+        };
+
+        const customRepos = Array.isArray(config?.customRepos)
+          ? config.customRepos
+          : db.settings?.integrations?.githubCdn?.customRepos || [];
+
+        if (!token) {
           verifiedStatus = 'NOT_CONFIGURED';
-          verificationMessage = 'GitHub Repository name and Access Token are required.';
-        } else if (!repo.includes('/')) {
-          verifiedStatus = 'VERIFICATION_FAILED';
-          verificationMessage = 'Repository must be in "owner/repo" format (e.g., Sri-Gokulam-Veg-Restaurant/assets).';
+          verificationMessage = 'GitHub Personal Access Token is required. Please configure your token.';
         } else {
-          isConnected = true;
-          verifiedStatus = 'VERIFIED';
-          verificationMessage = `GitHub CDN connection verified for repo: ${repo}.`;
+          try {
+            // 1. Verify user identity
+            const userRes = await fetch('https://api.github.com/user', {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/vnd.github+json',
+                'User-Agent': 'Sri-Gokulam-App',
+                'X-GitHub-Api-Version': '2022-11-28',
+              },
+            });
+
+            if (!userRes.ok) {
+              const uErr = await userRes.json().catch(() => ({}));
+              verifiedStatus = 'VERIFICATION_FAILED';
+              verificationMessage = uErr.message || `GitHub authentication failed (HTTP ${userRes.status}). Check personal access token.`;
+            } else {
+              const userData = await userRes.json();
+              const ghUsername = userData.login;
+
+              // 2. Test all configured repositories
+              const repoItems = [
+                ...Object.entries(reposConfig).map(([key, item]) => ({
+                  key,
+                  name: typeof item === 'object' ? item.name : item,
+                  role: typeof item === 'object' ? item.role : '',
+                  category: typeof item === 'object' ? item.category : '',
+                  isCore: true,
+                })),
+                ...customRepos.map((cr, idx) => ({
+                  key: `custom_${idx}`,
+                  name: cr.name,
+                  role: cr.role || 'Custom Asset Storage',
+                  category: cr.category || 'Custom',
+                  isCore: false,
+                })),
+              ];
+
+              const verifiedRepoResults = [];
+              let verifiedCount = 0;
+
+              for (const r of repoItems) {
+                if (!r.name) continue;
+                const cleanRepo = r.name.includes('/') ? r.name.split('/')[1] : r.name;
+                const repoOwner = r.name.includes('/') ? r.name.split('/')[0] : owner;
+
+                try {
+                  const rRes = await fetch(`https://api.github.com/repos/${repoOwner}/${cleanRepo}`, {
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      Accept: 'application/vnd.github+json',
+                      'User-Agent': 'Sri-Gokulam-App',
+                      'X-GitHub-Api-Version': '2022-11-28',
+                    },
+                  });
+
+                  if (rRes.ok) {
+                    const rData = await rRes.json();
+                    verifiedCount++;
+                    verifiedRepoResults.push({
+                      name: cleanRepo,
+                      fullName: `${repoOwner}/${cleanRepo}`,
+                      role: r.role,
+                      category: r.category,
+                      status: 'VERIFIED',
+                      canPush: Boolean(rData.permissions?.push),
+                      isPrivate: Boolean(rData.private),
+                      cdnUrl: `https://cdn.jsdelivr.net/gh/${repoOwner}/${cleanRepo}@${branch}/dishes/`,
+                    });
+                  } else {
+                    verifiedRepoResults.push({
+                      name: cleanRepo,
+                      fullName: `${repoOwner}/${cleanRepo}`,
+                      role: r.role,
+                      category: r.category,
+                      status: 'NOT_FOUND',
+                      error: `HTTP ${rRes.status}`,
+                    });
+                  }
+                } catch (rErr) {
+                  verifiedRepoResults.push({
+                    name: cleanRepo,
+                    fullName: `${repoOwner}/${cleanRepo}`,
+                    role: r.role,
+                    category: r.category,
+                    status: 'ERROR',
+                    error: rErr.message,
+                  });
+                }
+              }
+
+              if (verifiedCount > 0) {
+                isConnected = true;
+                verifiedStatus = 'VERIFIED';
+                verificationMessage = `Connected as @${ghUsername}! Verified ${verifiedCount}/${repoItems.length} CDN repositories with write permissions.`;
+              } else {
+                verifiedStatus = 'VERIFICATION_FAILED';
+                verificationMessage = `Connected as @${ghUsername}, but none of the repositories were found under ${owner}. Check repository names.`;
+              }
+
+              db.settings.integrations.githubCdn = {
+                ...db.settings.integrations.githubCdn,
+                ...config,
+                token: token,
+                owner,
+                branch,
+                repos: reposConfig,
+                customRepos,
+                verifiedUser: ghUsername,
+                verifiedRepos: verifiedRepoResults,
+                status: verifiedStatus,
+                lastVerifiedAt: isConnected ? new Date().toISOString() : null,
+              };
+            }
+          } catch (netErr) {
+            verifiedStatus = 'VERIFICATION_FAILED';
+            verificationMessage = `Network error connecting to GitHub: ${netErr.message}`;
+          }
         }
 
-        db.settings.integrations.githubCdn = {
-          ...db.settings.integrations.githubCdn,
-          ...config,
-          status: verifiedStatus,
-          lastVerifiedAt: isConnected ? new Date().toISOString() : null,
-        };
+        if (verifiedStatus !== 'VERIFIED') {
+          db.settings.integrations.githubCdn = {
+            ...db.settings.integrations.githubCdn,
+            ...config,
+            status: verifiedStatus,
+            lastVerifiedAt: null,
+          };
+        }
       }
 
       await saveDbAsync(db);

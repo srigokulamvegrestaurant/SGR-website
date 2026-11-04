@@ -2846,14 +2846,23 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
                 </div>
               </div>
 
-              {/* 4. GitHub Image CDN */}
-              <div style={{ border: '1px solid var(--border-subtle, #27272a)', borderRadius: 10, padding: '1.25rem', marginTop: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                    <span style={{ fontSize: '1.4rem' }}>🐙</span>
+              {/* 4. GitHub Image CDN Multi-Repository Publishing */}
+              <div style={{ border: '1px solid var(--border-subtle, #27272a)', borderRadius: 12, padding: '1.35rem', marginTop: '1.25rem', background: 'rgba(255,255,255,0.01)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                    <span style={{ fontSize: '1.8rem', background: 'rgba(255,255,255,0.05)', padding: '0.4rem', borderRadius: '10px' }}>🐙</span>
                     <div>
-                      <strong style={{ fontSize: '1rem', color: 'var(--text-primary)' }}>GitHub Image CDN Publishing</strong>
-                      <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>Automated commit of dish images to repository</div>
+                      <strong style={{ fontSize: '1.05rem', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        GitHub Image CDN Multi-Repository Publishing
+                        {integ.githubCdn?.verifiedUser && (
+                          <span style={{ fontSize: '0.72rem', color: '#10b981', background: 'rgba(16, 185, 129, 0.1)', padding: '0.15rem 0.5rem', borderRadius: '12px', border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+                            ✓ @{integ.githubCdn.verifiedUser}
+                          </span>
+                        )}
+                      </strong>
+                      <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
+                        Automated commit of dish images directly to specialized GitHub repositories with zero-egress jsDelivr Edge CDN
+                      </div>
                     </div>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
@@ -2861,43 +2870,319 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
                       className={`${styles.statusBadge} ${
                         integ.githubCdn?.status === 'VERIFIED'
                           ? styles.statusVerified
+                          : integ.githubCdn?.status === 'VERIFICATION_FAILED'
+                          ? styles.statusDanger
                           : styles.statusNotConfigured
                       }`}
                     >
-                      {integ.githubCdn?.status || 'NOT_CONFIGURED'}
+                      {integ.githubCdn?.status === 'VERIFIED'
+                        ? '🟢 VERIFIED'
+                        : integ.githubCdn?.status === 'VERIFICATION_FAILED'
+                        ? '🔴 VERIFICATION_FAILED'
+                        : '🟡 NOT_CONFIGURED'}
                     </span>
                     <button
                       type="button"
                       className={`${styles.btnSecondary} ${styles.btnSm}`}
                       onClick={() => handleTestIntegration('githubCdn')}
                       disabled={testingIntegration === 'githubCdn'}
+                      style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', background: '#2563eb', color: '#fff', border: 'none' }}
                     >
-                      {testingIntegration === 'githubCdn' ? 'Testing...' : 'Test Connection'}
+                      {testingIntegration === 'githubCdn' ? '⏳ Verifying Repos...' : '⚡ Test All Connections'}
                     </button>
                   </div>
                 </div>
 
-                <div className={styles.formGrid2}>
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>GitHub Repository (owner/repo)</label>
-                    <input
-                      type="text"
-                      className={styles.input}
-                      value={integ.githubCdn?.repo || ''}
-                      onChange={(e) => handleUpdateField('integrations', 'githubCdn.repo', e.target.value)}
-                    />
+                {/* Account Credentials */}
+                <div style={{ background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: 8, marginBottom: '1.25rem', border: '1px solid var(--border-subtle, #27272a)' }}>
+                  <div style={{ fontSize: '0.78rem', fontWeight: 800, color: 'var(--text-secondary)', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.75rem' }}>
+                    🔐 GitHub Account &amp; Access Authentication
                   </div>
-                  <div className={styles.formGroup}>
-                    <label className={styles.label}>Personal Access Token</label>
-                    <input
-                      type="password"
-                      placeholder="ghp_••••••••••••"
-                      className={styles.input}
-                      value={integ.githubCdn?.token || ''}
-                      onChange={(e) => handleUpdateField('integrations', 'githubCdn.token', e.target.value)}
-                    />
+                  <div className={styles.formGrid3}>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>GitHub Owner / Organization</label>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder="srigokulamvegrestaurant"
+                        value={integ.githubCdn?.owner || 'srigokulamvegrestaurant'}
+                        onChange={(e) => handleUpdateField('integrations', 'githubCdn.owner', e.target.value)}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Personal Access Token (PAT)</label>
+                      <input
+                        type="password"
+                        placeholder="ghp_••••••••••••"
+                        className={styles.input}
+                        value={integ.githubCdn?.token || ''}
+                        onChange={(e) => handleUpdateField('integrations', 'githubCdn.token', e.target.value)}
+                      />
+                    </div>
+                    <div className={styles.formGroup}>
+                      <label className={styles.label}>Target Branch</label>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder="main"
+                        value={integ.githubCdn?.branch || 'main'}
+                        onChange={(e) => handleUpdateField('integrations', 'githubCdn.branch', e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
+
+                {/* Multi-Repository Architecture & Roles */}
+                <div style={{ marginBottom: '1.25rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                    <div>
+                      <div style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--text-primary)' }}>
+                        📂 Category Repositories &amp; Designated Roles
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        Dishes uploaded in menu management automatically route to their matching repository based on meal section or category.
+                      </div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+                    {/* 1. Tiffin */}
+                    <div style={{ border: '1px solid var(--border-subtle, #27272a)', borderRadius: 8, padding: '0.85rem 1rem', background: 'rgba(255,255,255,0.015)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#f59e0b', background: 'rgba(245, 158, 11, 0.1)', padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
+                          🌅 TIFFIN / BREAKFAST REPO
+                        </span>
+                        <span style={{ fontSize: '0.7rem', color: '#10b981' }}>
+                          Edge CDN: <code style={{ color: '#38bdf8' }}>cdn.jsdelivr.net/gh/{integ.githubCdn?.owner || 'srigokulamvegrestaurant'}/{integ.githubCdn?.repos?.tiffin?.name || 'SGR-Menu-Tiffin-img'}@main/dishes/</code>
+                        </span>
+                      </div>
+                      <div className={styles.formGrid2}>
+                        <div className={styles.formGroup}>
+                          <label className={styles.label}>Repository Name</label>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            value={integ.githubCdn?.repos?.tiffin?.name || 'SGR-Menu-Tiffin-img'}
+                            onChange={(e) => handleUpdateField('integrations', 'githubCdn.repos.tiffin.name', e.target.value)}
+                          />
+                        </div>
+                        <div className={styles.formGroup}>
+                          <label className={styles.label}>Role &amp; Intended Usage</label>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            value={integ.githubCdn?.repos?.tiffin?.role || 'Morning Tiffin, Idli, Dosa, Pongal, Vada Delicacies'}
+                            onChange={(e) => handleUpdateField('integrations', 'githubCdn.repos.tiffin.role', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 2. Lunch */}
+                    <div style={{ border: '1px solid var(--border-subtle, #27272a)', borderRadius: 8, padding: '0.85rem 1rem', background: 'rgba(255,255,255,0.015)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#3b82f6', background: 'rgba(59, 130, 246, 0.1)', padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
+                          ☀️ LUNCH / RAJA MEALS REPO
+                        </span>
+                        <span style={{ fontSize: '0.7rem', color: '#10b981' }}>
+                          Edge CDN: <code style={{ color: '#38bdf8' }}>cdn.jsdelivr.net/gh/{integ.githubCdn?.owner || 'srigokulamvegrestaurant'}/{integ.githubCdn?.repos?.lunch?.name || 'SGR-Menu-Lunch-img'}@main/dishes/</code>
+                        </span>
+                      </div>
+                      <div className={styles.formGrid2}>
+                        <div className={styles.formGroup}>
+                          <label className={styles.label}>Repository Name</label>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            value={integ.githubCdn?.repos?.lunch?.name || 'SGR-Menu-Lunch-img'}
+                            onChange={(e) => handleUpdateField('integrations', 'githubCdn.repos.lunch.name', e.target.value)}
+                          />
+                        </div>
+                        <div className={styles.formGroup}>
+                          <label className={styles.label}>Role &amp; Intended Usage</label>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            value={integ.githubCdn?.repos?.lunch?.role || 'Midday Raja Meals, Rice Varieties, Thali & Gravies'}
+                            onChange={(e) => handleUpdateField('integrations', 'githubCdn.repos.lunch.role', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 3. Snacks */}
+                    <div style={{ border: '1px solid var(--border-subtle, #27272a)', borderRadius: 8, padding: '0.85rem 1rem', background: 'rgba(255,255,255,0.015)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#ec4899', background: 'rgba(236, 72, 153, 0.1)', padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
+                          ☕ SNACKS &amp; BEVERAGES REPO
+                        </span>
+                        <span style={{ fontSize: '0.7rem', color: '#10b981' }}>
+                          Edge CDN: <code style={{ color: '#38bdf8' }}>cdn.jsdelivr.net/gh/{integ.githubCdn?.owner || 'srigokulamvegrestaurant'}/{integ.githubCdn?.repos?.snacks?.name || 'SGR-Menu-Snacks-img'}@main/dishes/</code>
+                        </span>
+                      </div>
+                      <div className={styles.formGrid2}>
+                        <div className={styles.formGroup}>
+                          <label className={styles.label}>Repository Name</label>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            value={integ.githubCdn?.repos?.snacks?.name || 'SGR-Menu-Snacks-img'}
+                            onChange={(e) => handleUpdateField('integrations', 'githubCdn.repos.snacks.name', e.target.value)}
+                          />
+                        </div>
+                        <div className={styles.formGroup}>
+                          <label className={styles.label}>Role &amp; Intended Usage</label>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            value={integ.githubCdn?.repos?.snacks?.role || 'Evening Snacks, Filter Coffee, Tea, Savories & Sweets'}
+                            onChange={(e) => handleUpdateField('integrations', 'githubCdn.repos.snacks.role', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 4. Dinner */}
+                    <div style={{ border: '1px solid var(--border-subtle, #27272a)', borderRadius: 8, padding: '0.85rem 1rem', background: 'rgba(255,255,255,0.015)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#8b5cf6', background: 'rgba(139, 92, 246, 0.1)', padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
+                          🌙 DINNER &amp; GENERAL DELICACIES REPO
+                        </span>
+                        <span style={{ fontSize: '0.7rem', color: '#10b981' }}>
+                          Edge CDN: <code style={{ color: '#38bdf8' }}>cdn.jsdelivr.net/gh/{integ.githubCdn?.owner || 'srigokulamvegrestaurant'}/{integ.githubCdn?.repos?.dinner?.name || 'SGR-Menu-Image'}@main/dishes/</code>
+                        </span>
+                      </div>
+                      <div className={styles.formGrid2}>
+                        <div className={styles.formGroup}>
+                          <label className={styles.label}>Repository Name</label>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            value={integ.githubCdn?.repos?.dinner?.name || 'SGR-Menu-Image'}
+                            onChange={(e) => handleUpdateField('integrations', 'githubCdn.repos.dinner.name', e.target.value)}
+                          />
+                        </div>
+                        <div className={styles.formGroup}>
+                          <label className={styles.label}>Role &amp; Intended Usage</label>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            value={integ.githubCdn?.repos?.dinner?.role || 'Evening Dinner Specialties, Multi-course Platters, Hero Banners & Fallbacks'}
+                            onChange={(e) => handleUpdateField('integrations', 'githubCdn.repos.dinner.role', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Additional Custom Repositories */}
+                    {Array.isArray(integ.githubCdn?.customRepos) && integ.githubCdn.customRepos.map((cr, idx) => (
+                      <div key={cr.id || idx} style={{ border: '1px solid #38bdf8', borderRadius: 8, padding: '0.85rem 1rem', background: 'rgba(56, 189, 248, 0.02)' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                          <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#38bdf8' }}>
+                            ✨ CUSTOM REPOSITORY #{idx + 1}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = (integ.githubCdn.customRepos || []).filter((_, i) => i !== idx);
+                              handleUpdateField('integrations', 'githubCdn.customRepos', updated);
+                            }}
+                            style={{ background: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer', fontSize: '0.75rem' }}
+                          >
+                            ✕ Remove
+                          </button>
+                        </div>
+                        <div className={styles.formGrid3}>
+                          <div className={styles.formGroup}>
+                            <label className={styles.label}>Repository Name</label>
+                            <input
+                              type="text"
+                              className={styles.input}
+                              placeholder="e.g. SGR-Catering-Assets"
+                              value={cr.name || ''}
+                              onChange={(e) => {
+                                const updated = [...(integ.githubCdn.customRepos || [])];
+                                updated[idx] = { ...updated[idx], name: e.target.value };
+                                handleUpdateField('integrations', 'githubCdn.customRepos', updated);
+                              }}
+                            />
+                          </div>
+                          <div className={styles.formGroup}>
+                            <label className={styles.label}>Role &amp; Use of Repo</label>
+                            <input
+                              type="text"
+                              className={styles.input}
+                              placeholder="e.g. Bulk Catering &amp; Wedding Event Photos"
+                              value={cr.role || ''}
+                              onChange={(e) => {
+                                const updated = [...(integ.githubCdn.customRepos || [])];
+                                updated[idx] = { ...updated[idx], role: e.target.value };
+                                handleUpdateField('integrations', 'githubCdn.customRepos', updated);
+                              }}
+                            />
+                          </div>
+                          <div className={styles.formGroup}>
+                            <label className={styles.label}>Target Category / Section</label>
+                            <input
+                              type="text"
+                              className={styles.input}
+                              placeholder="e.g. Catering"
+                              value={cr.category || ''}
+                              onChange={(e) => {
+                                const updated = [...(integ.githubCdn.customRepos || [])];
+                                updated[idx] = { ...updated[idx], category: e.target.value };
+                                handleUpdateField('integrations', 'githubCdn.customRepos', updated);
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const existing = Array.isArray(integ.githubCdn?.customRepos) ? integ.githubCdn.customRepos : [];
+                      const updated = [...existing, { id: 'cr_' + Date.now().toString(36), name: '', role: '', category: '' }];
+                      handleUpdateField('integrations', 'githubCdn.customRepos', updated);
+                    }}
+                    style={{
+                      marginTop: '0.85rem',
+                      background: 'rgba(56, 189, 248, 0.1)',
+                      border: '1px dashed #38bdf8',
+                      color: '#38bdf8',
+                      padding: '0.45rem 0.9rem',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '0.78rem',
+                      fontWeight: 700,
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                    }}
+                  >
+                    + Add Another Custom Repository
+                  </button>
+                </div>
+
+                {/* Live Verification Results */}
+                {Array.isArray(integ.githubCdn?.verifiedRepos) && integ.githubCdn.verifiedRepos.length > 0 && (
+                  <div style={{ marginTop: '1rem', padding: '0.85rem', background: 'rgba(16, 185, 129, 0.05)', borderRadius: 8, border: '1px solid rgba(16, 185, 129, 0.25)' }}>
+                    <div style={{ fontSize: '0.78rem', fontWeight: 800, color: '#10b981', marginBottom: '0.5rem' }}>
+                      ✓ Verified CDN Repositories Available for Direct Uploads:
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '0.5rem' }}>
+                      {integ.githubCdn.verifiedRepos.map((vr, i) => (
+                        <div key={i} style={{ fontSize: '0.72rem', background: 'rgba(0,0,0,0.3)', padding: '0.45rem 0.65rem', borderRadius: 6, display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                          <span style={{ fontWeight: 800, color: '#f8fafc' }}>{vr.name}</span>
+                          <span style={{ color: 'var(--text-muted)' }}>{vr.role}</span>
+                          <span style={{ color: '#10b981' }}>Status: {vr.status} (Push: {vr.canPush ? 'Granted' : 'Denied'})</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

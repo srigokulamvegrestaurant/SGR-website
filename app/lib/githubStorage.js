@@ -16,9 +16,20 @@ export async function uploadToGitHubCdn({
   folder = 'dishes',
   mimeType = 'image/webp',
 }) {
-  const token = (process.env.GITHUB_TOKEN || '').trim();
-  const owner = (process.env.GITHUB_OWNER || 'srigokulamvegrestaurant').trim();
-  const branch = (process.env.GITHUB_BRANCH || 'main').trim();
+  let dbSettingsInteg = null;
+  try {
+    const { getDb } = require('./db');
+    dbSettingsInteg = getDb()?.settings?.integrations?.githubCdn;
+  } catch (e) {}
+
+  const token = (
+    (dbSettingsInteg?.token && !dbSettingsInteg.token.includes('••••') ? dbSettingsInteg.token : null) ||
+    process.env.GITHUB_TOKEN ||
+    ''
+  ).trim();
+
+  const owner = (dbSettingsInteg?.owner || process.env.GITHUB_OWNER || 'srigokulamvegrestaurant').trim();
+  const branch = (dbSettingsInteg?.branch || process.env.GITHUB_BRANCH || 'main').trim();
 
   // Smart Repository Router based on Meal Section or Category
   let repo = (repoOverride || '').trim();
@@ -26,13 +37,18 @@ export async function uploadToGitHubCdn({
     const catLower = (category || '').toLowerCase();
     const mealLower = (mealSection || '').toLowerCase();
 
+    const tiffinRepo = (typeof dbSettingsInteg?.repos?.tiffin === 'object' ? dbSettingsInteg.repos.tiffin.name : dbSettingsInteg?.repos?.tiffin) || process.env.GITHUB_REPO_TIFFIN || 'SGR-Menu-Tiffin-img';
+    const lunchRepo = (typeof dbSettingsInteg?.repos?.lunch === 'object' ? dbSettingsInteg.repos.lunch.name : dbSettingsInteg?.repos?.lunch) || process.env.GITHUB_REPO_LUNCH || 'SGR-Menu-Lunch-img';
+    const snacksRepo = (typeof dbSettingsInteg?.repos?.snacks === 'object' ? dbSettingsInteg.repos.snacks.name : dbSettingsInteg?.repos?.snacks) || process.env.GITHUB_REPO_SNACKS || 'SGR-Menu-Snacks-img';
+    const dinnerRepo = (typeof dbSettingsInteg?.repos?.dinner === 'object' ? dbSettingsInteg.repos.dinner.name : dbSettingsInteg?.repos?.dinner) || process.env.GITHUB_REPO_DINNER || process.env.GITHUB_REPO || 'SGR-Menu-Image';
+
     if (
       mealLower.includes('tiffin') ||
       mealLower.includes('breakfast') ||
       catLower.includes('tiffin') ||
       catLower.includes('breakfast')
     ) {
-      repo = process.env.GITHUB_REPO_TIFFIN || 'SGR-Menu-Tiffin-img';
+      repo = tiffinRepo;
     } else if (
       mealLower.includes('lunch') ||
       mealLower.includes('meal') ||
@@ -40,7 +56,7 @@ export async function uploadToGitHubCdn({
       catLower.includes('lunch') ||
       catLower.includes('rice')
     ) {
-      repo = process.env.GITHUB_REPO_LUNCH || 'SGR-Menu-Lunch-img';
+      repo = lunchRepo;
     } else if (
       mealLower.includes('snack') ||
       catLower.includes('snack') ||
@@ -49,11 +65,22 @@ export async function uploadToGitHubCdn({
       catLower.includes('tea') ||
       catLower.includes('coffee')
     ) {
-      repo = process.env.GITHUB_REPO_SNACKS || 'SGR-Menu-Snacks-img';
+      repo = snacksRepo;
     } else if (mealLower.includes('dinner') || catLower.includes('dinner')) {
-      repo = process.env.GITHUB_REPO_DINNER || process.env.GITHUB_REPO || 'SGR-Menu-Dinner-img';
+      repo = dinnerRepo;
     } else {
-      repo = process.env.GITHUB_REPO_DINNER || process.env.GITHUB_REPO || 'SGR-Menu-Tiffin-img';
+      // Check custom repositories matching category or role
+      const customRepos = Array.isArray(dbSettingsInteg?.customRepos) ? dbSettingsInteg.customRepos : [];
+      const customMatch = customRepos.find(
+        (cr) =>
+          (cr.category && catLower.includes(cr.category.toLowerCase())) ||
+          (cr.role && catLower.includes(cr.role.toLowerCase()))
+      );
+      if (customMatch && customMatch.name) {
+        repo = customMatch.name;
+      } else {
+        repo = dinnerRepo;
+      }
     }
   }
 
