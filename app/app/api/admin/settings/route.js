@@ -64,6 +64,11 @@ function sanitizeSettingsForClient(settings) {
     }
     if (!cloned.integrations.githubCdn.repos) {
       cloned.integrations.githubCdn.repos = {
+        banner: {
+          name: process.env.GITHUB_REPO_BANNER || 'SGR-Banner',
+          role: 'Hero Carousel Banners, Promotional Posters & Visual Slides',
+          category: 'Banners / Visuals',
+        },
         tiffin: {
           name: process.env.GITHUB_REPO_TIFFIN || 'SGR-Menu-Tiffin-img',
           role: 'Morning Tiffin, Idli, Dosa, Pongal, Vada Delicacies',
@@ -719,6 +724,11 @@ export async function POST(request) {
         ).trim();
 
         const reposConfig = config?.repos || db.settings?.integrations?.githubCdn?.repos || {
+          banner: {
+            name: process.env.GITHUB_REPO_BANNER || 'SGR-Banner',
+            role: 'Hero Carousel Banners, Promotional Posters & Visual Slides',
+            category: 'Banners / Visuals',
+          },
           tiffin: {
             name: process.env.GITHUB_REPO_TIFFIN || 'SGR-Menu-Tiffin-img',
             role: 'Morning Tiffin, Idli, Dosa, Pongal, Vada Delicacies',
@@ -815,7 +825,7 @@ export async function POST(request) {
                       status: 'VERIFIED',
                       canPush: Boolean(rData.permissions?.push),
                       isPrivate: Boolean(rData.private),
-                      cdnUrl: `https://cdn.jsdelivr.net/gh/${repoOwner}/${cleanRepo}@${branch}/dishes/`,
+                      cdnUrl: `https://cdn.jsdelivr.net/gh/${repoOwner}/${cleanRepo}@${branch}/${cleanRepo.toLowerCase().includes('banner') || (r.role || '').toLowerCase().includes('banner') ? 'banners/' : 'dishes/'}`,
                     });
                   } else {
                     verifiedRepoResults.push({

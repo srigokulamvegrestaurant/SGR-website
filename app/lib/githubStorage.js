@@ -36,13 +36,21 @@ export async function uploadToGitHubCdn({
   if (!repo) {
     const catLower = (category || '').toLowerCase();
     const mealLower = (mealSection || '').toLowerCase();
+    const folderLower = (folder || '').toLowerCase();
 
+    const bannerRepo = (typeof dbSettingsInteg?.repos?.banner === 'object' ? dbSettingsInteg.repos.banner.name : dbSettingsInteg?.repos?.banner) || process.env.GITHUB_REPO_BANNER || 'SGR-Banner';
     const tiffinRepo = (typeof dbSettingsInteg?.repos?.tiffin === 'object' ? dbSettingsInteg.repos.tiffin.name : dbSettingsInteg?.repos?.tiffin) || process.env.GITHUB_REPO_TIFFIN || 'SGR-Menu-Tiffin-img';
     const lunchRepo = (typeof dbSettingsInteg?.repos?.lunch === 'object' ? dbSettingsInteg.repos.lunch.name : dbSettingsInteg?.repos?.lunch) || process.env.GITHUB_REPO_LUNCH || 'SGR-Menu-Lunch-img';
     const snacksRepo = (typeof dbSettingsInteg?.repos?.snacks === 'object' ? dbSettingsInteg.repos.snacks.name : dbSettingsInteg?.repos?.snacks) || process.env.GITHUB_REPO_SNACKS || 'SGR-Menu-Snacks-img';
     const dinnerRepo = (typeof dbSettingsInteg?.repos?.dinner === 'object' ? dbSettingsInteg.repos.dinner.name : dbSettingsInteg?.repos?.dinner) || process.env.GITHUB_REPO_DINNER || process.env.GITHUB_REPO || 'SGR-Menu-Image';
 
     if (
+      catLower.includes('banner') ||
+      folderLower.includes('banner') ||
+      mealLower.includes('banner')
+    ) {
+      repo = bannerRepo;
+    } else if (
       mealLower.includes('tiffin') ||
       mealLower.includes('breakfast') ||
       catLower.includes('tiffin') ||
@@ -106,7 +114,12 @@ export async function uploadToGitHubCdn({
   if (mimeType.includes('png')) ext = 'png';
   else if (mimeType.includes('jpeg') || mimeType.includes('jpg')) ext = 'jpg';
 
-  let baseName = 'dish';
+  const isBanner =
+    repo === 'SGR-Banner' ||
+    (category || '').toLowerCase().includes('banner') ||
+    (folder || '').toLowerCase().includes('banner');
+
+  let baseName = isBanner ? 'hero_banner' : 'dish';
   if (dishTitle) {
     baseName = dishTitle
       .toLowerCase()
@@ -123,7 +136,12 @@ export async function uploadToGitHubCdn({
 
   const timestamp = Date.now().toString(36);
   const targetFilename = `${baseName}_${timestamp}.${ext}`;
-  const cleanFolder = (folder || 'dishes').replace(/^\/+|\/+$/g, '').replace(/^public\/?/, '');
+  let cleanFolder = (folder || (isBanner ? 'banners' : 'dishes'))
+    .replace(/^\/+|\/+$/g, '')
+    .replace(/^public\/?/, '');
+  if (isBanner && (!folder || folder === 'dishes')) {
+    cleanFolder = 'banners';
+  }
   const repoFilePath = cleanFolder ? `${cleanFolder}/${targetFilename}` : targetFilename;
 
   // 3. If GITHUB_TOKEN is present, commit directly to GitHub via REST API
@@ -152,7 +170,7 @@ export async function uploadToGitHubCdn({
       }
 
       const commitPayload = {
-        message: `Upload dish image: ${targetFilename} [skip ci]`,
+        message: `${isBanner ? 'Upload banner visual asset' : 'Upload dish image'}: ${targetFilename} [skip ci]`,
         content: cleanBase64,
         branch,
         ...(existingSha ? { sha: existingSha } : {}),

@@ -49,6 +49,8 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
   const [editingQuickLink, setEditingQuickLink] = useState(null);
   const [videoFilter, setVideoFilter] = useState('ALL'); // 'ALL' | 'REEL' | 'YOUTUBE'
   const [showMediaUploadModal, setShowMediaUploadModal] = useState(false);
+  const [uploadingDesktopBanner, setUploadingDesktopBanner] = useState(false);
+  const [uploadingMobileBanner, setUploadingMobileBanner] = useState(false);
   const [newMediaData, setNewMediaData] = useState({
     title: '',
     category: 'Dishes',
@@ -260,6 +262,62 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
     setIsDirty(true);
     setDeleteConfirmModal(null);
     showNotice('Hero banner deleted from draft');
+  };
+
+  const handleUploadBannerImage = async (file, type = 'desktop') => {
+    if (!file) return;
+    if (type === 'desktop') setUploadingDesktopBanner(true);
+    else setUploadingMobileBanner(true);
+
+    try {
+      showNotice(`Uploading ${type} banner to SGR-Banner repository...`, 'info');
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('repo', 'SGR-Banner');
+      fd.append('folder', 'banners');
+      fd.append('category', 'Banners');
+      fd.append('dishTitle', `${editingSlide?.titleLine1 || 'hero_banner'}_${type}`);
+
+      const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.success && data.url) {
+        if (type === 'desktop') {
+          setEditingSlide((prev) => ({
+            ...prev,
+            desktopImage: data.url,
+            mobileImage: prev.mobileImage || data.url,
+          }));
+        } else {
+          setEditingSlide((prev) => ({
+            ...prev,
+            mobileImage: data.url,
+          }));
+        }
+
+        // Also add to mediaLibrary state for quick reuse
+        const newMediaItem = {
+          id: 'banner_' + Date.now(),
+          title: `${editingSlide?.titleLine1 || 'Hero Banner'} (${type === 'desktop' ? 'Desktop' : 'Mobile'})`,
+          category: 'Banners',
+          desktopUrl: data.url,
+          mobileUrl: data.url,
+          aspectRatio: type === 'desktop' ? '16:9' : '9:16',
+          tags: 'banner, hero, sgr-banner',
+          uploadedAt: new Date().toISOString(),
+        };
+        setMediaLibrary((prev) => [newMediaItem, ...(Array.isArray(prev) ? prev : [])]);
+
+        showNotice(`✅ ${type === 'desktop' ? 'Desktop' : 'Mobile'} banner uploaded directly to SGR-Banner repository!`);
+      } else {
+        showNotice(data.error || 'Banner upload failed', 'error');
+      }
+    } catch (err) {
+      console.error('Banner upload error:', err);
+      showNotice('Banner upload failed: ' + (err.message || 'Network error'), 'error');
+    } finally {
+      if (type === 'desktop') setUploadingDesktopBanner(false);
+      else setUploadingMobileBanner(false);
+    }
   };
 
   // ─── 0. ATOMIC INSTANT LIVE PUBLISH ───
@@ -3020,7 +3078,7 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
          ══════════════════════════════════════════════════════════════════════ */}
       {editingSlide && (
         <div className={styles.modalBackdrop} onClick={() => setEditingSlide(null)}>
-          <div className={styles.modalBox} style={{ maxWidth: '600px' }} onClick={(e) => e.stopPropagation()}>
+          <div className={styles.modalBox} style={{ maxWidth: '640px', maxHeight: '92vh', overflowY: 'auto' }} onClick={(e) => e.stopPropagation()}>
             <div className={styles.modalHeader}>
               <h3 className={styles.modalTitle}>{editingSlide.id ? 'Edit Hero Banner Slide' : 'Add New Hero Banner Slide'}</h3>
               <button type="button" className={styles.modalClose} onClick={() => setEditingSlide(null)}>✕</button>
@@ -3089,24 +3147,270 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                 />
               </div>
 
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Desktop Image URL (16:9)</label>
+              {/* Desktop Banner Image (16:9) with GitHub SGR-Banner Upload */}
+              <div
+                className={styles.formGroup}
+                style={{
+                  border: '1px solid #0284c7',
+                  borderRadius: '10px',
+                  padding: '0.85rem',
+                  background: 'rgba(2, 132, 199, 0.03)',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '0.5rem',
+                    flexWrap: 'wrap',
+                    gap: '0.4rem',
+                  }}
+                >
+                  <label className={styles.formLabel} style={{ margin: 0, fontWeight: 700, color: '#0369a1' }}>
+                    🖥️ Desktop Banner Image (16:9 Landscape)
+                  </label>
+                  <span
+                    style={{
+                      fontSize: '0.72rem',
+                      background: 'rgba(2, 132, 199, 0.12)',
+                      color: '#0284c7',
+                      padding: '0.15rem 0.5rem',
+                      borderRadius: '4px',
+                      fontWeight: 700,
+                    }}
+                  >
+                    📦 Repo: SGR-Banner
+                  </span>
+                </div>
+
+                {/* Upload Button + Actions */}
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                  <input
+                    type="file"
+                    id="desktopBannerFileInput"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleUploadBannerImage(file, 'desktop');
+                      e.target.value = '';
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className={styles.btnActionSec}
+                    style={{
+                      background: uploadingDesktopBanner ? '#64748b' : '#0284c7',
+                      color: '#ffffff',
+                      border: 'none',
+                      fontSize: '0.8rem',
+                      padding: '0.45rem 0.85rem',
+                      cursor: uploadingDesktopBanner ? 'wait' : 'pointer',
+                    }}
+                    disabled={uploadingDesktopBanner}
+                    onClick={() => document.getElementById('desktopBannerFileInput')?.click()}
+                  >
+                    {uploadingDesktopBanner ? '⏳ Uploading to SGR-Banner...' : '📁 Upload Desktop Banner (SGR-Banner)'}
+                  </button>
+                  {editingSlide.desktopImage && (
+                    <button
+                      type="button"
+                      className={styles.btnActionSec}
+                      style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem', color: '#ef4444' }}
+                      onClick={() => setEditingSlide({ ...editingSlide, desktopImage: '' })}
+                    >
+                      ✕ Clear
+                    </button>
+                  )}
+                </div>
+
+                {/* URL Input */}
                 <input
                   type="text"
                   value={editingSlide.desktopImage || ''}
                   onChange={(e) => setEditingSlide({ ...editingSlide, desktopImage: e.target.value })}
+                  placeholder="https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Banner@main/banners/..."
                   className={styles.formInput}
                 />
+
+                {/* Live Preview Thumbnail */}
+                {editingSlide.desktopImage && (
+                  <div
+                    style={{
+                      marginTop: '0.6rem',
+                      position: 'relative',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      border: '1px solid #cbd5e1',
+                      maxHeight: '140px',
+                      background: '#090d16',
+                    }}
+                  >
+                    <img
+                      src={editingSlide.desktopImage}
+                      alt="Desktop Banner Preview"
+                      style={{ width: '100%', maxHeight: '140px', objectFit: 'cover', display: 'block' }}
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '6px',
+                        left: '6px',
+                        background: 'rgba(0,0,0,0.75)',
+                        color: '#38bdf8',
+                        fontSize: '0.7rem',
+                        padding: '0.15rem 0.5rem',
+                        borderRadius: '4px',
+                        fontWeight: 600,
+                      }}
+                    >
+                      🌐 SGR-Banner Edge CDN
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Mobile Image URL (Optimized for Mobile)</label>
+              {/* Mobile Banner Image (Optimized for Mobile) with GitHub SGR-Banner Upload */}
+              <div
+                className={styles.formGroup}
+                style={{
+                  border: '1px solid #8b5cf6',
+                  borderRadius: '10px',
+                  padding: '0.85rem',
+                  background: 'rgba(139, 92, 246, 0.03)',
+                }}
+              >
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginBottom: '0.5rem',
+                    flexWrap: 'wrap',
+                    gap: '0.4rem',
+                  }}
+                >
+                  <label className={styles.formLabel} style={{ margin: 0, fontWeight: 700, color: '#6d28d9' }}>
+                    📱 Mobile Banner Image (Optimized for Mobile Screens)
+                  </label>
+                  <span
+                    style={{
+                      fontSize: '0.72rem',
+                      background: 'rgba(139, 92, 246, 0.12)',
+                      color: '#8b5cf6',
+                      padding: '0.15rem 0.5rem',
+                      borderRadius: '4px',
+                      fontWeight: 700,
+                    }}
+                  >
+                    📦 Repo: SGR-Banner
+                  </span>
+                </div>
+
+                {/* Upload Button + Actions + Shortcut */}
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+                  <input
+                    type="file"
+                    id="mobileBannerFileInput"
+                    accept="image/*"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) handleUploadBannerImage(file, 'mobile');
+                      e.target.value = '';
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className={styles.btnActionSec}
+                    style={{
+                      background: uploadingMobileBanner ? '#64748b' : '#8b5cf6',
+                      color: '#ffffff',
+                      border: 'none',
+                      fontSize: '0.8rem',
+                      padding: '0.45rem 0.85rem',
+                      cursor: uploadingMobileBanner ? 'wait' : 'pointer',
+                    }}
+                    disabled={uploadingMobileBanner}
+                    onClick={() => document.getElementById('mobileBannerFileInput')?.click()}
+                  >
+                    {uploadingMobileBanner ? '⏳ Uploading to SGR-Banner...' : '📱 Upload Mobile Banner (SGR-Banner)'}
+                  </button>
+                  {editingSlide.desktopImage && editingSlide.desktopImage !== editingSlide.mobileImage && (
+                    <button
+                      type="button"
+                      className={styles.btnActionSec}
+                      style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem', color: '#0284c7' }}
+                      onClick={() => setEditingSlide({ ...editingSlide, mobileImage: editingSlide.desktopImage })}
+                    >
+                      ⚡ Use Desktop Image
+                    </button>
+                  )}
+                  {editingSlide.mobileImage && (
+                    <button
+                      type="button"
+                      className={styles.btnActionSec}
+                      style={{ fontSize: '0.75rem', padding: '0.35rem 0.6rem', color: '#ef4444' }}
+                      onClick={() => setEditingSlide({ ...editingSlide, mobileImage: '' })}
+                    >
+                      ✕ Clear
+                    </button>
+                  )}
+                </div>
+
+                {/* URL Input */}
                 <input
                   type="text"
                   value={editingSlide.mobileImage || ''}
                   onChange={(e) => setEditingSlide({ ...editingSlide, mobileImage: e.target.value })}
+                  placeholder="Optional mobile variant or paste direct URL"
                   className={styles.formInput}
                 />
+
+                {/* Live Preview Thumbnail */}
+                {editingSlide.mobileImage && (
+                  <div
+                    style={{
+                      marginTop: '0.6rem',
+                      position: 'relative',
+                      borderRadius: '8px',
+                      overflow: 'hidden',
+                      border: '1px solid #cbd5e1',
+                      maxHeight: '140px',
+                      background: '#090d16',
+                      display: 'flex',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <img
+                      src={editingSlide.mobileImage}
+                      alt="Mobile Banner Preview"
+                      style={{ maxHeight: '140px', objectFit: 'contain', display: 'block' }}
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none';
+                      }}
+                    />
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '6px',
+                        left: '6px',
+                        background: 'rgba(0,0,0,0.75)',
+                        color: '#c4b5fd',
+                        fontSize: '0.7rem',
+                        padding: '0.15rem 0.5rem',
+                        borderRadius: '4px',
+                        fontWeight: 600,
+                      }}
+                    >
+                      📱 SGR-Banner Edge CDN
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
             <div className={styles.modalFooter}>
@@ -4061,6 +4365,7 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                   onChange={(e) => setNewMediaData({ ...newMediaData, category: e.target.value })}
                   className={styles.formSelect}
                 >
+                  <option value="Banners">Hero Banners &amp; Slides (SGR-Banner)</option>
                   <option value="Dishes">Dishes &amp; Tiffin</option>
                   <option value="Meals">Raja Meals &amp; Rice</option>
                   <option value="Beverages">Filter Coffee &amp; Beverages</option>
@@ -4070,7 +4375,9 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.formLabel}>Upload File to GitHub CDN</label>
+                <label className={styles.formLabel}>
+                  Upload File to GitHub CDN {newMediaData.category === 'Banners' && '(Repo: SGR-Banner)'}
+                </label>
                 <input
                   type="file"
                   accept="image/*"
@@ -4078,17 +4385,21 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                     const file = e.target.files?.[0];
                     if (!file) return;
                     try {
-                      showNotice('Uploading file to GitHub CDN...', 'info');
+                      const isBanner = newMediaData.category === 'Banners';
+                      showNotice(`Uploading file to ${isBanner ? 'SGR-Banner' : 'GitHub'} CDN...`, 'info');
                       const fd = new FormData();
                       fd.append('file', file);
                       fd.append('dishTitle', newMediaData.title || file.name);
                       fd.append('category', newMediaData.category || 'Dishes');
-                      fd.append('folder', 'cms');
+                      fd.append('folder', isBanner ? 'banners' : 'cms');
+                      if (isBanner) {
+                        fd.append('repo', 'SGR-Banner');
+                      }
                       const res = await fetch('/api/admin/upload', { method: 'POST', body: fd });
                       const d = await res.json();
                       if (d.success) {
                         setNewMediaData(prev => ({ ...prev, desktopUrl: d.url }));
-                        showNotice('✅ Uploaded to GitHub CDN! CDN URL populated.');
+                        showNotice(`✅ Uploaded to ${isBanner ? 'SGR-Banner' : 'GitHub'} CDN! CDN URL populated.`);
                       } else {
                         showNotice(d.error || 'Upload failed', 'error');
                       }

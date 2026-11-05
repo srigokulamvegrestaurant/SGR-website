@@ -3499,8 +3499,40 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
                           <input
                             type="text"
                             className={styles.input}
-                            value={integ.githubCdn?.repos?.dinner?.role || 'Evening Dinner Specialties, Multi-course Platters, Hero Banners & Fallbacks'}
+                            value={integ.githubCdn?.repos?.dinner?.role || 'Evening Dinner Specialties, Multi-course Platters & General Menu'}
                             onChange={(e) => handleUpdateField('integrations', 'githubCdn.repos.dinner.role', e.target.value)}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 5. Banners & Visuals (SGR-Banner) */}
+                    <div style={{ border: '1px solid #ec4899', borderRadius: 8, padding: '0.85rem 1rem', background: 'rgba(236, 72, 153, 0.03)' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', flexWrap: 'wrap', gap: '0.4rem' }}>
+                        <span style={{ fontSize: '0.75rem', fontWeight: 800, color: '#ec4899', background: 'rgba(236, 72, 153, 0.12)', padding: '0.15rem 0.5rem', borderRadius: '4px' }}>
+                          🖼️ HERO BANNERS &amp; MARKETING REPO (SGR-Banner)
+                        </span>
+                        <span style={{ fontSize: '0.7rem', color: '#10b981' }}>
+                          Edge CDN: <code style={{ color: '#38bdf8' }}>cdn.jsdelivr.net/gh/{integ.githubCdn?.owner || 'srigokulamvegrestaurant'}/{integ.githubCdn?.repos?.banner?.name || 'SGR-Banner'}@main/banners/</code>
+                        </span>
+                      </div>
+                      <div className={styles.formGrid2}>
+                        <div className={styles.formGroup}>
+                          <label className={styles.label}>Repository Name</label>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            value={integ.githubCdn?.repos?.banner?.name || 'SGR-Banner'}
+                            onChange={(e) => handleUpdateField('integrations', 'githubCdn.repos.banner.name', e.target.value)}
+                          />
+                        </div>
+                        <div className={styles.formGroup}>
+                          <label className={styles.label}>Role &amp; Intended Usage</label>
+                          <input
+                            type="text"
+                            className={styles.input}
+                            value={integ.githubCdn?.repos?.banner?.role || 'Hero Carousel Banners, Promotional Posters & Visual Slides'}
+                            onChange={(e) => handleUpdateField('integrations', 'githubCdn.repos.banner.role', e.target.value)}
                           />
                         </div>
                       </div>

@@ -482,3 +482,4 @@ Before handing this specification to another AI or development team for further 
    * Should waiters be permitted to see only their assigned tables, or should all floor captains have full visibility over the entire floor for flexible teamwork?
 4. **Manager PIN Configuration**:
    * Is the current default PIN (`1234` or `4321`) acceptable for store handover, or should a strict 6-digit cryptographic PIN setup be required during first admin onboarding?
+
