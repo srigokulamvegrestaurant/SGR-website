@@ -134,6 +134,17 @@ const COOKING_PREFERENCES = [
   { id: 'HOT_SAMBAR', labelTa: '🍲 சுடச்சுட சாம்பார்', labelEn: 'Piping Hot Sambar' },
 ];
 
+function getCategoryIcon(cat = '') {
+  const c = String(cat).toLowerCase();
+  if (c.includes('tiffin')) return '🫓';
+  if (c.includes('dosa')) return '🥞';
+  if (c.includes('meal') || c.includes('rice')) return '🍛';
+  if (c.includes('beverage') || c.includes('tea') || c.includes('coffee')) return '☕';
+  if (c.includes('snack') || c.includes('starter') || c.includes('parotta')) return '🥟';
+  if (c.includes('chinese') || c.includes('north')) return '🍜';
+  return '🍲';
+}
+
 // ─── Audio Engine ────────────────────────────────────────────────────────────
 function playChime(type = 'new_order', soundEnabled = true) {
   if (!soundEnabled) return;
@@ -203,6 +214,7 @@ export default function WaiterTerminal() {
   const [isFiringKot, setIsFiringKot] = useState(false);
   const [isAddonMode, setIsAddonMode] = useState(false);
   const [addonParentOrderId, setAddonParentOrderId] = useState(null);
+  const [showMobileCartDrawer, setShowMobileCartDrawer] = useState(false);
 
   // OTP Verification Modal
   const [selectedOtpOrder, setSelectedOtpOrder] = useState(null);
@@ -265,7 +277,7 @@ export default function WaiterTerminal() {
           if (event.type === 'NEW_ORDER_OTP_PENDING') {
             playChime('new_order', soundEnabled);
             if (typeof navigator !== 'undefined' && navigator.vibrate) {
-              navigator.vibrate([200, 100, 200, 100, 200]);
+              navigator.vibrate([200, 100, 200]);
             }
             fetchData();
           } else if (event.type === 'ORDER_OTP_VERIFIED') {
@@ -400,7 +412,7 @@ export default function WaiterTerminal() {
         dishId: dish.id,
         title: dish.title,
         tamilTitle: dish.tamilTitle || dish.titleTamil || '',
-        price: dish.price,
+        price: dish.price || 0,
         quantity: qty,
       };
     });
@@ -429,10 +441,12 @@ export default function WaiterTerminal() {
         orderNotes.trim(),
       ].filter(Boolean).join(' • ') || 'Standard Chettinad Sattvic Prep';
 
+      const cleanTableNum = String(orderTargetTable).replace(/^Table\s*#?/i, '').padStart(2, '0');
+
       const payload = {
-        tables: [String(orderTargetTable).padStart(2, '0')],
+        tables: [cleanTableNum],
         orderType: 'DINE_IN',
-        guestName: orderGuestName.trim() || `Table #${orderTargetTable}`,
+        guestName: orderGuestName.trim() || `Table #${cleanTableNum}`,
         guestCount: orderGuestCount,
         cookingNotes: fullNotes,
         items: cartItems.map(it => ({
@@ -455,10 +469,11 @@ export default function WaiterTerminal() {
       if (!res.ok || !data.success) throw new Error(data.error || 'Failed to fire KOT');
 
       playChime('ready', soundEnabled);
-      setAlertMsg({ type: 'success', text: `Table #${orderTargetTable}: ${t.orderFiredSuccess}` });
+      setAlertMsg({ type: 'success', text: `Table #${cleanTableNum}: ${t.orderFiredSuccess}` });
       setOrderCart({});
       setSelectedPrefs([]);
       setOrderNotes('');
+      setShowMobileCartDrawer(false);
       setActiveTab('tables');
       fetchData();
     } catch (err) {
@@ -486,7 +501,7 @@ export default function WaiterTerminal() {
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error);
       playChime('otp_verify', soundEnabled);
-      setAlertMsg({ type: 'success', text: `Table #${selectedOtpOrder.tables.join(' & #')} verified & KOT fired to kitchen!` });
+      setAlertMsg({ type: 'success', text: `Table #${selectedOtpOrder.tables?.join(' & #')} verified & KOT fired to kitchen!` });
       setSelectedOtpOrder(null);
       setEnteredOtp('');
       fetchData();
@@ -539,6 +554,9 @@ export default function WaiterTerminal() {
     }));
   }, [floorPlans, tables]);
 
+  // Clean Table Number Display
+  const cleanOrderTableNumber = String(orderTargetTable).replace(/^Table\s*#?/i, '') || '01';
+
   return (
     <div className={styles.container}>
       {/* ─── Top Staff Header ──────────────────────────────────────────────── */}
@@ -546,7 +564,7 @@ export default function WaiterTerminal() {
         <div className={styles.headerLeft}>
           <span className={styles.brandBadge}>{t.portalTitle}</span>
           <h1 className={styles.headerTitle}>
-            🧑‍🍳 {lang === 'ta' ? 'கேப்டன் & சர்வர் முனையம்' : 'Floor Captain Terminal'}
+            🧑‍🍳 {lang === 'ta' ? 'கேப்டன் முனையம்' : 'Captain Terminal'}
           </h1>
           <div className={styles.serverBadge}>
             <span>{t.captainLead}</span> •{' '}
@@ -562,7 +580,7 @@ export default function WaiterTerminal() {
             onClick={() => setLang(l => l === 'ta' ? 'en' : 'ta')}
             title="Switch Language / மொழி மாற்று"
           >
-            {lang === 'ta' ? '🇬🇧 English' : '🇮🇳 தமிழ்'}
+            {lang === 'ta' ? '🇬🇧 EN' : '🇮🇳 தமிழ்'}
           </button>
           <button
             type="button"
@@ -649,7 +667,7 @@ export default function WaiterTerminal() {
         </div>
       </div>
 
-      {/* ─── Navigation Tabs ───────────────────────────────────────────────── */}
+      {/* ─── Navigation Tabs Bar ───────────────────────────────────────────── */}
       <div className={styles.tabsRow}>
         <button
           type="button"
@@ -716,7 +734,7 @@ export default function WaiterTerminal() {
               <button
                 type="button"
                 className={styles.btnOrderPrimary}
-                style={{ padding: '8px 16px', borderRadius: '10px', fontSize: '0.85rem' }}
+                style={{ padding: '6px 14px', borderRadius: '8px', fontSize: '0.8rem' }}
                 onClick={() => {
                   if (tables.length > 0) openTakeOrder(tables[0].tableNumber);
                 }}
@@ -784,7 +802,7 @@ export default function WaiterTerminal() {
                   <div key={sec.id} className={styles.sectionBlock}>
                     <div className={styles.sectionBlockTitle}>
                       <span>{sec.icon || '📍'} {sec.name || sec.id}</span>
-                      <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>
+                      <span style={{ fontSize: '0.74rem', color: '#64748b', fontWeight: 600 }}>
                         {secTables.length} {t.totalTables}
                       </span>
                     </div>
@@ -830,12 +848,14 @@ export default function WaiterTerminal() {
                             {activeOrder && (
                               <div className={styles.tableMetaRow}>
                                 <span>{activeOrder.items?.length || 0} {t.itemsCount}</span>
-                                <span className={styles.tableRunningTotal}>₹{activeOrder.totalAmount}</span>
+                                <span className={styles.tableRunningTotal}>
+                                  {activeOrder.totalAmount > 0 ? `₹${activeOrder.totalAmount}` : 'KOT Active'}
+                                </span>
                               </div>
                             )}
 
                             {hasServiceCall && (
-                              <div style={{ fontSize: '0.72rem', background: '#f3e8ff', color: '#7e22ce', padding: '3px 6px', borderRadius: '6px', fontWeight: 800 }}>
+                              <div style={{ fontSize: '0.68rem', background: '#f3e8ff', color: '#7e22ce', padding: '3px 6px', borderRadius: '6px', fontWeight: 800 }}>
                                 🔔 {t.tabCalls}!
                               </div>
                             )}
@@ -911,9 +931,9 @@ export default function WaiterTerminal() {
             <div className={styles.sectionHeader}>
               <div>
                 <h2>
-                  ⚡ {t.tabQuickOrder} — {isAddonMode ? `Add-on KOT to Table #${orderTargetTable}` : `Table #${orderTargetTable || '01'}`}
+                  ⚡ {t.tabQuickOrder} — {isAddonMode ? `Add-on KOT to Table #${cleanOrderTableNumber}` : `Table #${cleanOrderTableNumber}`}
                 </h2>
-                <p>One-handed mobile POS order punching directly at the dining table.</p>
+                <p>One-handed mobile POS order punching directly at the dining table with live menu images.</p>
               </div>
               {isAddonMode && (
                 <button
@@ -927,7 +947,7 @@ export default function WaiterTerminal() {
             </div>
 
             <div className={styles.orderPunchLayout}>
-              {/* Menu Catalog & Dish Stepper */}
+              {/* Menu Catalog with Photos & Stepper */}
               <div className={styles.menuCatalogSection}>
                 {/* Search Bar & Categories */}
                 <div className={styles.catalogSearchBar}>
@@ -970,45 +990,82 @@ export default function WaiterTerminal() {
                   <div className={styles.dishGrid}>
                     {filteredDishes.map(dish => {
                       const qty = orderCart[dish.id] || 0;
+                      // Resolve dish image from DB or local storage cache
+                      const dishImg = dish.image || (typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + dish.id) || localStorage.getItem('sgr_dish_img_' + dish.title)) : null);
+
                       return (
                         <div key={dish.id} className={styles.dishCard}>
-                          <div>
+                          {/* Dish Photo Header */}
+                          <div className={styles.dishImgWrap}>
+                            {dishImg ? (
+                              <img
+                                src={dishImg}
+                                alt={dish.title}
+                                className={styles.dishImg}
+                                loading="lazy"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.style.display = 'none';
+                                  const next = e.currentTarget.nextElementSibling;
+                                  if (next) next.style.display = 'flex';
+                                }}
+                              />
+                            ) : null}
+                            <div
+                              className={styles.dishImgFallback}
+                              style={{ display: dishImg ? 'none' : 'flex' }}
+                            >
+                              <span className={styles.dishCategoryIcon}>
+                                {getCategoryIcon(dish.category)}
+                              </span>
+                            </div>
+                            <span className={styles.vegIndicatorPill} title="100% Pure Vegetarian">
+                              <span className={styles.vegDot} />
+                            </span>
+                          </div>
+
+                          {/* Dish Information */}
+                          <div className={styles.dishInfo}>
                             <div className={styles.dishTitleTa}>
                               {dish.tamilTitle || dish.titleTamil || dish.title}
                             </div>
                             <div className={styles.dishTitleEn}>{dish.title}</div>
-                          </div>
 
-                          <div className={styles.dishPrice}>₹{dish.price}</div>
+                            <div className={styles.dishBottomRow}>
+                              {dish.price > 0 ? (
+                                <span className={styles.dishPrice}>₹{dish.price}</span>
+                              ) : (
+                                <span className={styles.dishUnpriced}>✨ Heritage</span>
+                              )}
 
-                          <div className={styles.dishStepperRow}>
-                            {qty === 0 ? (
-                              <button
-                                type="button"
-                                className={styles.btnDishAdd}
-                                onClick={() => handleUpdateCart(dish.id, 1)}
-                              >
-                                + {lang === 'ta' ? 'சேர்' : 'Add'}
-                              </button>
-                            ) : (
-                              <>
+                              {qty === 0 ? (
                                 <button
                                   type="button"
-                                  className={styles.stepperBtn}
-                                  onClick={() => handleUpdateCart(dish.id, -1)}
-                                >
-                                  -
-                                </button>
-                                <span className={styles.stepperCount}>{qty}</span>
-                                <button
-                                  type="button"
-                                  className={styles.stepperBtn}
+                                  className={styles.btnDishAdd}
                                   onClick={() => handleUpdateCart(dish.id, 1)}
                                 >
-                                  +
+                                  + {lang === 'ta' ? 'சேர்' : 'Add'}
                                 </button>
-                              </>
-                            )}
+                              ) : (
+                                <div className={styles.dishStepper}>
+                                  <button
+                                    type="button"
+                                    className={styles.stepperBtn}
+                                    onClick={() => handleUpdateCart(dish.id, -1)}
+                                  >
+                                    -
+                                  </button>
+                                  <span className={styles.stepperCount}>{qty}</span>
+                                  <button
+                                    type="button"
+                                    className={styles.stepperBtn}
+                                    onClick={() => handleUpdateCart(dish.id, 1)}
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
                       );
@@ -1017,18 +1074,18 @@ export default function WaiterTerminal() {
                 )}
               </div>
 
-              {/* Live KOT Cart Tray */}
+              {/* Desktop KOT Cart Sidebar */}
               <div className={styles.kotCartSidebar}>
                 <div className={styles.cartHeader}>
                   <h3>📝 {isAddonMode ? 'Add-on KOT Tray' : 'New KOT Tray'}</h3>
-                  <span style={{ fontSize: '0.8rem', fontWeight: 800, color: '#004080' }}>
+                  <span style={{ fontSize: '0.78rem', fontWeight: 800, color: '#004080' }}>
                     {cartItems.length} {t.itemsCount}
                   </span>
                 </div>
 
                 {/* Table Picker */}
                 <div className={styles.tableSelectorRow}>
-                  <label style={{ fontSize: '0.78rem', fontWeight: 800, color: '#475569' }}>Table:</label>
+                  <label style={{ fontSize: '0.76rem', fontWeight: 800, color: '#475569' }}>Table:</label>
                   <select
                     value={orderTargetTable}
                     onChange={e => setOrderTargetTable(e.target.value)}
@@ -1044,7 +1101,7 @@ export default function WaiterTerminal() {
 
                 {/* Diner Count */}
                 <div className={styles.tableSelectorRow}>
-                  <label style={{ fontSize: '0.78rem', fontWeight: 800, color: '#475569' }}>Diners:</label>
+                  <label style={{ fontSize: '0.76rem', fontWeight: 800, color: '#475569' }}>Diners:</label>
                   <select
                     value={orderGuestCount}
                     onChange={e => setOrderGuestCount(Number(e.target.value))}
@@ -1081,13 +1138,13 @@ export default function WaiterTerminal() {
                   value={orderNotes}
                   onChange={e => setOrderNotes(e.target.value)}
                   className={styles.catalogSearchInput}
-                  style={{ fontSize: '0.8rem', padding: '6px 10px' }}
+                  style={{ fontSize: '0.78rem', padding: '6px 10px' }}
                 />
 
                 {/* Cart Items List */}
                 <div className={styles.cartItemsList}>
                   {cartItems.length === 0 ? (
-                    <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.8rem', padding: '16px 0' }}>
+                    <div style={{ textAlign: 'center', color: '#94a3b8', fontSize: '0.78rem', padding: '16px 0' }}>
                       Tap &quot;+&quot; on dishes to add to KOT
                     </div>
                   ) : (
@@ -1095,7 +1152,9 @@ export default function WaiterTerminal() {
                       <div key={it.dishId} className={styles.cartItemLine}>
                         <span>{it.quantity}× {it.tamilTitle || it.title}</span>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontWeight: 800 }}>₹{it.price * it.quantity}</span>
+                          <span style={{ fontWeight: 800 }}>
+                            {it.price > 0 ? `₹${it.price * it.quantity}` : '—'}
+                          </span>
                           <button
                             type="button"
                             onClick={() => handleUpdateCart(it.dishId, -it.quantity)}
@@ -1135,6 +1194,31 @@ export default function WaiterTerminal() {
                 </button>
               </div>
             </div>
+
+            {/* ─── Mobile Floating Cart Sticky Bar ─── */}
+            {cartItems.length > 0 && (
+              <div
+                className={styles.floatingCartBar}
+                onClick={() => setShowMobileCartDrawer(true)}
+              >
+                <div className={styles.floatingCartInfo}>
+                  <span className={styles.floatingCartCount}>{cartItems.length} {t.itemsCount} in KOT</span>
+                  <span className={styles.floatingCartTotal}>
+                    {cartGrandTotal > 0 ? `₹${cartGrandTotal}` : 'Ready to Fire'}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className={styles.floatingCartBtn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setShowMobileCartDrawer(true);
+                  }}
+                >
+                  Review KOT 🔥
+                </button>
+              </div>
+            )}
           </div>
 
         ) : activeTab === 'pending' ? (
@@ -1303,12 +1387,12 @@ export default function WaiterTerminal() {
                       <span className={styles.callTypeBadge}>{c.requestType}</span>
                     </div>
 
-                    <div style={{ fontSize: '0.9rem', fontWeight: 800, color: '#0f172a' }}>
+                    <div style={{ fontSize: '0.88rem', fontWeight: 800, color: '#0f172a' }}>
                       {c.message}
                     </div>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto' }}>
-                      <span style={{ fontSize: '0.72rem', color: '#64748b' }}>
+                      <span style={{ fontSize: '0.7rem', color: '#64748b' }}>
                         {new Date(c.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                       </span>
                       <button
@@ -1327,6 +1411,130 @@ export default function WaiterTerminal() {
         )}
       </main>
 
+      {/* ─── Mobile Cart Review Drawer Modal ─────────────────────────────────── */}
+      {showMobileCartDrawer && (
+        <div className={styles.modalOverlay} onClick={() => setShowMobileCartDrawer(false)}>
+          <div className={styles.modalBox} onClick={e => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <div>
+                <h3>📝 {isAddonMode ? `Add-on KOT — Table #${cleanOrderTableNumber}` : `KOT — Table #${cleanOrderTableNumber}`}</h3>
+                <p style={{ fontSize: '0.75rem', color: '#fbe08e', margin: '2px 0 0' }}>
+                  {cartItems.length} {t.itemsCount} • Total: ₹{cartGrandTotal}
+                </p>
+              </div>
+              <button type="button" onClick={() => setShowMobileCartDrawer(false)} className={styles.modalClose}>✕</button>
+            </div>
+
+            <div className={styles.modalBody}>
+              {/* Table Selector */}
+              <div className={styles.tableSelectorRow}>
+                <label style={{ fontSize: '0.76rem', fontWeight: 800, color: '#475569' }}>Table:</label>
+                <select
+                  value={orderTargetTable}
+                  onChange={e => setOrderTargetTable(e.target.value)}
+                  className={styles.tableSelectField}
+                >
+                  {tables.map(tbl => (
+                    <option key={tbl.tableNumber} value={tbl.tableNumber}>
+                      Table #{tbl.tableNumber} ({tbl.status === 'AVAILABLE' ? '🟢 Free' : '🟡 Dining'})
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Diners Count */}
+              <div className={styles.tableSelectorRow}>
+                <label style={{ fontSize: '0.76rem', fontWeight: 800, color: '#475569' }}>Diners:</label>
+                <select
+                  value={orderGuestCount}
+                  onChange={e => setOrderGuestCount(Number(e.target.value))}
+                  className={styles.tableSelectField}
+                >
+                  {[1, 2, 3, 4, 5, 6, 8, 10].map(n => (
+                    <option key={n} value={n}>{n} {t.diners}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Preferences */}
+              <div className={styles.preferenceChipsTitle}>{t.cookingPref}</div>
+              <div className={styles.preferenceChips}>
+                {COOKING_PREFERENCES.map(pref => {
+                  const active = selectedPrefs.includes(lang === 'ta' ? pref.labelTa : pref.labelEn);
+                  return (
+                    <button
+                      key={pref.id}
+                      type="button"
+                      className={`${styles.prefChip} ${active ? styles.prefChipActive : ''}`}
+                      onClick={() => handleTogglePref(lang === 'ta' ? pref.labelTa : pref.labelEn)}
+                    >
+                      {lang === 'ta' ? pref.labelTa : pref.labelEn}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Notes */}
+              <input
+                type="text"
+                placeholder={lang === 'ta' ? 'கூடுதல் சமையல் குறிப்பு...' : 'Special instructions...'}
+                value={orderNotes}
+                onChange={e => setOrderNotes(e.target.value)}
+                className={styles.catalogSearchInput}
+                style={{ fontSize: '0.8rem', padding: '6px 10px' }}
+              />
+
+              {/* Items List */}
+              <div className={styles.cartItemsList} style={{ maxHeight: '180px' }}>
+                {cartItems.map(it => (
+                  <div key={it.dishId} className={styles.cartItemLine}>
+                    <span>{it.quantity}× {it.tamilTitle || it.title}</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontWeight: 850 }}>
+                        {it.price > 0 ? `₹${it.price * it.quantity}` : '—'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleUpdateCart(it.dishId, -it.quantity)}
+                        style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontWeight: 800 }}
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Price Row */}
+              <div className={styles.cartTotalBox}>
+                <div className={styles.grandTotalRow}>
+                  <span>{t.totalAmount}:</span>
+                  <span>₹{cartGrandTotal}</span>
+                </div>
+              </div>
+
+              <div className={styles.modalActions}>
+                <button
+                  type="button"
+                  className={styles.btnFireKot}
+                  onClick={handleFireKot}
+                  disabled={isFiringKot || cartItems.length === 0}
+                >
+                  {isFiringKot ? '⏳ Firing to Kitchen...' : t.fireKotBtn}
+                </button>
+                <button
+                  type="button"
+                  className={styles.btnCancel}
+                  onClick={() => setShowMobileCartDrawer(false)}
+                >
+                  {t.cancel}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* ─── Table Inspector Modal (Running KOT, Actions) ───────────────────── */}
       {inspectTable && (
         <div className={styles.modalOverlay} onClick={() => setInspectTable(null)}>
@@ -1334,7 +1542,7 @@ export default function WaiterTerminal() {
             <div className={styles.modalHeader}>
               <div>
                 <h3>🏛️ Table #{inspectTable.tableNumber} — {inspectTable.section?.replace('_', ' ')}</h3>
-                <p style={{ fontSize: '0.75rem', color: '#fbe08e', margin: '2px 0 0' }}>
+                <p style={{ fontSize: '0.74rem', color: '#fbe08e', margin: '2px 0 0' }}>
                   Capacity: {inspectTable.capacity} Diners • Status: {inspectTable.status}
                 </p>
               </div>
@@ -1343,11 +1551,11 @@ export default function WaiterTerminal() {
 
             <div className={styles.modalBody}>
               {/* Table Quick Dispatch */}
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
                 <button
                   type="button"
                   className={styles.btnTableQuick}
-                  style={{ background: '#0284c7', color: '#ffffff', padding: '8px 12px' }}
+                  style={{ background: '#0284c7', color: '#ffffff', padding: '7px 10px' }}
                   onClick={() => handleTableStatus(inspectTable.tableNumber, 'BILL_REQUESTED')}
                 >
                   🧾 {t.requestBill}
@@ -1355,7 +1563,7 @@ export default function WaiterTerminal() {
                 <button
                   type="button"
                   className={styles.btnTableQuick}
-                  style={{ background: '#dc2626', color: '#ffffff', padding: '8px 12px' }}
+                  style={{ background: '#dc2626', color: '#ffffff', padding: '7px 10px' }}
                   onClick={() => handleTableStatus(inspectTable.tableNumber, 'CLEANING')}
                 >
                   🧹 {t.cleaning}
@@ -1363,7 +1571,7 @@ export default function WaiterTerminal() {
                 <button
                   type="button"
                   className={styles.btnTableQuick}
-                  style={{ background: '#16a34a', color: '#ffffff', padding: '8px 12px' }}
+                  style={{ background: '#16a34a', color: '#ffffff', padding: '7px 10px' }}
                   onClick={() => handleTableStatus(inspectTable.tableNumber, 'AVAILABLE')}
                 >
                   ✨ {t.markCleaned}
@@ -1395,19 +1603,21 @@ export default function WaiterTerminal() {
 
                 return (
                   <div>
-                    <h4 style={{ margin: '0 0 8px', fontSize: '0.88rem', color: '#051B41' }}>
+                    <h4 style={{ margin: '0 0 8px', fontSize: '0.85rem', color: '#051B41' }}>
                       Active KOT: {active.orderId} ({active.guestName})
                     </h4>
                     <div className={styles.itemsSummary}>
                       {(active.items || []).map((it, idx) => (
                         <div key={idx} className={styles.itemLine}>
                           <span>{it.quantity}× {it.title}</span>
-                          <span style={{ fontWeight: 800 }}>₹{(it.price || 0) * (it.quantity || 1)}</span>
+                          <span style={{ fontWeight: 800 }}>
+                            {it.price > 0 ? `₹${(it.price || 0) * (it.quantity || 1)}` : '—'}
+                          </span>
                         </div>
                       ))}
                     </div>
 
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, fontSize: '1rem', color: '#051B41', margin: '8px 0 14px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontWeight: 900, fontSize: '0.98rem', color: '#051B41', margin: '8px 0 12px' }}>
                       <span>Total Bill:</span>
                       <span>₹{active.totalAmount}</span>
                     </div>
@@ -1435,7 +1645,7 @@ export default function WaiterTerminal() {
             <div className={styles.modalHeader}>
               <div>
                 <h3>🔑 Table #{selectedOtpOrder.tables?.join(' & #')} Authorization</h3>
-                <p style={{ fontSize: '0.78rem', color: '#fbe08e', margin: '2px 0 0' }}>
+                <p style={{ fontSize: '0.74rem', color: '#fbe08e', margin: '2px 0 0' }}>
                   {selectedOtpOrder.guestName} • {selectedOtpOrder.items?.length} items • ₹{selectedOtpOrder.totalAmount}
                 </p>
               </div>
@@ -1471,7 +1681,7 @@ export default function WaiterTerminal() {
                   ))}
                 </div>
 
-                <div className={styles.modalActions} style={{ marginTop: '16px' }}>
+                <div className={styles.modalActions} style={{ marginTop: '14px' }}>
                   <button
                     type="submit"
                     className={styles.btnAuthorizeSubmit}
