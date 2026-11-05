@@ -16,7 +16,23 @@ import {
   isProtectedDeveloperEmail,
   canCallerManageUser,
   canCallerCreateRole,
+  hashPassword,
 } from '@/lib/db';
+
+function formatStaffUser(u) {
+  return {
+    id: u.id,
+    fullName: u.fullName,
+    username: u.username || '',
+    email: u.email || '',
+    phone: u.phone || '',
+    role: u.role,
+    isActive: u.isActive !== false,
+    hasPassword: !!u.passwordHash,
+    isProtected: isProtectedDeveloperEmail(u.email) || !!u.isProtected,
+    createdAt: u.createdAt,
+  };
+}
 
 // Helper to sanitize settings before returning to client (masks all sensitive credentials)
 function sanitizeSettingsForClient(settings) {
@@ -141,16 +157,7 @@ export async function GET(request) {
     return NextResponse.json({
       success: true,
       settings: sanitized,
-      staffUsers: (db.users || []).map(u => ({
-        id: u.id,
-        fullName: u.fullName,
-        email: u.email,
-        phone: u.phone,
-        role: u.role,
-        isActive: u.isActive,
-        isProtected: isProtectedDeveloperEmail(u.email) || !!u.isProtected,
-        createdAt: u.createdAt,
-      })),
+      staffUsers: (db.users || []).map(formatStaffUser),
       tables: (db.tables || []).map(t => ({
         id: t.id,
         tableNumber: t.tableNumber,
@@ -330,12 +337,12 @@ export async function POST(request) {
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // 3. CREATE STAFF ACCOUNT
+    // 3. CREATE STAFF ACCOUNT (Supports Waiters with Username & Password)
     // ──────────────────────────────────────────────────────────────────────────
     if (action === 'CREATE_STAFF') {
       const { userPayload } = body;
-      if (!userPayload || !userPayload.fullName || !userPayload.email || !userPayload.role) {
-        return NextResponse.json({ success: false, error: 'Full name, email, and role are required.' }, { status: 400 });
+      if (!userPayload || !userPayload.fullName || !userPayload.role) {
+        return NextResponse.json({ success: false, error: 'Full name and role are required.' }, { status: 400 });
       }
 
       // Security check: Only Developer Admin can create Owner Admin (SUPER_ADMIN) or Developer Admin accounts
@@ -344,24 +351,58 @@ export async function POST(request) {
         return NextResponse.json({ success: false, error: roleCheck.reason }, { status: 403 });
       }
 
-      const emailNormalized = userPayload.email.trim().toLowerCase();
+      const role = userPayload.role;
+      const fullName = userPayload.fullName.trim();
+      let username = (userPayload.username || '').trim().toLowerCase();
+      let emailNormalized = (userPayload.email || '').trim().toLowerCase();
+      const isActive = userPayload.status === 'Inactive' || userPayload.isActive === false ? false : true;
+
+      // Special handling for Waiters
+      if (role === 'WAITER') {
+        if (!username) {
+          return NextResponse.json({ success: false, error: 'Username is required for waiter accounts.' }, { status: 400 });
+        }
+        if (!/^[a-zA-Z0-9_.-]{3,30}$/.test(username)) {
+          return NextResponse.json({ success: false, error: 'Username must be 3-30 characters (letters, numbers, underscores, dots, hyphens).' }, { status: 400 });
+        }
+        if (!userPayload.password || userPayload.password.length < 4) {
+          return NextResponse.json({ success: false, error: 'Password must be at least 4 characters long.' }, { status: 400 });
+        }
+
+        // Check if username already exists
+        const existingUsername = (db.users || []).find(u => u.username && u.username.toLowerCase() === username);
+        if (existingUsername) {
+          return NextResponse.json({ success: false, error: `Username "${username}" is already taken. Please choose another.` }, { status: 400 });
+        }
+
+        if (!emailNormalized) {
+          emailNormalized = `${username}@waiter.srigokulam.com`;
+        }
+      } else {
+        if (!emailNormalized) {
+          return NextResponse.json({ success: false, error: 'Email address is required for administrative staff.' }, { status: 400 });
+        }
+      }
+
       if (isProtectedDeveloperEmail(emailNormalized)) {
         return NextResponse.json({ success: false, error: 'Reserved system email. Cannot create account with reserved Developer Admin address.' }, { status: 400 });
       }
 
-      const existing = (db.users || []).find(u => u.email && u.email.toLowerCase() === emailNormalized);
-      if (existing) {
+      const existingEmail = (db.users || []).find(u => u.email && u.email.toLowerCase() === emailNormalized);
+      if (existingEmail) {
         return NextResponse.json({ success: false, error: 'A staff account with this email already exists.' }, { status: 400 });
       }
 
       const newUser = {
         id: `usr_${Date.now()}`,
-        fullName: userPayload.fullName.trim(),
+        fullName,
+        username: username || '',
         email: emailNormalized,
         phone: userPayload.phone ? userPayload.phone.trim() : '',
-        role: userPayload.role,
-        isActive: true,
+        role,
+        isActive,
         isProtected: false,
+        passwordHash: userPayload.password ? hashPassword(userPayload.password) : null,
         otpHash: null,
         otpExpiresAt: null,
         otpAttempts: 0,
@@ -380,20 +421,20 @@ export async function POST(request) {
         role: caller.role || 'SUPER_ADMIN',
         module: 'USERS',
         action: 'STAFF_CREATED',
-        detail: `Created staff account for ${newUser.fullName} with role ${newUser.role}.`,
+        detail: `Created ${role} account for ${newUser.fullName} (${username ? '@' + username : newUser.email}, Status: ${isActive ? 'ACTIVE' : 'INACTIVE'}).`,
         ip: callerIp,
       });
 
       return NextResponse.json({
         success: true,
-        message: `Staff account created for ${newUser.fullName}.`,
-        user: newUser,
-        staffUsers: db.users,
+        message: `${role === 'WAITER' ? 'Waiter' : 'Staff'} account created successfully for ${newUser.fullName}.`,
+        user: formatStaffUser(newUser),
+        staffUsers: db.users.map(formatStaffUser),
       });
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // 4. UPDATE STAFF ACCOUNT
+    // 4. UPDATE STAFF ACCOUNT (Edit details, toggle status, reset password)
     // ──────────────────────────────────────────────────────────────────────────
     if (action === 'UPDATE_STAFF') {
       const { userId, userPayload } = body;
@@ -422,29 +463,60 @@ export async function POST(request) {
         }
       }
 
-      db.users[userIndex] = {
-        ...existingUser,
-        fullName: userPayload.fullName ? userPayload.fullName.trim() : existingUser.fullName,
-        phone: userPayload.phone !== undefined ? userPayload.phone.trim() : existingUser.phone,
-        role: userPayload.role || existingUser.role,
-        isActive: userPayload.isActive !== undefined ? userPayload.isActive : existingUser.isActive,
-      };
+      // Check username uniqueness if changed
+      if (userPayload.username) {
+        const cleanUser = userPayload.username.trim().toLowerCase();
+        if (!/^[a-zA-Z0-9_.-]{3,30}$/.test(cleanUser)) {
+          return NextResponse.json({ success: false, error: 'Username must be 3-30 characters (letters, numbers, underscores, dots, hyphens).' }, { status: 400 });
+        }
+        const duplicateUsername = (db.users || []).find(u => u.id !== userId && u.username && u.username.toLowerCase() === cleanUser);
+        if (duplicateUsername) {
+          return NextResponse.json({ success: false, error: `Username "${cleanUser}" is already taken by another account.` }, { status: 400 });
+        }
+        existingUser.username = cleanUser;
+      }
 
+      // If reset/change password provided
+      if (userPayload.password) {
+        if (userPayload.password.length < 4) {
+          return NextResponse.json({ success: false, error: 'Password must be at least 4 characters long.' }, { status: 400 });
+        }
+        existingUser.passwordHash = hashPassword(userPayload.password);
+      }
+
+      // Update basic fields
+      if (userPayload.fullName) {
+        existingUser.fullName = userPayload.fullName.trim();
+      }
+      if (userPayload.phone !== undefined) {
+        existingUser.phone = userPayload.phone ? userPayload.phone.trim() : '';
+      }
+      if (userPayload.role) {
+        existingUser.role = userPayload.role;
+      }
+      if (userPayload.status !== undefined) {
+        existingUser.isActive = userPayload.status === 'Active' || userPayload.status === true;
+      } else if (userPayload.isActive !== undefined) {
+        existingUser.isActive = !!userPayload.isActive;
+      }
+
+      db.users[userIndex] = existingUser;
       await saveDbAsync(db);
 
       recordAuditLog({
         user: caller.name || 'Admin',
         role: caller.role || 'SUPER_ADMIN',
         module: 'USERS',
-        action: 'STAFF_UPDATED',
-        detail: `Updated staff account for ${db.users[userIndex].fullName} (Status: ${db.users[userIndex].isActive ? 'ACTIVE' : 'DEACTIVATED'}, Role: ${db.users[userIndex].role}).`,
+        action: userPayload.password ? 'STAFF_PASSWORD_RESET' : 'STAFF_UPDATED',
+        detail: `Updated account for ${existingUser.fullName} (Status: ${existingUser.isActive ? 'ACTIVE' : 'DEACTIVATED'}, Role: ${existingUser.role}${userPayload.password ? ', Password Reset' : ''}).`,
         ip: callerIp,
       });
 
       return NextResponse.json({
         success: true,
-        message: `Staff account for ${db.users[userIndex].fullName} updated.`,
-        staffUsers: db.users,
+        message: `Account for ${existingUser.fullName} updated successfully.`,
+        user: formatStaffUser(existingUser),
+        staffUsers: db.users.map(formatStaffUser),
       });
     }
 
@@ -478,14 +550,14 @@ export async function POST(request) {
         role: caller.role || 'SUPER_ADMIN',
         module: 'USERS',
         action: 'STAFF_DELETED',
-        detail: `Permanently removed staff account for ${deleted.fullName} (${deleted.email}, Role: ${deleted.role}).`,
+        detail: `Permanently removed account for ${deleted.fullName} (${deleted.username ? '@' + deleted.username : deleted.email}, Role: ${deleted.role}).`,
         ip: callerIp,
       });
 
       return NextResponse.json({
         success: true,
-        message: `Staff account for ${deleted.fullName} has been permanently deleted.`,
-        staffUsers: db.users,
+        message: `Account for ${deleted.fullName} has been permanently deleted.`,
+        staffUsers: db.users.map(formatStaffUser),
       });
     }
 

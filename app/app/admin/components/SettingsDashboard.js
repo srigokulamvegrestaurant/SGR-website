@@ -44,6 +44,17 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
   const [showAddStaffModal, setShowAddStaffModal] = useState(false);
   const [editingStaffUser, setEditingStaffUser] = useState(null);
   const [newStaffForm, setNewStaffForm] = useState({ fullName: '', email: '', phone: '', role: 'WAITER' });
+
+  // Waiter Management State & Modals
+  const [showAddWaiterModal, setShowAddWaiterModal] = useState(false);
+  const [editingWaiter, setEditingWaiter] = useState(null);
+  const [resetPasswordWaiter, setResetPasswordWaiter] = useState(null);
+  const [newWaiterForm, setNewWaiterForm] = useState({ fullName: '', username: '', password: '', status: 'Active' });
+  const [editWaiterForm, setEditWaiterForm] = useState({ fullName: '', username: '', status: 'Active' });
+  const [resetPasswordForm, setResetPasswordForm] = useState({ newPassword: '' });
+  const [showWaiterPassword, setShowWaiterPassword] = useState(false);
+  const [waiterSearch, setWaiterSearch] = useState('');
+  const [waiterStatusFilter, setWaiterStatusFilter] = useState('ALL');
   const [showAddTableModal, setShowAddTableModal] = useState(false);
   const [newTableForm, setNewTableForm] = useState({ tableNumber: '', section: 'GROUND_FLOOR', capacity: 4, shape: 'SQUARE' });
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
@@ -389,6 +400,125 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
     });
   };
 
+  // ─── Waiter Account Management Handlers ─────────────────────────────────────
+  const handleCreateWaiter = async (e) => {
+    e.preventDefault();
+    if (!newWaiterForm.fullName.trim()) {
+      showToast('error', 'Waiter full name is required');
+      return;
+    }
+    if (!newWaiterForm.username.trim()) {
+      showToast('error', 'Username is required for waiter login');
+      return;
+    }
+    if (!newWaiterForm.password || newWaiterForm.password.length < 4) {
+      showToast('error', 'Password must be at least 4 characters long');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'CREATE_STAFF',
+          userPayload: {
+            fullName: newWaiterForm.fullName.trim(),
+            username: newWaiterForm.username.trim().toLowerCase(),
+            password: newWaiterForm.password,
+            status: newWaiterForm.status,
+            role: 'WAITER',
+          },
+          caller: { name: currentUser.name, role: currentUser.role },
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('success', data.message);
+        setShowAddWaiterModal(false);
+        setNewWaiterForm({ fullName: '', username: '', password: '', status: 'Active' });
+        fetchSettings();
+      } else {
+        showToast('error', data.error || 'Failed to create waiter account');
+      }
+    } catch (err) {
+      showToast('error', err.message);
+    }
+  };
+
+  const handleUpdateWaiter = async (e) => {
+    e.preventDefault();
+    if (!editingWaiter) return;
+    if (!editWaiterForm.fullName.trim()) {
+      showToast('error', 'Waiter name is required');
+      return;
+    }
+    if (!editWaiterForm.username.trim()) {
+      showToast('error', 'Username is required');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'UPDATE_STAFF',
+          userId: editingWaiter.id,
+          userPayload: {
+            fullName: editWaiterForm.fullName.trim(),
+            username: editWaiterForm.username.trim().toLowerCase(),
+            status: editWaiterForm.status,
+            role: 'WAITER',
+          },
+          caller: { name: currentUser.name, role: currentUser.role },
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('success', data.message);
+        setEditingWaiter(null);
+        fetchSettings();
+      } else {
+        showToast('error', data.error || 'Failed to update waiter');
+      }
+    } catch (err) {
+      showToast('error', err.message);
+    }
+  };
+
+  const handleResetWaiterPassword = async (e) => {
+    e.preventDefault();
+    if (!resetPasswordWaiter) return;
+    if (!resetPasswordForm.newPassword || resetPasswordForm.newPassword.length < 4) {
+      showToast('error', 'New password must be at least 4 characters long');
+      return;
+    }
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'UPDATE_STAFF',
+          userId: resetPasswordWaiter.id,
+          userPayload: {
+            password: resetPasswordForm.newPassword,
+          },
+          caller: { name: currentUser.name, role: currentUser.role },
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('success', `Password for ${resetPasswordWaiter.fullName} reset successfully!`);
+        setResetPasswordWaiter(null);
+        setResetPasswordForm({ newPassword: '' });
+        fetchSettings();
+      } else {
+        showToast('error', data.error || 'Failed to reset password');
+      }
+    } catch (err) {
+      showToast('error', err.message);
+    }
+  };
+
   // Quick Dish Availability Toggle (Menu Settings)
   const handleToggleDishAvailability = async (dishId, currentAvailable) => {
     try {
@@ -597,11 +727,40 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
       const matchSearch =
         !staffSearch ||
         (u.fullName || '').toLowerCase().includes(staffSearch.toLowerCase()) ||
+        (u.username || '').toLowerCase().includes(staffSearch.toLowerCase()) ||
         (u.email || '').toLowerCase().includes(staffSearch.toLowerCase()) ||
         (u.phone || '').includes(staffSearch);
       return matchRole && matchSearch;
     });
   }, [staffUsers, staffRoleFilter, staffSearch]);
+
+  const waiterAccounts = useMemo(() => {
+    return (staffUsers || [])
+      .filter((u) => u.role === 'WAITER')
+      .filter((w) => {
+        const query = waiterSearch.trim().toLowerCase();
+        const matchSearch =
+          !query ||
+          (w.fullName || '').toLowerCase().includes(query) ||
+          (w.username || '').toLowerCase().includes(query);
+        const matchStatus =
+          waiterStatusFilter === 'ALL' ||
+          (waiterStatusFilter === 'ACTIVE' && w.isActive !== false) ||
+          (waiterStatusFilter === 'INACTIVE' && w.isActive === false);
+        return matchSearch && matchStatus;
+      });
+  }, [staffUsers, waiterSearch, waiterStatusFilter]);
+
+  const waiterStats = useMemo(() => {
+    const allWaiters = (staffUsers || []).filter((u) => u.role === 'WAITER');
+    const activeWaiters = allWaiters.filter((w) => w.isActive !== false);
+    const inactiveWaiters = allWaiters.filter((w) => w.isActive === false);
+    return {
+      total: allWaiters.length,
+      active: activeWaiters.length,
+      inactive: inactiveWaiters.length,
+    };
+  }, [staffUsers]);
 
   const filteredDishes = useMemo(() => {
     return menuDishes.filter((d) => {
@@ -739,11 +898,19 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
           <div className={styles.navCategoryTitle}>Access &amp; Security</div>
           <button
             type="button"
+            className={`${styles.subnavItem} ${activeSubTab === 'waiters' ? styles.subnavActive : ''}`}
+            onClick={() => setActiveSubTab('waiters')}
+          >
+            <span className={styles.subnavIcon}>🧑‍🍳</span>
+            <span>Waiter Accounts</span>
+          </button>
+          <button
+            type="button"
             className={`${styles.subnavItem} ${activeSubTab === 'users' ? styles.subnavActive : ''}`}
             onClick={() => setActiveSubTab('users')}
           >
             <span className={styles.subnavIcon}>👥</span>
-            <span>Staff Accounts</span>
+            <span>All Staff Directory</span>
           </button>
           <button
             type="button"
@@ -1199,6 +1366,253 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
           )}
 
           {/* ══════════════════════════════════════════════════════════════════════
+              MODULE 2.9: WAITER & FLOOR CAPTAIN ACCOUNTS
+             ══════════════════════════════════════════════════════════════════════ */}
+          {activeSubTab === 'waiters' && (
+            <div className={styles.settingsCard}>
+              <div className={styles.cardHeader}>
+                <div className={styles.cardHeaderTitleGroup}>
+                  <span className={styles.cardIcon}>🧑‍🍳</span>
+                  <div>
+                    <h2 className={styles.cardTitle}>Floor Captain &amp; Waiter Accounts</h2>
+                    <p className={styles.cardSubtitle}>
+                      Manage dining hall waiter credentials. Waiters log in to the Waiter Terminal using their Username and Password.
+                    </p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  className={styles.btnPrimary}
+                  onClick={() => {
+                    setNewWaiterForm({ fullName: '', username: '', password: '', status: 'Active' });
+                    setShowAddWaiterModal(true);
+                  }}
+                >
+                  ➕ Add New Waiter
+                </button>
+              </div>
+
+              {/* Status & Portal Overview Cards */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.85rem' }}>
+                <div
+                  style={{
+                    background: 'rgba(15, 23, 42, 0.5)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    borderRadius: 10,
+                    padding: '0.85rem 1rem',
+                  }}
+                >
+                  <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Total Waiter Accounts
+                  </div>
+                  <div style={{ fontSize: '1.45rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: '0.2rem' }}>
+                    {waiterStats.total}
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    background: 'rgba(16, 185, 129, 0.08)',
+                    border: '1px solid rgba(16, 185, 129, 0.25)',
+                    borderRadius: 10,
+                    padding: '0.85rem 1rem',
+                  }}
+                >
+                  <div style={{ fontSize: '0.72rem', color: '#34d399', textTransform: 'uppercase', fontWeight: 700 }}>
+                    🟢 Active (Can Log In)
+                  </div>
+                  <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#10b981', marginTop: '0.2rem' }}>
+                    {waiterStats.active}
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    background: 'rgba(239, 68, 68, 0.08)',
+                    border: '1px solid rgba(239, 68, 68, 0.25)',
+                    borderRadius: 10,
+                    padding: '0.85rem 1rem',
+                  }}
+                >
+                  <div style={{ fontSize: '0.72rem', color: '#f87171', textTransform: 'uppercase', fontWeight: 700 }}>
+                    🔴 Deactivated (Blocked)
+                  </div>
+                  <div style={{ fontSize: '1.45rem', fontWeight: 800, color: '#ef4444', marginTop: '0.2rem' }}>
+                    {waiterStats.inactive}
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    background: 'rgba(245, 158, 11, 0.08)',
+                    border: '1px solid rgba(245, 158, 11, 0.25)',
+                    borderRadius: 10,
+                    padding: '0.85rem 1rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <div style={{ fontSize: '0.72rem', color: '#fbbf24', textTransform: 'uppercase', fontWeight: 700 }}>
+                    Floor Captain Login URL
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.35rem' }}>
+                    <code style={{ fontSize: '0.78rem', color: '#fef3c7', background: 'rgba(0,0,0,0.3)', padding: '0.2rem 0.4rem', borderRadius: 4 }}>
+                      /waiter/login
+                    </code>
+                    <a
+                      href="/waiter/login"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={`${styles.btnSecondary} ${styles.btnSm}`}
+                      style={{ textDecoration: 'none', fontSize: '0.72rem', padding: '0.25rem 0.55rem' }}
+                    >
+                      🔗 Open Login
+                    </a>
+                  </div>
+                </div>
+              </div>
+
+              {/* Filters */}
+              <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  placeholder="🔍 Search by waiter name or @username..."
+                  className={styles.input}
+                  style={{ maxWidth: 320 }}
+                  value={waiterSearch}
+                  onChange={(e) => setWaiterSearch(e.target.value)}
+                />
+                <select
+                  className={styles.select}
+                  style={{ maxWidth: 200 }}
+                  value={waiterStatusFilter}
+                  onChange={(e) => setWaiterStatusFilter(e.target.value)}
+                >
+                  <option value="ALL">All Status ({waiterStats.total})</option>
+                  <option value="ACTIVE">Active Only ({waiterStats.active})</option>
+                  <option value="INACTIVE">Inactive Only ({waiterStats.inactive})</option>
+                </select>
+              </div>
+
+              {/* Waiter Accounts Table */}
+              <div className={styles.tableWrap}>
+                <table className={styles.dataTable}>
+                  <thead>
+                    <tr>
+                      <th>Waiter Name</th>
+                      <th>Login Username</th>
+                      <th>Login Status</th>
+                      <th>Password Security</th>
+                      <th>Account Created</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {waiterAccounts.length === 0 ? (
+                      <tr>
+                        <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>
+                          No waiter accounts found matching the filter. Click <strong>"➕ Add New Waiter"</strong> to create one.
+                        </td>
+                      </tr>
+                    ) : (
+                      waiterAccounts.map((w) => (
+                        <tr key={w.id}>
+                          <td>
+                            <strong>{w.fullName}</strong>
+                            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>ID: {w.id}</div>
+                          </td>
+                          <td>
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.3rem',
+                                background: 'rgba(245, 158, 11, 0.12)',
+                                border: '1px solid rgba(245, 158, 11, 0.35)',
+                                color: '#fbbf24',
+                                padding: '0.25rem 0.6rem',
+                                borderRadius: 6,
+                                fontSize: '0.82rem',
+                                fontWeight: 700,
+                                fontFamily: 'monospace',
+                              }}
+                            >
+                              @{w.username || 'not_set'}
+                            </span>
+                          </td>
+                          <td>
+                            <span className={`${styles.statusBadge} ${w.isActive !== false ? styles.statusVerified : styles.statusFailed}`}>
+                              {w.isActive !== false ? 'ACTIVE (Allowed)' : 'INACTIVE (Blocked)'}
+                            </span>
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', letterSpacing: '0.15em' }}>
+                                ••••••••
+                              </span>
+                              <button
+                                type="button"
+                                className={`${styles.btnSecondary} ${styles.btnSm}`}
+                                style={{ fontSize: '0.72rem', padding: '0.2rem 0.5rem' }}
+                                onClick={() => {
+                                  setResetPasswordWaiter(w);
+                                  setResetPasswordForm({ newPassword: '' });
+                                }}
+                                title="Reset / Change Waiter Password"
+                              >
+                                🔑 Reset Password
+                              </button>
+                            </div>
+                          </td>
+                          <td style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                            {w.createdAt ? new Date(w.createdAt).toLocaleDateString() : 'System Seed'}
+                          </td>
+                          <td>
+                            <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                              <button
+                                type="button"
+                                className={`${styles.btnSecondary} ${styles.btnSm}`}
+                                onClick={() => {
+                                  setEditingWaiter(w);
+                                  setEditWaiterForm({
+                                    fullName: w.fullName,
+                                    username: w.username || '',
+                                    status: w.isActive !== false ? 'Active' : 'Inactive',
+                                  });
+                                }}
+                                title="Edit Waiter Name, Username & Status"
+                              >
+                                ✏️ Edit
+                              </button>
+                              <button
+                                type="button"
+                                className={`${styles.btnSecondary} ${styles.btnSm}`}
+                                onClick={() => handleToggleStaffActive(w)}
+                                title={w.isActive !== false ? 'Deactivate waiter account' : 'Reactivate waiter account'}
+                              >
+                                {w.isActive !== false ? 'Deactivate' : 'Reactivate'}
+                              </button>
+                              <button
+                                type="button"
+                                className={`${styles.btnDanger} ${styles.btnSm}`}
+                                onClick={() => handleDeleteStaff(w)}
+                                title="Permanently delete waiter account"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* ══════════════════════════════════════════════════════════════════════
               MODULE 3: USER & ROLE MANAGEMENT
              ══════════════════════════════════════════════════════════════════════ */}
           {activeSubTab === 'users' && (
@@ -1290,6 +1704,11 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
                         <tr key={u.id}>
                           <td>
                             <strong>{u.fullName}</strong>
+                            {u.username && (
+                              <div style={{ fontSize: '0.76rem', color: '#fbbf24', fontWeight: 600, fontFamily: 'monospace' }}>
+                                @{u.username}
+                              </div>
+                            )}
                             <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>ID: {u.id}</div>
                           </td>
                           <td>
@@ -1351,7 +1770,20 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
                                 🛡️ PERMANENTLY PROTECTED
                               </span>
                             ) : (
-                              <div style={{ display: 'flex', gap: '0.4rem' }}>
+                              <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                                {u.role === 'WAITER' && (
+                                  <button
+                                    type="button"
+                                    className={`${styles.btnSecondary} ${styles.btnSm}`}
+                                    onClick={() => {
+                                      setResetPasswordWaiter(u);
+                                      setResetPasswordForm({ newPassword: '' });
+                                    }}
+                                    title="Reset Waiter Password"
+                                  >
+                                    🔑 Password
+                                  </button>
+                                )}
                                 <button
                                   type="button"
                                   className={`${styles.btnSecondary} ${styles.btnSm}`}
@@ -3652,6 +4084,250 @@ export default function SettingsDashboard({ currentUser = { name: 'Aswin', role:
                 </button>
                 <button type="submit" className={styles.btnPrimary}>
                   Create Account
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Add Waiter Modal ─── */}
+      {showAddWaiterModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalBox}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>🧑‍🍳 Create Waiter Account</h3>
+              <button type="button" className={styles.modalCloseBtn} onClick={() => setShowAddWaiterModal(false)}>
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleCreateWaiter}>
+              <div className={styles.modalBody}>
+                <div style={{ background: 'rgba(245, 158, 11, 0.08)', border: '1px solid rgba(245, 158, 11, 0.25)', padding: '0.75rem', borderRadius: 8, fontSize: '0.8rem', color: '#fef3c7', marginBottom: '0.5rem', lineHeight: 1.45 }}>
+                  🛡️ <strong>Dining Hall Waiter Account:</strong> Waiters log in to the Waiter Terminal with their <strong>Username &amp; Password</strong>. Self-registration is disabled for security.
+                </div>
+
+                {/* 1. Waiter Name */}
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>
+                    Waiter Name <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Murugan or Kannan"
+                    className={styles.input}
+                    value={newWaiterForm.fullName}
+                    onChange={(e) => setNewWaiterForm({ ...newWaiterForm, fullName: e.target.value })}
+                  />
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Display name shown on table KOTs and service calls.</span>
+                </div>
+
+                {/* 2. Username */}
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>
+                    Username <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. murugan"
+                    className={styles.input}
+                    value={newWaiterForm.username}
+                    onChange={(e) => setNewWaiterForm({ ...newWaiterForm, username: e.target.value })}
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck="false"
+                  />
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Unique login handle used on the waiter login screen.</span>
+                </div>
+
+                {/* 3. Password */}
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>
+                    Password <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <input
+                      type={showWaiterPassword ? 'text' : 'password'}
+                      required
+                      placeholder="Minimum 4 characters"
+                      className={styles.input}
+                      style={{ paddingRight: '2.5rem' }}
+                      value={newWaiterForm.password}
+                      onChange={(e) => setNewWaiterForm({ ...newWaiterForm, password: e.target.value })}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowWaiterPassword(!showWaiterPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '0.5rem',
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        cursor: 'pointer',
+                        fontSize: '1.1rem',
+                        padding: '0.25rem',
+                      }}
+                      tabIndex={-1}
+                    >
+                      {showWaiterPassword ? '🙈' : '👁️'}
+                    </button>
+                  </div>
+                </div>
+
+                {/* 4. Status */}
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>
+                    Account Status <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <select
+                    className={styles.select}
+                    value={newWaiterForm.status}
+                    onChange={(e) => setNewWaiterForm({ ...newWaiterForm, status: e.target.value })}
+                  >
+                    <option value="Active">🟢 Active (Can log in to Waiter Terminal)</option>
+                    <option value="Inactive">🔴 Inactive (Blocked from login)</option>
+                  </select>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>Only Active waiter accounts are permitted to authenticate.</span>
+                </div>
+              </div>
+              <div className={styles.modalFooter}>
+                <button type="button" className={styles.btnSecondary} onClick={() => setShowAddWaiterModal(false)}>
+                  Cancel
+                </button>
+                <button type="submit" className={styles.btnPrimary}>
+                  Create Waiter Account
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Edit Waiter Modal ─── */}
+      {editingWaiter && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalBox}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>✏️ Edit Waiter Account</h3>
+              <button type="button" className={styles.modalCloseBtn} onClick={() => setEditingWaiter(null)}>
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleUpdateWaiter}>
+              <div className={styles.modalBody}>
+                {/* 1. Waiter Name */}
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Waiter Name <span style={{ color: '#ef4444' }}>*</span></label>
+                  <input
+                    type="text"
+                    required
+                    className={styles.input}
+                    value={editWaiterForm.fullName}
+                    onChange={(e) => setEditWaiterForm({ ...editWaiterForm, fullName: e.target.value })}
+                  />
+                </div>
+
+                {/* 2. Username */}
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Username <span style={{ color: '#ef4444' }}>*</span></label>
+                  <input
+                    type="text"
+                    required
+                    className={styles.input}
+                    value={editWaiterForm.username}
+                    onChange={(e) => setEditWaiterForm({ ...editWaiterForm, username: e.target.value })}
+                    autoCapitalize="none"
+                    autoCorrect="off"
+                    spellCheck="false"
+                  />
+                </div>
+
+                {/* 3. Status */}
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>Status <span style={{ color: '#ef4444' }}>*</span></label>
+                  <select
+                    className={styles.select}
+                    value={editWaiterForm.status}
+                    onChange={(e) => setEditWaiterForm({ ...editWaiterForm, status: e.target.value })}
+                  >
+                    <option value="Active">🟢 Active (Can log in)</option>
+                    <option value="Inactive">🔴 Inactive (Blocked from login)</option>
+                  </select>
+                </div>
+              </div>
+              <div className={styles.modalFooter}>
+                <button type="button" className={styles.btnSecondary} onClick={() => setEditingWaiter(null)}>
+                  Cancel
+                </button>
+                <button type="submit" className={styles.btnPrimary}>
+                  Save Changes
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Reset Password Modal ─── */}
+      {resetPasswordWaiter && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modalBox}>
+            <div className={styles.modalHeader}>
+              <h3 className={styles.modalTitle}>🔑 Reset Waiter Password</h3>
+              <button type="button" className={styles.modalCloseBtn} onClick={() => setResetPasswordWaiter(null)}>
+                ✕
+              </button>
+            </div>
+            <form onSubmit={handleResetWaiterPassword}>
+              <div className={styles.modalBody}>
+                <div style={{ background: 'rgba(56, 189, 248, 0.08)', border: '1px solid rgba(56, 189, 248, 0.25)', padding: '0.75rem', borderRadius: 8, fontSize: '0.82rem', marginBottom: '1rem', color: '#e0f2fe' }}>
+                  Setting new password for: <strong>{resetPasswordWaiter.fullName}</strong> (<code>@{resetPasswordWaiter.username}</code>)
+                </div>
+
+                <div className={styles.formGroup}>
+                  <label className={styles.label}>
+                    New Password <span style={{ color: '#ef4444' }}>*</span>
+                  </label>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <input
+                      type={showWaiterPassword ? 'text' : 'password'}
+                      required
+                      placeholder="Enter new password (min 4 chars)"
+                      className={styles.input}
+                      style={{ paddingRight: '2.5rem' }}
+                      value={resetPasswordForm.newPassword}
+                      onChange={(e) => setResetPasswordForm({ ...resetPasswordForm, newPassword: e.target.value })}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowWaiterPassword(!showWaiterPassword)}
+                      style={{
+                        position: 'absolute',
+                        right: '0.5rem',
+                        background: 'none',
+                        border: 'none',
+                        color: 'var(--text-muted)',
+                        cursor: 'pointer',
+                        fontSize: '1.1rem',
+                        padding: '0.25rem',
+                      }}
+                      tabIndex={-1}
+                    >
+                      {showWaiterPassword ? '🙈' : '👁️'}
+                    </button>
+                  </div>
+                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>The waiter can immediately use this new password to log in.</span>
+                </div>
+              </div>
+              <div className={styles.modalFooter}>
+                <button type="button" className={styles.btnSecondary} onClick={() => setResetPasswordWaiter(null)}>
+                  Cancel
+                </button>
+                <button type="submit" className={styles.btnPrimary}>
+                  Update Password
                 </button>
               </div>
             </form>

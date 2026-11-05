@@ -891,6 +891,21 @@ export function getDb() {
         }
       });
 
+      // Auto-migrate: ensure waiter accounts have username and password credentials
+      (loaded.users || []).forEach(u => {
+        if (u.role === 'WAITER') {
+          if (!u.username || u.username === 'muruganfloorcaptain') {
+            const firstWord = (u.fullName || 'waiter').trim().split(' ')[0].toLowerCase().replace(/[^a-z0-9]/g, '');
+            u.username = firstWord || 'waiter';
+            u.passwordHash = hashPassword(u.username === 'murugan' ? 'murugan123' : 'waiter123');
+            needsSave = true;
+          } else if (!u.passwordHash) {
+            u.passwordHash = hashPassword(u.username === 'murugan' ? 'murugan123' : 'waiter123');
+            needsSave = true;
+          }
+        }
+      });
+
       // Auto-migrate: populate structured settings sub-objects if missing
       if (!loaded.settings) {
         loaded.settings = JSON.parse(JSON.stringify(SEED_DATA.settings));
@@ -1775,6 +1790,28 @@ export const AUTH_SECRET =
   process.env.NEXTAUTH_SECRET ||
   'sgr_sattvic_karaikudi_secret_key_2026_production_master_8e9b4c2a71f053e1987d65c4b3a2019f';
 
+export function hashPassword(password) {
+  if (!password || typeof password !== 'string') return '';
+  const salt = crypto.randomBytes(16).toString('hex');
+  const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+  return `${salt}:${hash}`;
+}
+
+export function verifyPassword(password, storedHash) {
+  if (!password || !storedHash || typeof storedHash !== 'string' || !storedHash.includes(':')) {
+    return false;
+  }
+  const [salt, key] = storedHash.split(':');
+  if (!salt || !key) return false;
+  try {
+    const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+    if (hash.length !== key.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(key, 'hex'), Buffer.from(hash, 'hex'));
+  } catch (err) {
+    return false;
+  }
+}
+
 export function createSignedToken(payload) {
   const payloadStr = Buffer.from(JSON.stringify(payload)).toString('base64url');
   const sig = crypto.createHmac('sha256', AUTH_SECRET).update(payloadStr).digest('base64url');
@@ -1859,7 +1896,11 @@ export function validateSession(token) {
     if (new Date() > new Date(decoded.expiresAt)) {
       return null;
     }
-    let user = (db.users || []).find(u => u.email && u.email.toLowerCase() === decoded.email.toLowerCase());
+    let user = (db.users || []).find(u => 
+      (decoded.userId && u.id === decoded.userId) ||
+      (decoded.username && u.username && u.username.toLowerCase() === decoded.username.toLowerCase()) ||
+      (decoded.email && u.email && u.email.toLowerCase() === decoded.email.toLowerCase())
+    );
     if (!user) {
       if (isProtectedDeveloperEmail(decoded.email)) {
         user = {

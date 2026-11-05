@@ -25,6 +25,6 @@ yarn-error.log*
 # Agents & ide temporary files
 .agents/
 
-# Backup snapshots
-.data/backups/
-app/.data/backups/
+# Backup snapshots & local runtime cache
+.data/
+app/.data/

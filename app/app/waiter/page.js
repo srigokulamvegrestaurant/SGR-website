@@ -181,6 +181,10 @@ export default function WaiterTerminal() {
   const [lang, setLang] = useState('ta'); // 'ta' (Tamil) or 'en' (English)
   const t = DICT[lang] || DICT.ta;
 
+  // Waiter Authentication & Session State
+  const [waiterUser, setWaiterUser] = useState(null);
+  const [authChecking, setAuthChecking] = useState(true);
+
   const [activeTab, setActiveTab] = useState('tables'); // 'tables' | 'quick_order' | 'pending' | 'kitchen' | 'calls'
   const [tables, setTables] = useState([]);
   const [floorPlans, setFloorPlans] = useState([]);
@@ -221,6 +225,42 @@ export default function WaiterTerminal() {
   const [enteredOtp, setEnteredOtp] = useState('');
   const [verifyingOtp, setVerifyingOtp] = useState(false);
   const [advancingId, setAdvancingId] = useState(null);
+
+  // ─── Verify Waiter Session & Redirect If Inactive ───────────────────────────
+  useEffect(() => {
+    let isMounted = true;
+    async function checkAuth() {
+      try {
+        const res = await fetch('/api/waiter/session', { cache: 'no-store' });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || !data.authenticated || !data.waiter?.isActive) {
+          window.location.href = '/waiter/login';
+          return;
+        }
+        if (isMounted) {
+          setWaiterUser(data.waiter);
+          setAuthChecking(false);
+        }
+      } catch (err) {
+        window.location.href = '/waiter/login';
+      }
+    }
+    checkAuth();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      await fetch('/api/waiter/logout', { method: 'POST' });
+    } catch (e) {}
+    try {
+      localStorage.removeItem('sgr_waiter_user');
+      localStorage.removeItem('sgr_waiter_token');
+    } catch (e) {}
+    window.location.href = '/waiter/login';
+  };
 
   // ─── Fetch Core Data ────────────────────────────────────────────────────────
   const fetchData = useCallback(async () => {
@@ -455,7 +495,7 @@ export default function WaiterTerminal() {
           quantity: it.quantity,
         })),
         isStaffPunch: true,
-        verifiedBy: 'Captain Murugan (Floor Lead)',
+        verifiedBy: waiterUser ? `Captain ${waiterUser.fullName}` : 'Floor Captain',
         isAddon: isAddonMode,
         parentOrderId: addonParentOrderId,
       };
@@ -495,7 +535,7 @@ export default function WaiterTerminal() {
         body: JSON.stringify({
           orderId: selectedOtpOrder.orderId,
           otp: enteredOtp.trim(),
-          staffName: 'Captain Murugan (Floor Lead)',
+          staffName: waiterUser ? `Captain ${waiterUser.fullName}` : 'Floor Captain',
         }),
       });
       const data = await res.json();
@@ -520,7 +560,7 @@ export default function WaiterTerminal() {
       const res = await fetch(`/api/orders/${orderId}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus, staffName: 'Captain Murugan' }),
+        body: JSON.stringify({ status: newStatus, staffName: waiterUser ? `Captain ${waiterUser.fullName}` : 'Floor Captain' }),
       });
       const data = await res.json();
       if (!res.ok || !data.success) throw new Error(data.error);
@@ -557,6 +597,35 @@ export default function WaiterTerminal() {
   // Clean Table Number Display
   const cleanOrderTableNumber = String(orderTargetTable).replace(/^Table\s*#?/i, '') || '01';
 
+  if (authChecking) {
+    return (
+      <div style={{
+        minHeight: '100vh',
+        minHeight: '100dvh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        background: '#041f17',
+        color: '#fef3c7',
+        fontFamily: 'system-ui, -apple-system, sans-serif'
+      }}>
+        <div style={{
+          width: 40,
+          height: 40,
+          border: '3px solid rgba(251, 191, 36, 0.25)',
+          borderTopColor: '#fbbf24',
+          borderRadius: '50%',
+          animation: 'spin 0.8s linear infinite',
+          marginBottom: '1rem'
+        }} />
+        <div style={{ fontSize: '1rem', fontWeight: 700, letterSpacing: '0.02em' }}>
+          {lang === 'ta' ? 'கேப்டன் கணக்கு சரிபார்க்கப்படுகிறது...' : 'Verifying Captain Terminal Session...'}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={styles.container}>
       {/* ─── Top Staff Header ──────────────────────────────────────────────── */}
@@ -567,7 +636,16 @@ export default function WaiterTerminal() {
             🧑‍🍳 {lang === 'ta' ? 'கேப்டன் முனையம்' : 'Captain Terminal'}
           </h1>
           <div className={styles.serverBadge}>
-            <span>{t.captainLead}</span> •{' '}
+            <span>
+              {waiterUser ? (
+                <>
+                  <strong>{lang === 'ta' ? `கேப்டன் ${waiterUser.fullName}` : `Captain ${waiterUser.fullName}`}</strong>
+                  {waiterUser.username && <span style={{ opacity: 0.75, marginLeft: '0.35rem' }}>@{waiterUser.username}</span>}
+                </>
+              ) : (
+                t.captainLead
+              )}
+            </span> •{' '}
             <span className={sseStatus === 'live' ? styles.sseLive : sseStatus === 'error' ? styles.sseError : styles.sseConnecting}>
               {sseStatus === 'live' ? t.live : sseStatus === 'error' ? t.reconnecting : t.connecting}
             </span>
@@ -589,6 +667,27 @@ export default function WaiterTerminal() {
             title={soundEnabled ? 'Mute Sounds' : 'Unmute Sounds'}
           >
             {soundEnabled ? '🔔' : '🔕'}
+          </button>
+          <button
+            type="button"
+            className={styles.btnLogout}
+            onClick={handleLogout}
+            title="Logout of Waiter Terminal / வெளியேறு"
+            style={{
+              background: 'rgba(239, 68, 68, 0.2)',
+              border: '1px solid rgba(239, 68, 68, 0.45)',
+              color: '#fca5a5',
+              padding: '0.42rem 0.8rem',
+              borderRadius: '8px',
+              fontSize: '0.82rem',
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+            }}
+          >
+            🚪 {lang === 'ta' ? 'வெளியேறு' : 'Logout'}
           </button>
           <Link href="/" className={styles.guestLink}>
             {t.guestView}
