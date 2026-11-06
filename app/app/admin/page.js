@@ -1439,7 +1439,7 @@ Status: SHIFT CLOSED & VERIFIED
       paperWidth: width,
       isDuplicate: !!b.isDuplicate,
       reprintCount: b.reprintCount || 0,
-      settings: systemSettings,
+      settings: posData?.settings || devSettings || {},
       standalonePage: true,
     });
     printWindow.document.write(html);
@@ -4763,7 +4763,7 @@ Status: SHIFT CLOSED & VERIFIED
                               transactionRef: lastSettledBill.transactionRef || '',
                               settledAt: lastSettledBill.settledAt || lastSettledBill.createdAt,
                               paperWidth: '80MM',
-                              settings: systemSettings,
+                              settings: posData?.settings || devSettings || {},
                               standalonePage: false,
                             })
                           }}
@@ -11994,7 +11994,7 @@ Status: SHIFT CLOSED & VERIFIED
         bills={posData.recentBills || []}
         activeTables={posData.tables || []}
         currentUser={currentUser}
-        settings={systemSettings}
+        settings={posData?.settings || devSettings || {}}
         onOpenManualBill={() => {
           setShowBillsHistoryModal(false);
           setShowManualBillModal(true);
