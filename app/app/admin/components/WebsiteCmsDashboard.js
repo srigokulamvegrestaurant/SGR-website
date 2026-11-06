@@ -3412,6 +3412,50 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                   </div>
                 )}
               </div>
+
+              {/* Call-to-Action Buttons Visibility Toggle */}
+              <div
+                className={styles.formGroup}
+                style={{
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '10px',
+                  padding: '0.85rem',
+                  background: 'var(--bg-card-subtle, #f8fafc)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                  <div>
+                    <label className={styles.formLabel} style={{ margin: 0, fontWeight: 700 }}>
+                      🔘 Overlay CTA Buttons (Reservation &amp; QR)
+                    </label>
+                    <p style={{ margin: '0.2rem 0 0', fontSize: '0.74rem', color: '#64748b' }}>
+                      Show clickable &quot;Table Reservation&quot; &amp; &quot;QR Table Order&quot; buttons over this banner. Turn OFF if your uploaded graphic banner already has its own buttons or text baked in.
+                    </p>
+                  </div>
+                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600 }}>
+                    <input
+                      type="checkbox"
+                      checked={editingSlide.primaryBtn?.isVisible !== false}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        setEditingSlide({
+                          ...editingSlide,
+                          primaryBtn: {
+                            ...(editingSlide.primaryBtn || { icon: '📅', text: 'Table Reservation →', action: 'reservation' }),
+                            isVisible: checked,
+                          },
+                          secondaryBtn: {
+                            ...(editingSlide.secondaryBtn || { icon: '📲', text: 'QR Table Order', action: 'qr' }),
+                            isVisible: checked,
+                          },
+                        });
+                      }}
+                      style={{ width: '18px', height: '18px', accentColor: '#0284c7' }}
+                    />
+                    {editingSlide.primaryBtn?.isVisible !== false ? 'Buttons Visible' : 'Hidden'}
+                  </label>
+                </div>
+              </div>
             </div>
             <div className={styles.modalFooter}>
               <button type="button" className={styles.btnActionSec} onClick={() => setEditingSlide(null)}>

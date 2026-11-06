@@ -28,6 +28,10 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
 
+  const hasDedicatedMobileBanners = activeSlides.some(
+    (s) => Boolean(s.mobileImage && s.mobileImage.trim() !== '' && s.mobileImage !== s.desktopImage)
+  );
+
   const goTo = useCallback((index) => {
     let newIdx = index;
     if (newIdx >= activeSlides.length) newIdx = 0;
@@ -182,7 +186,7 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
       </div>
 
       {/* Sliding Viewport */}
-      <div className={styles.sliderViewport}>
+      <div className={`${styles.sliderViewport} ${hasDedicatedMobileBanners ? styles.viewportHasMobilePortrait : ''}`}>
         {/* Floating Ambient Golden Ghee Particles */}
         <FloatingParticles count={14} />
 
@@ -191,58 +195,91 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
           className={styles.slidesTrack}
           style={{ transform: `translate3d(-${currentIdx * 100}%, 0, 0)` }}
         >
-          {activeSlides.map((slide, idx) => (
-            <div className={`${styles.slide} ${idx === currentIdx ? styles.slideActive : ''}`} key={slide.id || idx}>
-              <picture>
-                {slide.mobileImage && <source media="(max-width: 640px)" srcSet={slide.mobileImage} />}
-                <img
-                  className={styles.slidePhoto}
-                  src={slide.desktopImage || slide.image}
-                  alt={slide.alt || 'Sri Gokulam Chettinad Feast'}
-                  loading={idx === 0 ? 'eager' : 'lazy'}
-                />
-              </picture>
-              <div className={styles.gradientMask}></div>
+          {activeSlides.map((slide, idx) => {
+            const hasTextContent = Boolean(
+              (slide.tagText && slide.tagText.trim()) ||
+              (slide.titleLine1 && slide.titleLine1.trim()) ||
+              (slide.titleAccent && slide.titleAccent.trim()) ||
+              (slide.description && slide.description.trim())
+            );
+            const hasPrimaryBtn = Boolean(slide.primaryBtn && slide.primaryBtn.isVisible !== false && slide.primaryBtn.text);
+            const hasSecondaryBtn = Boolean(slide.secondaryBtn && slide.secondaryBtn.isVisible !== false && slide.secondaryBtn.text);
+            const hasButtons = hasPrimaryBtn || hasSecondaryBtn;
+            const hasPrice = Boolean(slide.priceText && slide.priceText.trim());
 
-              <div className={styles.innerContainer}>
-                <div className={styles.contentBox}>
-                  <div className={styles.tagPill}>
-                    <span>{slide.tagIcon}</span> {slide.tagText}
-                  </div>
-                  <h1 className={styles.titleText}>
-                    {slide.titleLine1}{' '}
-                    <span className={styles.goldAccent}>{slide.titleAccent}</span>
-                  </h1>
-                  <p className={styles.descText}>{slide.description}</p>
+            return (
+              <div
+                className={`${styles.slide} ${idx === currentIdx ? styles.slideActive : ''} ${!hasTextContent ? styles.slideGraphicOnly : ''}`}
+                key={slide.id || idx}
+              >
+                <picture className={styles.pictureWrapper}>
+                  {slide.mobileImage && <source media="(max-width: 640px)" srcSet={slide.mobileImage} />}
+                  <img
+                    className={styles.slidePhoto}
+                    src={slide.desktopImage || slide.image}
+                    alt={slide.alt || 'Sri Gokulam Chettinad Feast'}
+                    loading={idx === 0 ? 'eager' : 'lazy'}
+                  />
+                </picture>
 
-                  <div className={styles.btnGroup}>
-                    {slide.primaryBtn && slide.primaryBtn.isVisible !== false && (
-                      <button
-                        type="button"
-                        className={styles.ctaPrimary}
-                        onClick={(e) => handleBtnClick(slide.primaryBtn.action, slide.primaryBtn.href || '#menu', e)}
-                      >
-                        <span>{slide.primaryBtn.icon || '🛒'}</span> {slide.primaryBtn.text}
-                      </button>
+                {/* Only render dark gradient mask if slide has text to contrast against */}
+                {hasTextContent && <div className={styles.gradientMask}></div>}
+
+                {/* Content Overlay */}
+                {(hasTextContent || hasButtons || hasPrice) && (
+                  <div className={`${styles.innerContainer} ${!hasTextContent ? styles.innerContainerGraphicOnly : ''}`}>
+                    <div className={`${styles.contentBox} ${!hasTextContent ? styles.contentBoxGraphicOnly : ''}`}>
+                      {Boolean(slide.tagText && slide.tagText.trim()) && (
+                        <div className={styles.tagPill}>
+                          <span>{slide.tagIcon}</span> {slide.tagText}
+                        </div>
+                      )}
+
+                      {Boolean((slide.titleLine1 && slide.titleLine1.trim()) || (slide.titleAccent && slide.titleAccent.trim())) && (
+                        <h1 className={styles.titleText}>
+                          {slide.titleLine1}{' '}
+                          <span className={styles.goldAccent}>{slide.titleAccent}</span>
+                        </h1>
+                      )}
+
+                      {Boolean(slide.description && slide.description.trim()) && (
+                        <p className={styles.descText}>{slide.description}</p>
+                      )}
+
+                      {hasButtons && (
+                        <div className={styles.btnGroup}>
+                          {hasPrimaryBtn && (
+                            <button
+                              type="button"
+                              className={styles.ctaPrimary}
+                              onClick={(e) => handleBtnClick(slide.primaryBtn.action, slide.primaryBtn.href || '#reservation', e)}
+                            >
+                              <span>{slide.primaryBtn.icon || '📅'}</span> {slide.primaryBtn.text}
+                            </button>
+                          )}
+                          {hasSecondaryBtn && (
+                            <button
+                              type="button"
+                              className={styles.ctaSecondary}
+                              onClick={(e) => handleBtnClick(slide.secondaryBtn.action, slide.secondaryBtn.href || '#table-qr', e)}
+                            >
+                              <span>{slide.secondaryBtn.icon || '📲'}</span> {slide.secondaryBtn.text}
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {hasPrice && (
+                      <div className={styles.priceFloat}>
+                        {slide.priceText}
+                      </div>
                     )}
-                    {slide.secondaryBtn && slide.secondaryBtn.isVisible !== false && (
-                      <button
-                        type="button"
-                        className={styles.ctaSecondary}
-                        onClick={(e) => handleBtnClick(slide.secondaryBtn.action, slide.secondaryBtn.href || '#table-qr', e)}
-                      >
-                        <span>{slide.secondaryBtn.icon || '📲'}</span> {slide.secondaryBtn.text}
-                      </button>
-                    )}
                   </div>
-                </div>
-
-                <div className={styles.priceFloat}>
-                  {slide.priceText}
-                </div>
+                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         {/* Manual Navigation Arrows — Placed AFTER slidesTrack with explicit stopPropagation */}

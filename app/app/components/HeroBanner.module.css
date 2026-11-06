@@ -40,17 +40,20 @@
 
 .sliderViewport {
   width: 100%;
-  max-width: 100vw;
+  max-width: 1920px;
+  margin: 0 auto;
   overflow: hidden;
   position: relative;
-  height: calc(100vh - 177px);
-  min-height: 600px;
+  aspect-ratio: 16 / 9;
+  height: auto;
+  min-height: 0;
 }
 
 /* Physical Horizontal Moving Track */
 .slidesTrack {
   display: flex;
   width: 100%;
+  height: 100%;
   transition: transform 0.65s cubic-bezier(0.25, 1, 0.5, 1);
   will-change: transform;
 }
@@ -62,13 +65,22 @@
   max-width: 100%;
   box-sizing: border-box;
   position: relative;
-  height: calc(100vh - 177px);
-  min-height: 600px;
+  aspect-ratio: 16 / 9;
+  height: 100%;
+  min-height: 0;
   display: flex;
   align-items: center;
   overflow: hidden;
   padding: 0;
   margin: 0;
+}
+
+.pictureWrapper {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
 }
 
 .slidePhoto {
@@ -77,25 +89,21 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center right;
-  transition: transform 1.2s cubic-bezier(0.25, 1, 0.5, 1);
+  object-position: center center;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
   will-change: transform;
 }
 
+/* Maintain full framing without aggressive zoom cropping banner borders */
 .slideActive .slidePhoto {
-  animation: kenBurnsPan 8s ease-out forwards;
-}
-
-@keyframes kenBurnsPan {
-  0%   { transform: scale(1.06) translate(1%, 0.5%); }
-  100% { transform: scale(1.12) translate(-1%, -0.8%); }
+  transform: none;
 }
 
 .slide:hover .slidePhoto {
-  transform: scale(1.07);
+  transform: scale(1.01);
 }
 
-/* Soft Neutral Vignette — NO heavy navy blue wash */
+/* Soft Neutral Vignette — ONLY shown when slide has text overlay */
 .gradientMask {
   position: absolute;
   inset: 0;
@@ -108,6 +116,26 @@
   );
   z-index: 1;
   pointer-events: none;
+}
+
+/* Clean styling when slide is graphic-only (baked-in text banner) */
+.slideGraphicOnly .innerContainer {
+  align-items: flex-end;
+  padding-bottom: 38px;
+}
+
+.innerContainerGraphicOnly {
+  pointer-events: none;
+}
+
+.contentBoxGraphicOnly {
+  margin-top: 0;
+  width: 100%;
+}
+
+.contentBoxGraphicOnly .btnGroup {
+  pointer-events: auto;
+  justify-content: flex-start;
 }
 
 .innerContainer {
@@ -433,10 +461,11 @@
 
 @media (max-width: 900px) {
   .sliderViewport, .slide {
-    min-height: 520px;
+    height: auto;
+    min-height: 0;
   }
   .innerContainer {
-    padding: 40px 24px 65px;
+    padding: 30px 24px 50px;
     flex-direction: column;
     align-items: flex-start;
   }
@@ -467,12 +496,25 @@
   }
 }
 
-@media (max-width: 600px) {
-  .sliderViewport, .slide {
-    min-height: 460px;
+@media (max-width: 640px) {
+  /* Default 16:9 on mobile when only desktop banner is uploaded */
+  .sliderViewport,
+  .slide {
+    aspect-ratio: 16 / 9;
+    height: auto;
+    min-height: 0;
   }
+
+  /* When 1080x1920 (9:16) portrait mobile banner is uploaded */
+  .viewportHasMobilePortrait,
+  .viewportHasMobilePortrait .slide {
+    aspect-ratio: 9 / 16;
+    height: auto;
+    min-height: 0;
+  }
+
   .innerContainer {
-    padding: 24px 16px 55px;
+    padding: 20px 16px 50px;
   }
   .tagPill {
     font-size: 0.74rem;
@@ -524,14 +566,18 @@
   .paginationDots {
     bottom: 18px;
   }
+  .slideGraphicOnly .innerContainer {
+    padding-bottom: 56px;
+  }
 }
 
 @media (max-width: 360px) {
   .sliderViewport, .slide {
-    min-height: 480px;
+    height: auto;
+    min-height: 0;
   }
   .innerContainer {
-    padding: 18px 12px 50px;
+    padding: 16px 12px 48px;
   }
   .titleText {
     font-size: 1.35rem;
