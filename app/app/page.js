@@ -72,16 +72,22 @@ export default function Home() {
     }
   }, [cart]);
 
-  // Ingest deep-link table parameter from Google Lens / Phone Camera QR scan (?table=XX)
+  // Ingest deep-link table parameter ONLY when a diner actually scans a table QR code
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // Clean up any legacy persistent table assignment in localStorage so regular visitors are not stuck with Table #01
+      try {
+        localStorage.removeItem('sgr_active_table');
+        localStorage.removeItem('sgr_scanned_table');
+      } catch (e) {}
+
       const params = new URLSearchParams(window.location.search);
-      const tbl = params.get('table');
+      const tbl = params.get('table') || params.get('t') || params.get('tableNumber');
       if (tbl) {
         const formatted = tbl.replace(/[^0-9a-zA-Z]/g, '').padStart(2, '0');
         setSelectedTables([formatted]);
         try {
-          sessionStorage.setItem('sgr_active_table', formatted);
+          sessionStorage.setItem('sgr_scanned_table', formatted);
         } catch (e) {}
         setToast({
           title: `✨ Connected to Table #${formatted}! Contactless dine-in active.`,
@@ -89,12 +95,18 @@ export default function Home() {
           id: Date.now(),
         });
       } else {
+        // Normal visitor: only restore if the diner actually scanned a table during this specific browser session
         try {
-          const saved = sessionStorage.getItem('sgr_active_table');
-          if (saved) {
-            setSelectedTables([saved]);
+          const scanned = sessionStorage.getItem('sgr_scanned_table');
+          if (scanned) {
+            setSelectedTables([scanned]);
+          } else {
+            setSelectedTables([]);
+            sessionStorage.removeItem('sgr_active_table');
           }
-        } catch (e) {}
+        } catch (e) {
+          setSelectedTables([]);
+        }
       }
     }
   }, []);
@@ -288,10 +300,18 @@ export default function Home() {
         headerConfig={cms?.header}
       />
 
-      {/* 2B. Active Connected Dining Table Status Bar */}
+      {/* 2B. Active Connected Dining Table Status Bar — ONLY shown when diner scanned a table QR */}
       <ActiveTableBar
         selectedTables={selectedTables}
         onOpenQrScanner={() => setQrModalOpen(true)}
+        onClearTable={() => {
+          setSelectedTables([]);
+          try {
+            sessionStorage.removeItem('sgr_scanned_table');
+            sessionStorage.removeItem('sgr_active_table');
+            localStorage.removeItem('sgr_active_table');
+          } catch (e) {}
+        }}
         activeOrder={activeOrder}
         onOpenKotTracker={() => setKotModalOpen(true)}
       />
@@ -408,18 +428,20 @@ export default function Home() {
           setSelectedTables(tables);
           if (tables && tables.length > 0) {
             try {
+              sessionStorage.setItem('sgr_scanned_table', tables[0]);
               sessionStorage.setItem('sgr_active_table', tables[0]);
             } catch (e) {}
+            setToast({
+              title: `Connected to Table #${tables.join(' & #')}!`,
+              price: null,
+              id: Date.now(),
+            });
           } else {
             try {
+              sessionStorage.removeItem('sgr_scanned_table');
               sessionStorage.removeItem('sgr_active_table');
             } catch (e) {}
           }
-          setToast({
-            title: `Connected to Table #${tables.join(' & #')}!`,
-            price: null,
-            id: Date.now(),
-          });
         }}
       />
 

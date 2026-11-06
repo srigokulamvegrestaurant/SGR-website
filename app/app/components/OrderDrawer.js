@@ -26,21 +26,23 @@ export default function OrderDrawer({
   const [cookingNotes, setCookingNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  // Sync active tables from props or storage whenever drawer opens or tables change
+  // Sync active tables from props or session scanner ONLY when diner actually scanned a table
   useEffect(() => {
     if (selectedTables && selectedTables.length > 0) {
       setActiveTables(selectedTables);
     } else if (typeof window !== 'undefined') {
       try {
-        const stored = sessionStorage.getItem('sgr_active_table') || localStorage.getItem('sgr_active_table');
-        if (stored) {
-          setActiveTables([stored]);
+        const scanned = sessionStorage.getItem('sgr_scanned_table');
+        if (scanned) {
+          setActiveTables([scanned]);
         } else {
           setActiveTables([]);
         }
       } catch (e) {
         setActiveTables([]);
       }
+    } else {
+      setActiveTables([]);
     }
   }, [selectedTables, isOpen]);
 
@@ -48,7 +50,7 @@ export default function OrderDrawer({
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const handleStorage = (e) => {
-        if (e.key === 'sgr_active_table') {
+        if (e.key === 'sgr_scanned_table') {
           if (e.newValue) {
             setActiveTables([e.newValue]);
           } else {
@@ -92,8 +94,13 @@ export default function OrderDrawer({
     setActiveTables(tables);
     if (tables && tables.length > 0) {
       try {
-        sessionStorage.setItem('sgr_active_table', tables[0]);
-        localStorage.setItem('sgr_active_table', tables[0]);
+        sessionStorage.setItem('sgr_scanned_table', tables[0]);
+      } catch (e) {}
+    } else {
+      try {
+        sessionStorage.removeItem('sgr_scanned_table');
+        sessionStorage.removeItem('sgr_active_table');
+        localStorage.removeItem('sgr_active_table');
       } catch (e) {}
     }
     setInternalQrOpen(false);

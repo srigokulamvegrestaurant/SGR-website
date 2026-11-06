@@ -5,12 +5,13 @@ import styles from './ActiveTableBar.module.css';
 export default function ActiveTableBar({
   selectedTables,
   onOpenQrScanner,
+  onClearTable,
   activeOrder,
   onOpenKotTracker,
 }) {
   return (
     <>
-      {/* Top Banner: Connected Dining Tables - Only rendered when diner is at a table */}
+      {/* Top Banner: Connected Dining Tables - ONLY rendered when diner has scanned a table */}
       {selectedTables && selectedTables.length > 0 && (
         <div className={styles.tableBanner}>
           <div className={styles.bannerInner}>
@@ -28,9 +29,26 @@ export default function ActiveTableBar({
               </div>
             </div>
 
-            <button className={styles.btnChangeTable} onClick={onOpenQrScanner}>
-              <span>📸</span> Scan Standee / Join Tables
-            </button>
+            <div className={styles.actionsGroup}>
+              <button
+                type="button"
+                className={styles.btnChangeTable}
+                onClick={onOpenQrScanner}
+              >
+                <span>📸</span> Scan Standee / Join Tables
+              </button>
+              {onClearTable && (
+                <button
+                  type="button"
+                  className={styles.btnClearTable}
+                  onClick={onClearTable}
+                  title="Disconnect / Leave Table"
+                  aria-label="Disconnect from Table"
+                >
+                  ✕ Leave Table
+                </button>
+              )}
+            </div>
           </div>
         </div>
       )}
