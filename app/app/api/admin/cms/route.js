@@ -596,8 +596,15 @@ export async function POST(req) {
           db.menu = [];
         }
         const idx = db.menu.findIndex(d => d.id === dish.id);
+        const existingItem = idx >= 0 ? db.menu[idx] : null;
+        const itemImage = (dish.image && String(dish.image).trim() !== '')
+          ? String(dish.image).trim()
+          : (dish.removeImage || dish.image === null ? '' : (existingItem?.image || ''));
+
         const itemRecord = {
+          ...(existingItem || {}),
           ...dish,
+          image: itemImage,
           id: dish.id || `dish_${Date.now()}`,
           price: Number(dish.price),
           available: dish.available !== false,

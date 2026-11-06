@@ -224,7 +224,14 @@ export async function POST(request) {
         changes.push(`Status: ${existing.status} → ${item.status}`);
       }
 
-      const finalImage = item.image !== undefined ? item.image : (existing.image || '');
+      let finalImage = existing.image || '';
+      if (item.image !== undefined) {
+        if (typeof item.image === 'string' && item.image.trim() !== '') {
+          finalImage = item.image.trim();
+        } else if (item.removeImage === true || item.image === null) {
+          finalImage = '';
+        }
+      }
 
       const updated = {
         ...existing,

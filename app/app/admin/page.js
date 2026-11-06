@@ -752,8 +752,11 @@ export default function AdminPage() {
         const rawItems = data.allMenu || data.menu || [];
         if (typeof window !== 'undefined') {
           try {
-            Object.keys(localStorage).forEach((k) => {
-              if (k.startsWith('sgr_dish_img_')) localStorage.removeItem(k);
+            rawItems.forEach((it) => {
+              if (it.image) {
+                localStorage.setItem('sgr_dish_img_' + it.id, it.image);
+                if (it.title) localStorage.setItem('sgr_dish_img_' + it.title, it.image);
+              }
             });
           } catch (e) {}
         }
@@ -14414,7 +14417,7 @@ Status: SHIFT CLOSED & VERIFIED
                         <button
                           type="button"
                           onClick={() => {
-                            setDishFormData(prev => ({ ...prev, image: '' }));
+                            setDishFormData(prev => ({ ...prev, image: '', removeImage: true }));
                             setImageUploadStatus('');
                           }}
                           style={{

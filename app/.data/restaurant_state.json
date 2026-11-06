@@ -3,7 +3,7 @@
   "menu": [
     {
       "id": "dish_bf_01",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/mini_tiffin_mw256092.webp",
       "price": 0,
       "title": "Mini Tiffin",
       "status": "AVAILABLE",
@@ -45,7 +45,7 @@
     },
     {
       "id": "dish_bf_02",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/idli_mw257b1l.webp",
       "price": 0,
       "title": "Idli",
       "status": "AVAILABLE",
@@ -85,7 +85,7 @@
     },
     {
       "id": "dish_bf_03",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/ghee_pongal_mw25801t.webp",
       "price": 0,
       "title": "Ghee Pongal",
       "status": "AVAILABLE",
@@ -327,7 +327,7 @@
     },
     {
       "id": "dish_bf_09",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/test_tiffin_podi_dosa_mw0eyui5.webp",
       "price": 0,
       "title": "Podi Dosa",
       "status": "AVAILABLE",
@@ -1169,7 +1169,7 @@
     },
     {
       "id": "dish_lu_01",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Lunch-img@main/dishes/lemon_rice_mw25ag5q.webp",
       "price": 0,
       "title": "Lemon Rice",
       "status": "AVAILABLE",
@@ -1529,7 +1529,7 @@
     },
     {
       "id": "dish_lu_10",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Lunch-img@main/dishes/meals_lunch_thali_mw0ezsrf.webp",
       "price": 0,
       "title": "Mini Meals",
       "status": "AVAILABLE",
@@ -1569,7 +1569,7 @@
     },
     {
       "id": "dish_lu_11",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Lunch-img@main/dishes/meals_lunch_thali_mw0ezsrf.webp",
       "price": 0,
       "title": "Veg Meals",
       "status": "AVAILABLE",
@@ -2409,7 +2409,7 @@
     },
     {
       "id": "dish_es_01",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Snacks-img@main/dishes/kandharappam_mw25dpio.webp",
       "price": 0,
       "title": "Kandharappam",
       "status": "AVAILABLE",
@@ -2489,7 +2489,7 @@
     },
     {
       "id": "dish_es_03",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Snacks-img@main/dishes/karaikudi_paniyaram_mw0ezu9s.webp",
       "price": 0,
       "title": "Kuzhi Paniyaram",
       "status": "AVAILABLE",
@@ -2529,7 +2529,7 @@
     },
     {
       "id": "dish_es_04",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Snacks-img@main/dishes/karaikudi_paniyaram_mw0ezu9s.webp",
       "price": 0,
       "title": "Vellai Paniyaram",
       "status": "AVAILABLE",
@@ -2609,7 +2609,7 @@
     },
     {
       "id": "dish_dn_01",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/idli_mw257b1l.webp",
       "price": 0,
       "title": "Idli",
       "status": "AVAILABLE",
@@ -2889,7 +2889,7 @@
     },
     {
       "id": "dish_dn_08",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Image@main/dishes/chettinad_idiyappam_dinner_mw0f29hy.webp",
       "price": 0,
       "title": "Idiyappam",
       "status": "AVAILABLE",
@@ -3289,7 +3289,7 @@
     },
     {
       "id": "dish_dn_18",
-      "image": "",
+      "image": "https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/test_tiffin_podi_dosa_mw0eyui5.webp",
       "price": 0,
       "title": "Podi Dosa",
       "status": "AVAILABLE",

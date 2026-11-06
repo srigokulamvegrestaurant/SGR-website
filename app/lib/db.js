@@ -17,6 +17,68 @@ export const PROTECTED_DEVELOPER_EMAILS = [
   'info.ajtechsolutions@gmail.com'
 ];
 
+// Curated Canonical Mapping for High-Performance GitHub jsDelivr Edge CDN Dish Photography
+export const KNOWN_GITHUB_DISH_IMAGES = {
+  // Mini Tiffin
+  'dish_bf_01': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/mini_tiffin_mw256092.webp',
+  'mini tiffin': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/mini_tiffin_mw256092.webp',
+
+  // Idli
+  'dish_bf_02': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/idli_mw257b1l.webp',
+  'dish_dn_01': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/idli_mw257b1l.webp',
+  'idli': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/idli_mw257b1l.webp',
+
+  // Ghee Pongal
+  'dish_bf_03': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/ghee_pongal_mw25801t.webp',
+  'ghee pongal': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/ghee_pongal_mw25801t.webp',
+  'pongal': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/ghee_pongal_mw25801t.webp',
+
+  // Podi Dosa
+  'dish_bf_09': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/test_tiffin_podi_dosa_mw0eyui5.webp',
+  'dish_dn_18': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/test_tiffin_podi_dosa_mw0eyui5.webp',
+  'podi dosa': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Tiffin-img@main/dishes/test_tiffin_podi_dosa_mw0eyui5.webp',
+
+  // Lemon Rice
+  'dish_lu_01': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Lunch-img@main/dishes/lemon_rice_mw25ag5q.webp',
+  'lemon rice': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Lunch-img@main/dishes/lemon_rice_mw25ag5q.webp',
+
+  // Raja Meals / Veg Meals / Mini Meals
+  'dish_lu_10': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Lunch-img@main/dishes/meals_lunch_thali_mw0ezsrf.webp',
+  'dish_lu_11': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Lunch-img@main/dishes/meals_lunch_thali_mw0ezsrf.webp',
+  'mini meals': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Lunch-img@main/dishes/meals_lunch_thali_mw0ezsrf.webp',
+  'veg meals': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Lunch-img@main/dishes/meals_lunch_thali_mw0ezsrf.webp',
+  'meals': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Lunch-img@main/dishes/meals_lunch_thali_mw0ezsrf.webp',
+
+  // Kandharappam
+  'dish_es_01': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Snacks-img@main/dishes/kandharappam_mw25dpio.webp',
+  'kandharappam': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Snacks-img@main/dishes/kandharappam_mw25dpio.webp',
+
+  // Paniyaram (Kuzhi Paniyaram / Vellai Paniyaram)
+  'dish_es_03': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Snacks-img@main/dishes/karaikudi_paniyaram_mw0ezu9s.webp',
+  'dish_es_04': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Snacks-img@main/dishes/karaikudi_paniyaram_mw0ezu9s.webp',
+  'kuzhi paniyaram': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Snacks-img@main/dishes/karaikudi_paniyaram_mw0ezu9s.webp',
+  'vellai paniyaram': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Snacks-img@main/dishes/karaikudi_paniyaram_mw0ezu9s.webp',
+  'paniyaram': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Snacks-img@main/dishes/karaikudi_paniyaram_mw0ezu9s.webp',
+
+  // Idiyappam
+  'dish_dn_08': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Image@main/dishes/chettinad_idiyappam_dinner_mw0f29hy.webp',
+  'idiyappam': 'https://cdn.jsdelivr.net/gh/srigokulamvegrestaurant/SGR-Menu-Image@main/dishes/chettinad_idiyappam_dinner_mw0f29hy.webp',
+};
+
+export function resolveKnownDishImage(id, title) {
+  if (id && KNOWN_GITHUB_DISH_IMAGES[id]) return KNOWN_GITHUB_DISH_IMAGES[id];
+  if (title) {
+    const cleanTitle = String(title).trim().toLowerCase();
+    if (KNOWN_GITHUB_DISH_IMAGES[cleanTitle]) return KNOWN_GITHUB_DISH_IMAGES[cleanTitle];
+    for (const [key, url] of Object.entries(KNOWN_GITHUB_DISH_IMAGES)) {
+      if (cleanTitle === key || cleanTitle.includes(key) || key.includes(cleanTitle)) {
+        return url;
+      }
+    }
+  }
+  return null;
+}
+
 // Storage file location: dynamically resolves writable location (supports Vercel serverless /tmp)
 function getDataFilePath() {
   const defaultDir = path.join(process.cwd(), '.data');
@@ -967,6 +1029,17 @@ export function getDb() {
 
       // Ensure menu dishes have default values for portion, prepTime, dietary, and status
       if (Array.isArray(loaded.menu)) {
+        // Collect existing in-memory images so disk reload never wipes images
+        const memImgMap = new Map();
+        if (memoryStore && Array.isArray(memoryStore.menu)) {
+          memoryStore.menu.forEach(d => {
+            if (d.image) {
+              if (d.id) memImgMap.set(d.id, d.image);
+              if (d.title) memImgMap.set(d.title.trim().toLowerCase(), d.image);
+            }
+          });
+        }
+
         loaded.menu = loaded.menu.map((dish, idx) => {
           const portionSize = dish.portionSize || 'Standard (1 Person)';
           const prepTime = dish.prepTime || (dish.category === 'Meals' ? 15 : (dish.category === 'Beverages' ? 5 : 10));
@@ -980,6 +1053,12 @@ export function getDb() {
           const displayOrder = dish.displayOrder || (idx + 1);
           const discount = dish.discount || (idx === 4 ? { active: true, type: 'PERCENT', value: 10, discountedPrice: 189, label: 'Chettinad Heritage Festival', startDate: '2026-10-15', endDate: '2026-10-31' } : { active: false, type: 'PERCENT', value: 0, discountedPrice: dish.price, label: '', startDate: '', endDate: '' });
           const recipeId = dish.recipeId || (idx === 0 ? 'rec_01' : (idx === 1 ? 'rec_02' : (idx === 6 ? 'rec_03' : (idx === 4 ? 'rec_04' : null))));
+
+          const resolvedImg = dish.image || (dish.id && memImgMap.get(dish.id)) || (dish.title && memImgMap.get(dish.title.trim().toLowerCase())) || resolveKnownDishImage(dish.id, dish.title) || '';
+          if (resolvedImg && dish.image !== resolvedImg) {
+            dish.image = resolvedImg;
+            needsSave = true;
+          }
 
           if (!dish.portionSize || !dish.prepTime || !dish.status || !dish.dietary || dish.isFeatured === undefined) {
             needsSave = true;
@@ -1029,6 +1108,19 @@ export function saveDb(data) {
   if (data && data.settings) {
     syncLegacySettings(data.settings);
   }
+  // Image preservation safeguard: Never wipe an existing dish image with an empty string
+  if (data && Array.isArray(data.menu) && memoryStore && Array.isArray(memoryStore.menu)) {
+    const memMap = new Map();
+    memoryStore.menu.forEach(d => {
+      if (d.image) memMap.set(d.id, d.image);
+    });
+    data.menu = data.menu.map(d => {
+      if ((!d.image || d.image === '') && !d.removeImage && d.image !== null && memMap.has(d.id)) {
+        return { ...d, image: memMap.get(d.id) };
+      }
+      return d;
+    });
+  }
   memoryStore = data;
   lastPgSyncTime = Date.now();
   try {
@@ -1050,6 +1142,19 @@ export function saveDb(data) {
 export async function saveDbAsync(data) {
   if (data && data.settings) {
     syncLegacySettings(data.settings);
+  }
+  // Image preservation safeguard: Never wipe an existing dish image with an empty string
+  if (data && Array.isArray(data.menu) && memoryStore && Array.isArray(memoryStore.menu)) {
+    const memMap = new Map();
+    memoryStore.menu.forEach(d => {
+      if (d.image) memMap.set(d.id, d.image);
+    });
+    data.menu = data.menu.map(d => {
+      if ((!d.image || d.image === '') && !d.removeImage && d.image !== null && memMap.has(d.id)) {
+        return { ...d, image: memMap.get(d.id) };
+      }
+      return d;
+    });
   }
   memoryStore = data;
   lastPgSyncTime = Date.now();
@@ -1116,11 +1221,49 @@ export async function getDbAsync(options = {}) {
         pgData.tables = JSON.parse(JSON.stringify(DEFAULT_TABLES));
       }
 
-      memoryStore = pgData;
+      // Reconcile and preserve dish images across memory, disk, and known GitHub CDN assets
+      const existingImgMap = new Map();
+      if (memoryStore && Array.isArray(memoryStore.menu)) {
+        memoryStore.menu.forEach(d => {
+          if (d.image) {
+            if (d.id) existingImgMap.set(d.id, d.image);
+            if (d.title) existingImgMap.set(d.title.trim().toLowerCase(), d.image);
+          }
+        });
+      }
       const targetFile = getDataFilePath();
+      if (fs.existsSync(targetFile)) {
+        try {
+          const diskParsed = JSON.parse(fs.readFileSync(targetFile, 'utf-8'));
+          if (diskParsed && Array.isArray(diskParsed.menu)) {
+            diskParsed.menu.forEach(d => {
+              if (d.image) {
+                if (d.id && !existingImgMap.has(d.id)) existingImgMap.set(d.id, d.image);
+                if (d.title && !existingImgMap.has(d.title.trim().toLowerCase())) existingImgMap.set(d.title.trim().toLowerCase(), d.image);
+              }
+            });
+          }
+        } catch (e) {}
+      }
+
+      let restoredImagesCount = 0;
+      pgData.menu = pgData.menu.map(d => {
+        const resolved = d.image || (d.id && existingImgMap.get(d.id)) || (d.title && existingImgMap.get(d.title.trim().toLowerCase())) || resolveKnownDishImage(d.id, d.title) || '';
+        if (resolved && d.image !== resolved) {
+          restoredImagesCount++;
+          return { ...d, image: resolved };
+        }
+        return d;
+      });
+
+      memoryStore = pgData;
       try {
         fs.writeFileSync(targetFile, JSON.stringify(pgData, null, 2), 'utf-8');
       } catch (e) {}
+
+      if (restoredImagesCount > 0) {
+        saveStateToPg('restaurant_state', pgData).catch(() => {});
+      }
 
       return memoryStore;
     }
