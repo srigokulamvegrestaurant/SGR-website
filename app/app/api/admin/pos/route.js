@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getDb, getDbAsync, saveDb, saveDbAsync, categorizeStation, deductRecipeBom, recordAuditLog, recordCustomerTransaction } from '@/lib/db';
 import { broadcast } from '@/app/api/events/route';
-import { generateThermalReceiptText, DEFAULT_BILL_SLIP_FORMAT } from '@/lib/thermalSlipFormatter';
+import { generateThermalReceiptText, generateThermalSlipHtml, sanitizeEnglishTitle, formatBillTitle, DEFAULT_BILL_SLIP_FORMAT } from '@/lib/thermalSlipFormatter';
 
-export { generateThermalReceiptText };
+export { generateThermalReceiptText, generateThermalSlipHtml, sanitizeEnglishTitle };
 
 export async function GET(request) {
   try {
@@ -43,8 +43,8 @@ export async function GET(request) {
       };
     });
 
-    const recentBills = (db.bills || []).slice(-50).reverse().map(b => {
-      if (!b.thermalSlip) {
+    const recentBills = (db.bills || []).slice(-150).reverse().map(b => {
+      if (!b.thermalSlipHtml || !b.thermalSlip) {
         b.thermalSlip = generateThermalReceiptText({
           billNumber: b.billNumber,
           tableNumber: b.tableNumber,
@@ -66,6 +66,36 @@ export async function GET(request) {
           splitDetails: b.splitDetails,
           transactionRef: b.transactionRef,
           settledAt: b.settledAt || b.createdAt,
+          isDuplicate: !!b.isDuplicate,
+          reprintCount: b.reprintCount || 0,
+          settings: db.settings,
+        });
+        b.thermalSlipHtml = generateThermalSlipHtml({
+          billNumber: b.billNumber,
+          tableNumber: b.tableNumber,
+          orderType: b.orderType,
+          persons: b.persons || 1,
+          customer: b.customer,
+          cashierName: b.cashierName,
+          waiterName: b.waiterName || '',
+          items: b.items || [],
+          subtotal: b.subtotal || 0,
+          discountAmount: b.discountAmount || 0,
+          discountReason: b.discountReason,
+          packagingCharge: b.packagingCharge || 0,
+          deliveryCharge: b.deliveryCharge || 0,
+          serviceChargeAmount: b.serviceChargeAmount || 0,
+          cgst: b.cgst || 0,
+          sgst: b.sgst || 0,
+          roundOff: b.roundOff || 0,
+          totalAmount: b.totalAmount || 0,
+          paymentMode: b.paymentMode,
+          paymentStatus: b.paymentStatus || 'Paid',
+          splitDetails: b.splitDetails,
+          transactionRef: b.transactionRef,
+          settledAt: b.settledAt || b.createdAt,
+          isDuplicate: !!b.isDuplicate,
+          reprintCount: b.reprintCount || 0,
           settings: db.settings,
         });
       }
@@ -331,7 +361,7 @@ export async function POST(request) {
       const totalAmount = Math.round(rawTotal);
       const roundOff = Number((totalAmount - rawTotal).toFixed(2));
 
-      const billNumber = `SGR-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const billNumber = body.billNumber || `SGK${Math.floor(100000 + Math.random() * 900000)}`;
       const settledAt = new Date().toISOString();
 
       const newBill = {
@@ -339,8 +369,13 @@ export async function POST(request) {
         billNumber,
         tableNumber: orderType === 'TAKEAWAY' ? 'TK' : String(tableNumber),
         orderType,
-        customer: customer || { name: activeOrders[0]?.customerName || 'Guest' },
-        items,
+        persons: Math.max(1, Number(body.persons) || 1),
+        waiterName: body.waiterName || '',
+        customer: customer || { name: activeOrders[0]?.customerName || 'Guest', phone: activeOrders[0]?.customerPhone || '' },
+        items: items.map(it => ({
+          ...it,
+          title: sanitizeEnglishTitle(it.title || 'Item'),
+        })),
         subtotal,
         discountAmount,
         discountReason,
@@ -406,14 +441,14 @@ export async function POST(request) {
         }
       }
 
-      // Generate ESC/POS receipt
+      // Generate ESC/POS receipt & Visual HTML Slip
       const thermalReceipt = generateThermalReceiptText({
         billNumber,
         tableNumber: orderType === 'TAKEAWAY' ? 'TK' : String(tableNumber),
         orderType,
         customer: newBill.customer,
         cashierName,
-        items,
+        items: newBill.items,
         subtotal,
         discountAmount,
         discountReason,
@@ -429,7 +464,33 @@ export async function POST(request) {
         settings: db.settings,
       });
 
+      const thermalSlipHtml = generateThermalSlipHtml({
+        billNumber,
+        tableNumber: newBill.tableNumber,
+        orderType,
+        persons: newBill.persons,
+        customer: newBill.customer,
+        cashierName,
+        waiterName: newBill.waiterName,
+        items: newBill.items,
+        subtotal,
+        discountAmount,
+        discountReason,
+        serviceChargeAmount,
+        cgst,
+        sgst,
+        roundOff,
+        totalAmount,
+        paymentMode,
+        paymentStatus: 'PAID',
+        splitDetails,
+        transactionRef,
+        settledAt,
+        settings: db.settings,
+      });
+
       newBill.thermalSlip = thermalReceipt;
+      newBill.thermalSlipHtml = thermalSlipHtml;
       await saveDbAsync(db);
 
       // Broadcast SSE
@@ -528,14 +589,16 @@ export async function POST(request) {
       const totalAmount = Math.round(rawTotal);
       const roundOff = Number((totalAmount - rawTotal).toFixed(2));
 
-      const billNumber = `SGR-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const billNumber = body.billNumber || `SGK${Math.floor(100000 + Math.random() * 900000)}`;
       const settledAt = new Date().toISOString();
 
       const newBill = {
         id: `bill_${Date.now()}`,
         billNumber,
-        tableNumber: orderType === 'TAKEAWAY' ? 'TK' : orderType === 'DELIVERY' ? 'DEL' : String(tableNumber || '01'),
+        tableNumber: orderType === 'TAKEAWAY' ? 'TK' : orderType === 'DELIVERY' ? 'DEL' : orderType === 'PARCEL' ? 'P-01' : orderType === 'COUNTER' ? 'C-01' : String(tableNumber || '01'),
         orderType,
+        persons: Math.max(1, Number(body.persons) || 1),
+        waiterName: body.waiterName || '',
         customer: {
           name: customer.name || 'Walk-in Guest',
           phone: customer.phone || '',
@@ -544,7 +607,10 @@ export async function POST(request) {
           gstin: customer.gstin || '',
           tag: customer.tag || 'Walk-in',
         },
-        items: billItems,
+        items: billItems.map(it => ({
+          ...it,
+          title: sanitizeEnglishTitle(it.title || 'Custom Item'),
+        })),
         subtotal,
         discountAmount,
         discountReason,
@@ -566,14 +632,14 @@ export async function POST(request) {
         settledAt,
       };
 
-      // Generate ESC/POS receipt
+      // Generate ESC/POS receipt & Exact Visual HTML Slip
       const thermalReceipt = generateThermalReceiptText({
         billNumber,
         tableNumber: newBill.tableNumber,
         orderType,
         customer: newBill.customer,
         cashierName,
-        items: billItems,
+        items: newBill.items,
         subtotal,
         discountAmount,
         discountReason,
@@ -592,7 +658,36 @@ export async function POST(request) {
         formatOverrides,
       });
 
+      const thermalSlipHtml = generateThermalSlipHtml({
+        billNumber,
+        tableNumber: newBill.tableNumber,
+        orderType,
+        persons: newBill.persons,
+        customer: newBill.customer,
+        cashierName,
+        waiterName: newBill.waiterName,
+        items: newBill.items,
+        subtotal,
+        discountAmount,
+        discountReason,
+        packagingCharge: packCharge,
+        deliveryCharge: delCharge,
+        serviceChargeAmount,
+        cgst,
+        sgst,
+        roundOff,
+        totalAmount,
+        paymentMode,
+        paymentStatus: 'PAID',
+        splitDetails,
+        transactionRef,
+        settledAt,
+        settings: db.settings,
+        formatOverrides,
+      });
+
       newBill.thermalSlip = thermalReceipt;
+      newBill.thermalSlipHtml = thermalSlipHtml;
 
       db.bills = db.bills || [];
       db.bills.push(newBill);
@@ -713,6 +808,7 @@ export async function POST(request) {
       if (Array.isArray(updatedFields.items) && updatedFields.items.length > 0) {
         bill.items = updatedFields.items.map(it => ({
           ...it,
+          title: sanitizeEnglishTitle(it.title || 'Item'),
           price: Number(it.price) || 0,
           quantity: Math.max(1, Number(it.quantity) || 1),
           subtotal: (Number(it.price) || 0) * (Math.max(1, Number(it.quantity) || 1)),
@@ -749,35 +845,67 @@ export async function POST(request) {
       if (updatedFields.transactionRef !== undefined) bill.transactionRef = updatedFields.transactionRef;
       if (updatedFields.tableNumber) bill.tableNumber = updatedFields.tableNumber;
       if (updatedFields.orderType) bill.orderType = updatedFields.orderType;
+      if (updatedFields.persons) bill.persons = Number(updatedFields.persons);
+      if (updatedFields.waiterName !== undefined) bill.waiterName = updatedFields.waiterName;
       if (updatedFields.customNotes !== undefined) bill.customNotes = updatedFields.customNotes;
 
-      // If user did not provide a custom raw thermal slip text override, regenerate it with format options
-      if (!updatedFields.thermalSlip) {
-        bill.thermalSlip = generateThermalReceiptText({
-          billNumber: bill.billNumber,
-          tableNumber: bill.tableNumber,
-          orderType: bill.orderType,
-          customer: bill.customer,
-          cashierName: bill.cashierName,
-          items: bill.items,
-          subtotal: bill.subtotal,
-          discountAmount: bill.discountAmount || 0,
-          discountReason: bill.discountReason,
-          packagingCharge: bill.packagingCharge || 0,
-          deliveryCharge: bill.deliveryCharge || 0,
-          serviceChargeAmount: bill.serviceChargeAmount || 0,
-          cgst: bill.cgst || 0,
-          sgst: bill.sgst || 0,
-          roundOff: bill.roundOff || 0,
-          totalAmount: bill.totalAmount,
-          paymentMode: bill.paymentMode,
-          splitDetails: bill.splitDetails,
-          transactionRef: bill.transactionRef,
-          settledAt: bill.settledAt || bill.createdAt,
-          settings: db.settings,
-          formatOverrides: updatedFields.formatOverrides || {},
-        });
-      }
+      // Regenerate both raw ESC/POS text & visual HTML slip
+      bill.thermalSlip = generateThermalReceiptText({
+        billNumber: bill.billNumber,
+        tableNumber: bill.tableNumber,
+        orderType: bill.orderType,
+        customer: bill.customer,
+        cashierName: bill.cashierName,
+        items: bill.items,
+        subtotal: bill.subtotal,
+        discountAmount: bill.discountAmount || 0,
+        discountReason: bill.discountReason,
+        packagingCharge: bill.packagingCharge || 0,
+        deliveryCharge: bill.deliveryCharge || 0,
+        serviceChargeAmount: bill.serviceChargeAmount || 0,
+        cgst: bill.cgst || 0,
+        sgst: bill.sgst || 0,
+        roundOff: bill.roundOff || 0,
+        totalAmount: bill.totalAmount,
+        paymentMode: bill.paymentMode,
+        splitDetails: bill.splitDetails,
+        transactionRef: bill.transactionRef,
+        settledAt: bill.settledAt || bill.createdAt,
+        isDuplicate: !!bill.isDuplicate,
+        reprintCount: bill.reprintCount || 0,
+        settings: db.settings,
+        formatOverrides: updatedFields.formatOverrides || {},
+      });
+
+      bill.thermalSlipHtml = generateThermalSlipHtml({
+        billNumber: bill.billNumber,
+        tableNumber: bill.tableNumber,
+        orderType: bill.orderType,
+        persons: bill.persons || 1,
+        customer: bill.customer,
+        cashierName: bill.cashierName,
+        waiterName: bill.waiterName || '',
+        items: bill.items,
+        subtotal: bill.subtotal,
+        discountAmount: bill.discountAmount || 0,
+        discountReason: bill.discountReason,
+        packagingCharge: bill.packagingCharge || 0,
+        deliveryCharge: bill.deliveryCharge || 0,
+        serviceChargeAmount: bill.serviceChargeAmount || 0,
+        cgst: bill.cgst || 0,
+        sgst: bill.sgst || 0,
+        roundOff: bill.roundOff || 0,
+        totalAmount: bill.totalAmount,
+        paymentMode: bill.paymentMode,
+        paymentStatus: bill.paymentStatus || 'PAID',
+        splitDetails: bill.splitDetails,
+        transactionRef: bill.transactionRef,
+        settledAt: bill.settledAt || bill.createdAt,
+        isDuplicate: !!bill.isDuplicate,
+        reprintCount: bill.reprintCount || 0,
+        settings: db.settings,
+        formatOverrides: updatedFields.formatOverrides || {},
+      });
 
       bill.updatedAt = new Date().toISOString();
       bill.lastAmendedBy = callerName;
@@ -797,6 +925,103 @@ export async function POST(request) {
         message: `Bill #${bill.billNumber} successfully updated`,
         bill,
         thermalReceipt: bill.thermalSlip,
+        thermalSlipHtml: bill.thermalSlipHtml,
+      });
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // ACTION: REPRINT BILL WITH DUPLICATE WATERMARK & AUDIT TRACKING
+    // ──────────────────────────────────────────────────────────────────────────
+    if (action === 'REPRINT_BILL') {
+      const { billNumber, callerName = 'Admin', formatOverrides = {} } = body;
+      db.bills = db.bills || [];
+      const bill = db.bills.find(b => b.billNumber === billNumber || b.id === billNumber);
+      if (!bill) {
+        return NextResponse.json({ success: false, error: `Bill ${billNumber} not found` }, { status: 404 });
+      }
+
+      bill.reprintCount = (bill.reprintCount || 0) + 1;
+      bill.isDuplicate = true;
+      bill.lastReprintedAt = new Date().toISOString();
+      bill.lastReprintedBy = callerName;
+
+      // Regenerate thermal slip text & visual HTML with duplicate watermark
+      const thermalSlip = generateThermalReceiptText({
+        billNumber: bill.billNumber,
+        tableNumber: bill.tableNumber,
+        orderType: bill.orderType,
+        customer: bill.customer,
+        cashierName: bill.cashierName,
+        items: bill.items || [],
+        subtotal: bill.subtotal || 0,
+        discountAmount: bill.discountAmount || 0,
+        discountReason: bill.discountReason,
+        packagingCharge: bill.packagingCharge || 0,
+        deliveryCharge: bill.deliveryCharge || 0,
+        serviceChargeAmount: bill.serviceChargeAmount || 0,
+        cgst: bill.cgst || 0,
+        sgst: bill.sgst || 0,
+        roundOff: bill.roundOff || 0,
+        totalAmount: bill.totalAmount || 0,
+        paymentMode: bill.paymentMode,
+        splitDetails: bill.splitDetails,
+        transactionRef: bill.transactionRef,
+        settledAt: bill.settledAt || bill.createdAt,
+        isDuplicate: true,
+        reprintCount: bill.reprintCount,
+        settings: db.settings,
+        formatOverrides,
+      });
+
+      const thermalSlipHtml = generateThermalSlipHtml({
+        billNumber: bill.billNumber,
+        tableNumber: bill.tableNumber,
+        orderType: bill.orderType,
+        persons: bill.persons || 1,
+        customer: bill.customer,
+        cashierName: bill.cashierName,
+        waiterName: bill.waiterName || '',
+        items: bill.items || [],
+        subtotal: bill.subtotal || 0,
+        discountAmount: bill.discountAmount || 0,
+        discountReason: bill.discountReason,
+        packagingCharge: bill.packagingCharge || 0,
+        deliveryCharge: bill.deliveryCharge || 0,
+        serviceChargeAmount: bill.serviceChargeAmount || 0,
+        cgst: bill.cgst || 0,
+        sgst: bill.sgst || 0,
+        roundOff: bill.roundOff || 0,
+        totalAmount: bill.totalAmount || 0,
+        paymentMode: bill.paymentMode,
+        paymentStatus: bill.paymentStatus || 'PAID',
+        splitDetails: bill.splitDetails,
+        transactionRef: bill.transactionRef,
+        settledAt: bill.settledAt || bill.createdAt,
+        isDuplicate: true,
+        reprintCount: bill.reprintCount,
+        settings: db.settings,
+        formatOverrides,
+      });
+
+      bill.thermalSlip = thermalSlip;
+      bill.thermalSlipHtml = thermalSlipHtml;
+
+      recordAuditLog({
+        user: callerName,
+        role: 'CASHIER',
+        module: 'POS_BILLING',
+        action: 'DUPLICATE_REPRINT',
+        detail: `Duplicate reprint #${bill.reprintCount} generated for Bill #${bill.billNumber} by ${callerName}.`,
+      });
+
+      await saveDbAsync(db);
+
+      return NextResponse.json({
+        success: true,
+        message: `Duplicate reprint #${bill.reprintCount} logged for Bill #${bill.billNumber}`,
+        bill,
+        thermalReceipt: thermalSlip,
+        thermalSlipHtml,
       });
     }
 
@@ -844,7 +1069,7 @@ export async function POST(request) {
         if (table) table.status = 'AVAILABLE';
       }
 
-      // Log into refund_logs
+      // Log into refund_logs & audit_logs
       db.refund_logs = db.refund_logs || [];
       const logEntry = {
         id: `void_${Date.now()}`,
@@ -857,6 +1082,14 @@ export async function POST(request) {
         timestamp: new Date().toISOString(),
       };
       db.refund_logs.unshift(logEntry);
+
+      recordAuditLog({
+        user: authorizedBy,
+        role: 'MANAGER',
+        module: 'POS_BILLING',
+        action: 'BILL_VOIDED',
+        detail: `Bill #${billNumber || 'N/A'} (₹${bill?.totalAmount || 0}) voided/cancelled by ${authorizedBy}. Reason: ${reason}.`,
+      });
 
       await saveDbAsync(db);
 
@@ -885,6 +1118,19 @@ export async function POST(request) {
         return NextResponse.json({ success: false, error: 'Invalid Manager PIN. Refund requires manager authorization.' }, { status: 403 });
       }
 
+      const bill = (db.bills || []).find(b => b.billNumber === billNumber || b.id === billNumber);
+      if (bill) {
+        bill.refundAmount = (bill.refundAmount || 0) + Number(amount);
+        bill.refundReason = reason;
+        bill.refundedBy = authorizedBy;
+        bill.refundedAt = new Date().toISOString();
+        if (bill.refundAmount >= bill.totalAmount) {
+          bill.paymentStatus = 'REFUNDED';
+        } else {
+          bill.paymentStatus = 'PARTIALLY_REFUNDED';
+        }
+      }
+
       db.refund_logs = db.refund_logs || [];
       const refundLog = {
         id: `ref_${Date.now()}`,
@@ -896,6 +1142,14 @@ export async function POST(request) {
         timestamp: new Date().toISOString(),
       };
       db.refund_logs.unshift(refundLog);
+
+      recordAuditLog({
+        user: authorizedBy,
+        role: 'MANAGER',
+        module: 'POS_BILLING',
+        action: 'BILL_REFUNDED',
+        detail: `Refund of ₹${amount} processed for Bill #${billNumber} by ${authorizedBy}. Reason: ${reason}.`,
+      });
 
       await saveDbAsync(db);
 

@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import styles from './ManualBillModal.module.css';
+import { sanitizeEnglishTitle, generateThermalSlipHtml, formatBillTitle } from '@/lib/thermalSlipFormatter';
 
 export default function ManualBillModal(props) {
   if (!props.isOpen) return null;
@@ -22,7 +23,10 @@ function ManualBillDialog({
 
   // Order Type & Table
   const [orderType, setOrderType] = useState('DINE_IN');
-  const [tableNumber, setTableNumber] = useState('01');
+  const [tableNumber, setTableNumber] = useState('04');
+  const [persons, setPersons] = useState(3);
+  const [waiterName, setWaiterName] = useState('Captain Murugan');
+  const [paperWidth, setPaperWidth] = useState('80MM');
 
   // Customer Information
   const [customerSearch, setCustomerSearch] = useState('');
@@ -66,8 +70,10 @@ function ManualBillDialog({
   const [taxExempt, setTaxExempt] = useState(false);
 
   // Payment Settlement
-  const [paymentMode, setPaymentMode] = useState('CASH');
+  const [paymentMode, setPaymentMode] = useState('UPI');
   const [cashTendered, setCashTendered] = useState('');
+  const [splitCash, setSplitCash] = useState('');
+  const [splitUpi, setSplitUpi] = useState('');
   const [transactionRef, setTransactionRef] = useState('');
   const [customNotes, setCustomNotes] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -141,10 +147,11 @@ function ManualBillDialog({
     return Math.max(0, Number(cashTendered) - grandTotal);
   }, [paymentMode, cashTendered, grandTotal]);
 
-  // Add dish from catalog
+  // Add dish from catalog (English Only Title)
   const handleAddDish = (dish) => {
+    const cleanTitle = sanitizeEnglishTitle(dish.title, 'Delicacy');
     setCartItems(prev => {
-      const existingIdx = prev.findIndex(i => i.id === dish.id && !i.isCustom && !i.variant);
+      const existingIdx = prev.findIndex(i => (i.id === dish.id || i.title === cleanTitle) && !i.isCustom && !i.variant);
       if (existingIdx >= 0) {
         const next = [...prev];
         next[existingIdx].quantity += 1;
@@ -154,7 +161,7 @@ function ManualBillDialog({
         ...prev,
         {
           id: dish.id,
-          title: dish.title,
+          title: cleanTitle,
           tamilTitle: dish.tamilTitle || '',
           price: Number(dish.price) || 0,
           quantity: 1,
@@ -175,11 +182,12 @@ function ManualBillDialog({
       return;
     }
     setErrorMsg('');
+    const cleanTitle = sanitizeEnglishTitle(customItem.title.trim(), 'Custom Item');
     setCartItems(prev => [
       ...prev,
       {
         id: `custom_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-        title: customItem.title.trim(),
+        title: cleanTitle,
         tamilTitle: customItem.tamilTitle.trim(),
         price: Number(customItem.price),
         quantity: Math.max(1, Number(customItem.quantity) || 1),
@@ -233,6 +241,11 @@ function ManualBillDialog({
     setErrorMsg('');
     setSubmitting(true);
 
+    const splitDetails = paymentMode === 'SPLIT' ? [
+      { mode: 'CASH', amount: Number(splitCash) || 0 },
+      { mode: 'UPI', amount: Number(splitUpi) || 0 },
+    ] : null;
+
     try {
       const res = await fetch('/api/admin/pos', {
         method: 'POST',
@@ -241,7 +254,9 @@ function ManualBillDialog({
           action: 'CREATE_MANUAL_BILL',
           customer,
           orderType,
-          tableNumber: orderType === 'TAKEAWAY' ? 'TK' : orderType === 'DELIVERY' ? 'DEL' : tableNumber,
+          tableNumber: orderType === 'TAKEAWAY' ? 'TK' : orderType === 'DELIVERY' ? 'DEL' : orderType === 'PARCEL' ? 'P-01' : orderType === 'COUNTER' ? 'C-01' : tableNumber,
+          persons: Number(persons) || 1,
+          waiterName,
           items: cartItems,
           discountPercent: Number(discountPercent) || 0,
           discountFlat: Number(discountFlat) || 0,
@@ -252,6 +267,7 @@ function ManualBillDialog({
           taxRateCgst: cgstRate,
           taxRateSgst: sgstRate,
           paymentMode,
+          splitDetails,
           transactionRef,
           cashierName: currentUser.name,
           customNotes,
@@ -267,6 +283,36 @@ function ManualBillDialog({
           }
           onClose();
         } else {
+          // Direct Print using exact visual reference layout
+          if (actionType === 'SETTLE_AND_PRINT') {
+            const printWin = window.open('', '_blank', 'width=460,height=750');
+            if (printWin) {
+              const html = generateThermalSlipHtml({
+                billNumber: data.bill.billNumber,
+                tableNumber: data.bill.tableNumber,
+                orderType: data.bill.orderType,
+                persons: data.bill.persons || persons,
+                customer: data.bill.customer,
+                cashierName: data.bill.cashierName || currentUser.name,
+                waiterName: data.bill.waiterName || waiterName,
+                items: data.bill.items,
+                subtotal: data.bill.subtotal,
+                discountAmount: data.bill.discountAmount,
+                roundOff: data.bill.roundOff,
+                totalAmount: data.bill.totalAmount,
+                paymentMode: data.bill.paymentMode,
+                paymentStatus: data.bill.paymentStatus || 'Paid',
+                splitDetails: data.bill.splitDetails,
+                transactionRef: data.bill.transactionRef,
+                paperWidth,
+                settings,
+                standalonePage: true,
+              });
+              printWin.document.write(html);
+              printWin.document.close();
+            }
+          }
+
           if (onBillCreated) {
             onBillCreated(data.bill, data.thermalReceipt, actionType === 'SETTLE_AND_PRINT');
           }
@@ -308,7 +354,7 @@ function ManualBillDialog({
             </div>
           )}
 
-          {/* Top Config: Order Type & Table Selection */}
+          {/* Top Config: Order Type, Table, Persons & Staff Selection */}
           <div className={styles.topConfigBar}>
             <div className={styles.orderTypeGroup}>
               <span className={styles.label}>Order Type:</span>
@@ -324,7 +370,14 @@ function ManualBillDialog({
                 className={`${styles.orderTypeBtn} ${orderType === 'TAKEAWAY' ? styles.orderTypeBtnActive : ''}`}
                 onClick={() => setOrderType('TAKEAWAY')}
               >
-                🥡 Takeaway / Parcel
+                🥡 Takeaway
+              </button>
+              <button
+                type="button"
+                className={`${styles.orderTypeBtn} ${orderType === 'PARCEL' ? styles.orderTypeBtnActive : ''}`}
+                onClick={() => setOrderType('PARCEL')}
+              >
+                📦 Parcel
               </button>
               <button
                 type="button"
@@ -333,23 +386,106 @@ function ManualBillDialog({
               >
                 🛵 Delivery
               </button>
+              <button
+                type="button"
+                className={`${styles.orderTypeBtn} ${orderType === 'WALK_IN' ? styles.orderTypeBtnActive : ''}`}
+                onClick={() => setOrderType('WALK_IN')}
+              >
+                🚶 Walk-In
+              </button>
+              <button
+                type="button"
+                className={`${styles.orderTypeBtn} ${orderType === 'COUNTER' ? styles.orderTypeBtnActive : ''}`}
+                onClick={() => setOrderType('COUNTER')}
+              >
+                🏪 Counter
+              </button>
             </div>
 
-            {orderType === 'DINE_IN' && (
-              <div className={styles.tableInputWrap}>
-                <span className={styles.label}>Table #:</span>
-                <input
-                  type="text"
-                  className={styles.inputSmall}
-                  value={tableNumber}
-                  onChange={(e) => setTableNumber(e.target.value)}
-                  placeholder="01"
-                />
-              </div>
-            )}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+              {orderType === 'DINE_IN' && (
+                <>
+                  <div className={styles.tableInputWrap}>
+                    <span className={styles.label}>Table #:</span>
+                    <input
+                      type="text"
+                      className={styles.inputSmall}
+                      value={tableNumber}
+                      onChange={(e) => setTableNumber(e.target.value)}
+                      placeholder="04"
+                      style={{ width: '50px' }}
+                    />
+                  </div>
 
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Operator: <strong style={{ color: '#38bdf8' }}>{currentUser.name}</strong>
+                  <div className={styles.tableInputWrap}>
+                    <span className={styles.label}>Persons:</span>
+                    <input
+                      type="number"
+                      min="1"
+                      max="30"
+                      className={styles.inputSmall}
+                      value={persons}
+                      onChange={(e) => setPersons(e.target.value)}
+                      style={{ width: '45px' }}
+                    />
+                  </div>
+                </>
+              )}
+
+              <div className={styles.tableInputWrap}>
+                <span className={styles.label}>Waiter:</span>
+                <select
+                  className={styles.inputSmall}
+                  value={waiterName}
+                  onChange={(e) => setWaiterName(e.target.value)}
+                >
+                  <option value="Captain Murugan">Captain Murugan</option>
+                  <option value="Karthik">Karthik</option>
+                  <option value="Rajan">Rajan</option>
+                  <option value="Admin">Admin</option>
+                  <option value="Floor Staff">Floor Staff</option>
+                </select>
+              </div>
+
+              <div className={styles.tableInputWrap}>
+                <span className={styles.label}>Slip Width:</span>
+                <button
+                  type="button"
+                  style={{
+                    background: paperWidth === '80MM' ? '#10b981' : 'rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '0.2rem 0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '0.72rem',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                  }}
+                  onClick={() => setPaperWidth('80MM')}
+                >
+                  80mm
+                </button>
+                <button
+                  type="button"
+                  style={{
+                    background: paperWidth === '58MM' ? '#10b981' : 'rgba(255,255,255,0.1)',
+                    color: '#fff',
+                    border: 'none',
+                    padding: '0.2rem 0.5rem',
+                    borderRadius: '4px',
+                    fontSize: '0.72rem',
+                    cursor: 'pointer',
+                    fontWeight: 700,
+                  }}
+                  onClick={() => setPaperWidth('58MM')}
+                >
+                  58mm
+                </button>
+              </div>
+
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                Cashier: <strong style={{ color: '#38bdf8' }}>{currentUser.name}</strong>
+              </div>
             </div>
           </div>
 
@@ -831,10 +967,10 @@ function ManualBillDialog({
                 </label>
                 <div className={styles.paymentModes}>
                   {[
+                    { id: 'UPI', label: '📱 UPI' },
                     { id: 'CASH', label: '💵 Cash' },
-                    { id: 'ONLINE_UPI', label: '📱 UPI (GPay/PhonePe)' },
                     { id: 'CARD', label: '💳 Card EDC' },
-                    { id: 'CREDIT_DUE', label: '📋 Credit / Due' },
+                    { id: 'SPLIT', label: '➗ Split Payment' },
                   ].map(m => (
                     <button
                       key={m.id}
@@ -847,6 +983,38 @@ function ManualBillDialog({
                   ))}
                 </div>
               </div>
+
+              {/* Split Payment Breakdown */}
+              {paymentMode === 'SPLIT' && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', background: 'rgba(0,0,0,0.3)', padding: '0.6rem', borderRadius: '8px' }}>
+                  <div>
+                    <label className={styles.label}>Cash Amount (₹)</label>
+                    <input
+                      type="number"
+                      className={styles.input}
+                      placeholder="e.g. 200"
+                      value={splitCash}
+                      onChange={e => {
+                        const val = e.target.value;
+                        setSplitCash(val);
+                        if (!isNaN(val) && Number(val) <= grandTotal) {
+                          setSplitUpi(String(Math.max(0, grandTotal - Number(val))));
+                        }
+                      }}
+                    />
+                  </div>
+                  <div>
+                    <label className={styles.label}>UPI Amount (₹)</label>
+                    <input
+                      type="number"
+                      className={styles.input}
+                      placeholder="e.g. 335"
+                      value={splitUpi}
+                      onChange={e => setSplitUpi(e.target.value)}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Cash Tendered Calculator */}
               {paymentMode === 'CASH' && (

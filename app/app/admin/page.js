@@ -11,6 +11,8 @@ import WebsiteCmsDashboard from './components/WebsiteCmsDashboard';
 import ManualBillModal from './components/ManualBillModal';
 import EditBillBeforePrintModal from './components/EditBillBeforePrintModal';
 import BillSlipFormatDesigner from './components/BillSlipFormatDesigner';
+import BillingManagementModal from './components/BillingManagementModal';
+import { generateThermalSlipHtml, sanitizeEnglishTitle } from '@/lib/thermalSlipFormatter';
 
 // Pre-seeded staff roles
 const STAFF_PRESETS = [
@@ -1399,9 +1401,49 @@ Status: SHIFT CLOSED & VERIFIED
     }
   };
 
-  // ─── Direct Print to TVSE RP3200 Plus Thermal Printer ───────────────────
-  const handlePrintReceipt = () => {
-    window.print();
+  // ─── Direct Print to TVSE RP3200 Plus / Exact Thermal Slip ───────────────────
+  const handlePrintReceipt = (customBill = null, width = '80MM') => {
+    const b = customBill || lastSettledBill || (posData.recentBills && posData.recentBills[0]);
+    if (!b) {
+      window.print();
+      return;
+    }
+    const printWindow = window.open('', '_blank', 'width=460,height=750');
+    if (!printWindow) {
+      window.print();
+      return;
+    }
+    const html = generateThermalSlipHtml({
+      billNumber: b.billNumber || 'SGK100245',
+      tableNumber: b.tableNumber || '04',
+      orderType: b.orderType || 'DINE_IN',
+      persons: b.persons || 3,
+      customer: b.customer,
+      cashierName: b.cashierName || currentUser.name,
+      waiterName: b.waiterName || '',
+      items: b.items || [],
+      subtotal: b.subtotal || 0,
+      discountAmount: b.discountAmount || 0,
+      discountReason: b.discountReason,
+      packagingCharge: b.packagingCharge || 0,
+      deliveryCharge: b.deliveryCharge || 0,
+      serviceChargeAmount: b.serviceChargeAmount || 0,
+      cgst: b.cgst || 0,
+      sgst: b.sgst || 0,
+      roundOff: b.roundOff || 0,
+      totalAmount: b.totalAmount || 0,
+      paymentMode: b.paymentMode || 'UPI',
+      paymentStatus: b.paymentStatus || 'Paid',
+      transactionRef: b.transactionRef || '',
+      settledAt: b.settledAt || b.createdAt,
+      paperWidth: width,
+      isDuplicate: !!b.isDuplicate,
+      reprintCount: b.reprintCount || 0,
+      settings: systemSettings,
+      standalonePage: true,
+    });
+    printWindow.document.write(html);
+    printWindow.document.close();
   };
 
   // ─── KDS Handlers (15 Requirements) ─────────────────────────────────────
@@ -4652,19 +4694,19 @@ Status: SHIFT CLOSED & VERIFIED
                   </>
                 )}
 
-                {/* ESC/POS Thermal Receipt Slip Preview (Requirement 12) */}
+                {/* Exact Visual Thermal Receipt Slip Preview (Sri Gokulam Reference Match) */}
                 {activeReceipt && (
                   <div style={{ marginTop: '0.85rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.35rem', flexWrap: 'wrap', gap: '0.5rem' }}>
-                      <span style={{ fontSize: '0.82rem', fontWeight: '700', color: 'var(--text-primary)' }}>
-                        🖨️ Thermal Receipt Preview (TVSE RP3200 Plus)
+                      <span style={{ fontSize: '0.82rem', fontWeight: '700', color: '#10b981' }}>
+                        🧾 Thermal Receipt Preview (Exact Reference Template)
                       </span>
                       <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                         <button
                           type="button"
                           className={styles.btnNavAlt}
                           onClick={() => {
-                            const targetBill = lastSettledBill || (posData.recentBills && posData.recentBills[0]) || { billNumber: 'SGR-RECENT', thermalSlip: activeReceipt, items: [], totalAmount: 0 };
+                            const targetBill = lastSettledBill || (posData.recentBills && posData.recentBills[0]) || { billNumber: 'SGK100245', thermalSlip: activeReceipt, items: [], totalAmount: 0 };
                             setEditBillTarget({ bill: targetBill, thermalSlip: activeReceipt });
                           }}
                           style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', borderColor: '#38bdf8', color: '#38bdf8', fontWeight: 'bold' }}
@@ -4684,15 +4726,51 @@ Status: SHIFT CLOSED & VERIFIED
                         <button
                           type="button"
                           className={styles.btnThermalPrint}
-                          onClick={handlePrintReceipt}
-                          style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem' }}
+                          onClick={() => handlePrintReceipt(lastSettledBill, '80MM')}
+                          style={{ padding: '0.35rem 0.75rem', fontSize: '0.78rem', background: '#059669', borderColor: '#10b981' }}
                         >
-                          🖨️ Direct Print
+                          🖨️ 80mm Print
+                        </button>
+                        <button
+                          type="button"
+                          className={styles.btnNavAlt}
+                          onClick={() => handlePrintReceipt(lastSettledBill, '58MM')}
+                          style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem' }}
+                        >
+                          🖨️ 58mm Print
                         </button>
                       </div>
                     </div>
-                    <div className={styles.thermalReceiptBox}>
-                      <pre>{activeReceipt}</pre>
+                    <div style={{ background: '#f1f5f9', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', display: 'flex', justifyContent: 'center', maxHeight: '420px', overflowY: 'auto' }}>
+                      {lastSettledBill ? (
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: generateThermalSlipHtml({
+                              billNumber: lastSettledBill.billNumber,
+                              tableNumber: lastSettledBill.tableNumber,
+                              orderType: lastSettledBill.orderType,
+                              persons: lastSettledBill.persons || 3,
+                              customer: lastSettledBill.customer,
+                              cashierName: lastSettledBill.cashierName || currentUser.name,
+                              waiterName: lastSettledBill.waiterName || '',
+                              items: lastSettledBill.items || [],
+                              subtotal: lastSettledBill.subtotal || 0,
+                              discountAmount: lastSettledBill.discountAmount || 0,
+                              roundOff: lastSettledBill.roundOff || 0,
+                              totalAmount: lastSettledBill.totalAmount || 0,
+                              paymentMode: lastSettledBill.paymentMode || 'UPI',
+                              paymentStatus: lastSettledBill.paymentStatus || 'Paid',
+                              transactionRef: lastSettledBill.transactionRef || '',
+                              settledAt: lastSettledBill.settledAt || lastSettledBill.createdAt,
+                              paperWidth: '80MM',
+                              settings: systemSettings,
+                              standalonePage: false,
+                            })
+                          }}
+                        />
+                      ) : (
+                        <pre style={{ color: '#000', fontSize: '11px', margin: 0 }}>{activeReceipt}</pre>
+                      )}
                     </div>
                   </div>
                 )}
@@ -11909,179 +11987,25 @@ Status: SHIFT CLOSED & VERIFIED
         </div>
       )}
 
-      {/* ─── 7. Bills History, Refunds & Voids Modal (Requirements 8, 12, 13) ─── */}
-      {showBillsHistoryModal && (
-        <div className={styles.posModalOverlay}>
-          <div className={styles.posModalBox} style={{ maxWidth: '680px' }}>
-            <div className={styles.posModalHeader}>
-              <div>
-                <h3 className={styles.posModalTitle} style={{ color: '#06b6d4' }}>
-                  🧾 Bills History, Thermal Reprints &amp; Audit Logs
-                </h3>
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
-                  Reprint 80mm thermal slips, authorize bill voids &amp; process refunds
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowBillsHistoryModal(false);
-                    setShowManualBillModal(true);
-                  }}
-                  style={{
-                    background: 'linear-gradient(135deg, #059669 0%, #10b981 100%)',
-                    color: '#fff',
-                    border: 'none',
-                    padding: '0.35rem 0.75rem',
-                    fontSize: '0.75rem',
-                    borderRadius: '6px',
-                    fontWeight: 'bold',
-                    cursor: 'pointer',
-                  }}
-                >
-                  🧾 + New Manual Bill
-                </button>
-                <button
-                  type="button"
-                  className={styles.posModalCloseBtn}
-                  onClick={() => setShowBillsHistoryModal(false)}
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-
-            {(!posData.recentBills || posData.recentBills.length === 0) ? (
-              <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                📭 No bills settled yet for this shift.
-              </div>
-            ) : (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '380px', overflowY: 'auto' }}>
-                {posData.recentBills.map(b => (
-                  <div
-                    key={b.id || b.billNumber}
-                    style={{
-                      background: 'var(--bg-card-subtle)',
-                      border: '1px solid var(--border-subtle)',
-                      borderRadius: '8px',
-                      padding: '0.75rem',
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: '0.5rem'
-                    }}
-                  >
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
-                        <strong style={{ fontSize: '0.9rem', color: 'var(--text-primary)' }}>
-                          #{b.billNumber}
-                        </strong>
-                        <span style={{
-                          fontSize: '0.65rem',
-                          fontWeight: 800,
-                          padding: '0.1rem 0.4rem',
-                          borderRadius: '9999px',
-                          background: b.status === 'SETTLED' ? 'rgba(16, 185, 129, 0.15)' : (b.status === 'VOIDED' ? 'rgba(239, 68, 68, 0.15)' : 'rgba(234, 179, 8, 0.15)'),
-                          color: b.status === 'SETTLED' ? '#10b981' : (b.status === 'VOIDED' ? '#ef4444' : '#eab308'),
-                        }}>
-                          {b.status}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.2rem' }}>
-                        Table #{b.tableNumber} • {b.customer?.name || 'Walk-in'} • {b.paymentMode || 'CASH'} • {new Date(b.createdAt).toLocaleTimeString()}
-                      </div>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', flexWrap: 'wrap' }}>
-                      <strong style={{ fontSize: '1rem', color: '#10b981' }}>
-                        ₹{b.totalAmount}
-                      </strong>
-                      <button
-                        type="button"
-                        className={styles.btnThermalPrint}
-                        onClick={() => {
-                          if (b.thermalSlip) {
-                            setActiveReceipt(b.thermalSlip);
-                            setLastSettledBill(b);
-                            setShowBillsHistoryModal(false);
-                            showNotice(`Loaded Bill #${b.billNumber} for Thermal Printing`);
-                          } else {
-                            showNotice('Generating thermal slip...');
-                          }
-                        }}
-                        style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem' }}
-                      >
-                        🖨️ Slip
-                      </button>
-                      <button
-                        type="button"
-                        className={styles.btnNavAlt}
-                        onClick={() => {
-                          setEditBillTarget({ bill: b, thermalSlip: b.thermalSlip });
-                          setShowBillsHistoryModal(false);
-                        }}
-                        style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', borderColor: '#38bdf8', color: '#38bdf8', fontWeight: 'bold' }}
-                        title="Edit items, customer, discount, or customize slip before printing"
-                      >
-                        ✏️ Edit &amp; Print
-                      </button>
-
-                      {b.status === 'SETTLED' && (
-                        <>
-                          <button
-                            type="button"
-                            className={styles.btnNavAlt}
-                            onClick={() => {
-                              setVoidBillTarget(b);
-                              setManagerPinAction({
-                                type: 'VOID_BILL',
-                                title: `Authorize Void for Bill #${b.billNumber}`,
-                                onConfirm: handleVoidBill,
-                              });
-                              setShowManagerPinModal(true);
-                            }}
-                            style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', color: '#ef4444' }}
-                          >
-                            ❌ Void
-                          </button>
-                          <button
-                            type="button"
-                            className={styles.btnNavAlt}
-                            onClick={() => {
-                              setRefundBillTarget(b);
-                              setRefundAmountVal(String(b.totalAmount));
-                              setManagerPinAction({
-                                type: 'REFUND_BILL',
-                                title: `Authorize Refund for Bill #${b.billNumber}`,
-                                onConfirm: handleProcessRefund,
-                              });
-                              setShowManagerPinModal(true);
-                            }}
-                            style={{ padding: '0.35rem 0.65rem', fontSize: '0.75rem', color: '#eab308' }}
-                          >
-                            ↩️ Refund
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
-              <button
-                type="button"
-                className={styles.btnNavAlt}
-                onClick={() => setShowBillsHistoryModal(false)}
-              >
-                Close
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* ─── 7. Bills History, Thermal Reprints & Audit Logs Modal (Enhanced Restaurant Billing) ─── */}
+      <BillingManagementModal
+        isOpen={showBillsHistoryModal}
+        onClose={() => setShowBillsHistoryModal(false)}
+        bills={posData.recentBills || []}
+        activeTables={posData.tables || []}
+        currentUser={currentUser}
+        settings={systemSettings}
+        onOpenManualBill={() => {
+          setShowBillsHistoryModal(false);
+          setShowManualBillModal(true);
+        }}
+        onOpenEditBill={(b) => {
+          setShowBillsHistoryModal(false);
+          setEditBillTarget({ bill: b, thermalSlip: b.thermalSlip });
+        }}
+        onRefreshBills={() => fetchPos()}
+        onShowNotice={showNotice}
+      />
 
       {/* ─── 8. Split Bill & Partial Payment Modal (Requirement 11) ─── */}
       {showSplitModal && (

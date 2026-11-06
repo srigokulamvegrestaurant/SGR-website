@@ -2,7 +2,14 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import styles from './EditBillBeforePrintModal.module.css';
-import { generateThermalReceiptText, generateA4TaxInvoiceHtml } from '@/lib/thermalSlipFormatter';
+import {
+  generateThermalSlipHtml,
+  generateThermalReceiptText,
+  generateA4TaxInvoiceHtml,
+  sanitizeEnglishTitle,
+  formatBillTitle,
+  formatTableDisplay
+} from '@/lib/thermalSlipFormatter';
 
 export default function EditBillBeforePrintModal(props) {
   if (!props.isOpen || !props.bill) return null;
@@ -19,8 +26,15 @@ function EditBillDialog({
   onSaved, // callback(updatedBill, thermalReceipt)
 }) {
 
-  // Editor mode: 'FORM' | 'RAW'
-  const [editorMode, setEditorMode] = useState('FORM');
+  // Editor mode: 'VISUAL' | 'RAW' | 'A4'
+  const [editorMode, setEditorMode] = useState('VISUAL');
+
+  // Order meta fields
+  const [orderType, setOrderType] = useState(bill.orderType || 'DINE_IN');
+  const [tableNumber, setTableNumber] = useState(bill.tableNumber || '04');
+  const [persons, setPersons] = useState(bill.persons || 3);
+  const [cashierName, setCashierName] = useState(bill.cashierName || currentUser.name || 'Admin');
+  const [waiterName, setWaiterName] = useState(bill.waiterName || 'Captain Murugan');
 
   // Customer fields
   const [customer, setCustomer] = useState({
@@ -30,11 +44,11 @@ function EditBillDialog({
     address: bill.customer?.address || '',
   });
 
-  // Items
+  // Items (English Only)
   const [items, setItems] = useState(
     (bill.items || []).map(it => ({
       id: it.id,
-      title: it.title || 'Item',
+      title: sanitizeEnglishTitle(it.title || 'Item'),
       tamilTitle: it.tamilTitle || '',
       price: Number(it.price) || 0,
       quantity: Math.max(1, Number(it.quantity) || 1),
@@ -54,14 +68,12 @@ function EditBillDialog({
   const [discountReason, setDiscountReason] = useState(bill.discountReason || 'Discount');
   const [packagingCharge, setPackagingCharge] = useState(bill.packagingCharge || '');
   const [deliveryCharge, setDeliveryCharge] = useState(bill.deliveryCharge || '');
-  const [paymentMode, setPaymentMode] = useState(bill.paymentMode || 'CASH');
+  const [paymentMode, setPaymentMode] = useState(bill.paymentMode || 'UPI');
   const [transactionRef, setTransactionRef] = useState(bill.transactionRef || '');
 
   // Format Toggles for this bill print
   const [paperWidth, setPaperWidth] = useState(settings?.bill_slip_format?.paperWidth || '80MM');
-  const [showTamilItemNames, setShowTamilItemNames] = useState(true);
-  const [showTaxBreakdown, setShowTaxBreakdown] = useState(true);
-  const [showCustomerDetails, setShowCustomerDetails] = useState(true);
+  const [showTaxBreakdown, setShowTaxBreakdown] = useState(false);
   const [customFooterNote, setCustomFooterNote] = useState('');
 
   // Raw ESC/POS text
@@ -96,17 +108,17 @@ function EditBillDialog({
   const grandTotal = Math.round(rawTotal);
   const roundOff = Number((grandTotal - rawTotal).toFixed(2));
 
-  // Live generated receipt string when in FORM mode
+  // Live generated raw slip
   const generatedSlip = useMemo(() => {
-    if (editorMode === 'RAW') {
+    if (editorMode === 'RAW' && rawSlipText) {
       return rawSlipText;
     }
     return generateThermalReceiptText({
       billNumber: bill.billNumber,
-      tableNumber: bill.tableNumber,
-      orderType: bill.orderType,
+      tableNumber,
+      orderType,
       customer,
-      cashierName: bill.cashierName || currentUser.name,
+      cashierName,
       items,
       subtotal,
       discountAmount,
@@ -121,12 +133,12 @@ function EditBillDialog({
       paymentMode,
       transactionRef,
       settledAt: bill.settledAt || bill.createdAt,
+      isDuplicate: !!bill.isDuplicate,
+      reprintCount: bill.reprintCount || 0,
       settings,
       formatOverrides: {
         paperWidth,
-        showTamilItemNames,
         showTaxBreakdown,
-        showCustomerDetails,
         footerDisclaimer: customFooterNote || undefined,
       },
     });
@@ -134,7 +146,10 @@ function EditBillDialog({
     editorMode,
     rawSlipText,
     bill,
+    tableNumber,
+    orderType,
     customer,
+    cashierName,
     items,
     subtotal,
     discountAmount,
@@ -148,15 +163,74 @@ function EditBillDialog({
     paymentMode,
     transactionRef,
     paperWidth,
-    showTamilItemNames,
     showTaxBreakdown,
-    showCustomerDetails,
     customFooterNote,
-    currentUser,
     settings,
   ]);
 
-  // Keep rawSlipText in sync when switching to RAW mode
+  // Live generated exact visual HTML slip
+  const visualSlipHtml = useMemo(() => {
+    return generateThermalSlipHtml({
+      billNumber: bill.billNumber,
+      tableNumber,
+      orderType,
+      persons,
+      customer,
+      cashierName,
+      waiterName,
+      items,
+      subtotal,
+      discountAmount,
+      discountReason,
+      packagingCharge: packAmount,
+      deliveryCharge: delAmount,
+      serviceChargeAmount: bill.serviceChargeAmount || 0,
+      cgst,
+      sgst,
+      roundOff,
+      totalAmount: grandTotal,
+      paymentMode,
+      paymentStatus: bill.paymentStatus || 'Paid',
+      transactionRef,
+      settledAt: bill.settledAt || bill.createdAt,
+      paperWidth,
+      isDuplicate: !!bill.isDuplicate,
+      reprintCount: bill.reprintCount || 0,
+      settings,
+      formatOverrides: {
+        paperWidth,
+        showTaxBreakdown,
+        footerDisclaimer: customFooterNote || undefined,
+      },
+      standalonePage: false,
+    });
+  }, [
+    bill,
+    tableNumber,
+    orderType,
+    persons,
+    customer,
+    cashierName,
+    waiterName,
+    items,
+    subtotal,
+    discountAmount,
+    discountReason,
+    packAmount,
+    delAmount,
+    cgst,
+    sgst,
+    roundOff,
+    grandTotal,
+    paymentMode,
+    transactionRef,
+    paperWidth,
+    showTaxBreakdown,
+    customFooterNote,
+    settings,
+  ]);
+
+  // Synchronize raw slip text when toggling to RAW
   useEffect(() => {
     if (editorMode === 'RAW' && !rawSlipText) {
       setRawSlipText(generatedSlip);
@@ -182,6 +256,14 @@ function EditBillDialog({
     });
   };
 
+  const handleTitleChange = (idx, newTitle) => {
+    setItems(prev => {
+      const next = [...prev];
+      next[idx].title = sanitizeEnglishTitle(newTitle, 'Item');
+      return next;
+    });
+  };
+
   const handleDeleteItem = (idx) => {
     setItems(prev => prev.filter((_, i) => i !== idx));
   };
@@ -193,7 +275,7 @@ function EditBillDialog({
       ...prev,
       {
         id: `custom_${Date.now()}`,
-        title: newItem.title.trim(),
+        title: sanitizeEnglishTitle(newItem.title.trim(), 'Custom Item'),
         tamilTitle: newItem.tamilTitle.trim(),
         price: Number(newItem.price),
         quantity: Math.max(1, Number(newItem.quantity) || 1),
@@ -203,53 +285,48 @@ function EditBillDialog({
     setShowAddItem(false);
   };
 
-  // Direct Thermal Print
-  const handlePrintThermal = (slipTextToPrint = generatedSlip) => {
-    const is58mm = paperWidth === '58MM';
-    const printWindow = window.open('', '_blank', 'width=450,height=700');
+  // Direct Thermal Print using exact visual reference layout
+  const handlePrintThermal = (targetWidth = paperWidth) => {
+    const printWindow = window.open('', '_blank', 'width=460,height=750');
     if (!printWindow) {
       alert('Pop-up was blocked. Please allow pop-ups for thermal receipt printing.');
       return;
     }
 
-    const html = `<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>Thermal Receipt - ${bill.billNumber}</title>
-  <style>
-    @page {
-      size: ${is58mm ? '58mm' : '80mm'} auto;
-      margin: 0;
-    }
-    body {
-      margin: 0;
-      padding: ${is58mm ? '2mm' : '4mm'};
-      background: #ffffff;
-      color: #000000;
-      width: ${is58mm ? '48mm' : '72mm'};
-    }
-    pre {
-      font-family: 'Courier New', Courier, monospace;
-      font-size: ${is58mm ? '9pt' : '10.5pt'};
-      line-height: 1.25;
-      margin: 0;
-      white-space: pre-wrap;
-      word-break: break-all;
-    }
-  </style>
-</head>
-<body>
-  <pre>${slipTextToPrint.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</pre>
-  <script>
-    window.onload = function() {
-      window.focus();
-      window.print();
-      setTimeout(function() { window.close(); }, 750);
-    };
-  </script>
-</body>
-</html>`;
+    const html = generateThermalSlipHtml({
+      billNumber: bill.billNumber,
+      tableNumber,
+      orderType,
+      persons,
+      customer,
+      cashierName,
+      waiterName,
+      items,
+      subtotal,
+      discountAmount,
+      discountReason,
+      packagingCharge: packAmount,
+      deliveryCharge: delAmount,
+      serviceChargeAmount: bill.serviceChargeAmount || 0,
+      cgst,
+      sgst,
+      roundOff,
+      totalAmount: grandTotal,
+      paymentMode,
+      paymentStatus: bill.paymentStatus || 'Paid',
+      transactionRef,
+      settledAt: bill.settledAt || bill.createdAt,
+      paperWidth: targetWidth,
+      isDuplicate: !!bill.isDuplicate,
+      reprintCount: bill.reprintCount || 0,
+      settings,
+      formatOverrides: {
+        paperWidth: targetWidth,
+        showTaxBreakdown,
+        footerDisclaimer: customFooterNote || undefined,
+      },
+      standalonePage: true,
+    });
 
     printWindow.document.write(html);
     printWindow.document.close();
@@ -257,12 +334,14 @@ function EditBillDialog({
 
   // Print A4 Tax Invoice
   const handlePrintA4 = () => {
+    const printWin = window.open('', '_blank', 'width=850,height=900');
+    if (!printWin) return;
     const html = generateA4TaxInvoiceHtml({
       billNumber: bill.billNumber,
-      tableNumber: bill.tableNumber,
-      orderType: bill.orderType,
+      tableNumber,
+      orderType,
       customer,
-      cashierName: bill.cashierName || currentUser.name,
+      cashierName,
       items,
       subtotal,
       discountAmount,
@@ -278,21 +357,9 @@ function EditBillDialog({
       transactionRef,
       settledAt: bill.settledAt || bill.createdAt,
       settings,
-      formatOverrides: {
-        paperWidth: 'A4',
-        footerDisclaimer: customFooterNote || undefined,
-      },
     });
-
-    const printWin = window.open('', '_blank', 'width=800,height=900');
-    if (printWin) {
-      printWin.document.write(html);
-      printWin.document.close();
-      setTimeout(() => {
-        printWin.focus();
-        printWin.print();
-      }, 400);
-    }
+    printWin.document.write(html);
+    printWin.document.close();
   };
 
   // Save changes to DB & Print
@@ -306,6 +373,11 @@ function EditBillDialog({
         billId: bill.id,
         callerName: currentUser.name,
         updatedFields: {
+          tableNumber,
+          orderType,
+          persons: Number(persons) || 1,
+          cashierName,
+          waiterName,
           customer,
           items,
           discountPercent: Number(discountPercent) || 0,
@@ -318,9 +390,8 @@ function EditBillDialog({
           thermalSlip: editorMode === 'RAW' ? rawSlipText : generatedSlip,
           formatOverrides: {
             paperWidth,
-            showTamilItemNames,
             showTaxBreakdown,
-            showCustomerDetails,
+            footerDisclaimer: customFooterNote || undefined,
           },
         },
       };
@@ -335,7 +406,7 @@ function EditBillDialog({
       if (data.success) {
         setNotice('✅ Bill updated successfully!');
         if (onSaved) onSaved(data.bill, data.thermalReceipt);
-        handlePrintThermal(data.thermalReceipt || generatedSlip);
+        handlePrintThermal(paperWidth);
         setTimeout(() => onClose(), 600);
       } else {
         alert(data.error || 'Failed to update bill');
@@ -361,10 +432,10 @@ function EditBillDialog({
         <div className={styles.header}>
           <div>
             <h2 className={styles.headerTitle}>
-              ✏️ Edit Bill Before Print #{bill.billNumber}
+              ✏️ Edit Bill #{bill.billNumber}
             </h2>
             <div className={styles.headerSub}>
-              Modify items, rates, customer details, or customize the raw thermal printout before sending to printer
+              Modify items, English dish names, rates, order type, customer details, or print exact thermal slips
             </div>
           </div>
           <button type="button" className={styles.closeBtn} onClick={onClose} title="Close">
@@ -381,140 +452,166 @@ function EditBillDialog({
 
         {/* Body Split */}
         <div className={styles.body}>
-          {/* Left: Edit Controls */}
-          <div className={styles.editPanel}>
-            {/* Mode Switcher */}
-            <div className={styles.modeToggleBar}>
-              <button
-                type="button"
-                className={`${styles.modeTab} ${editorMode === 'FORM' ? styles.modeTabActive : ''}`}
-                onClick={() => setEditorMode('FORM')}
-              >
-                📝 Visual Form &amp; Format Options
-              </button>
-              <button
-                type="button"
-                className={`${styles.modeTab} ${editorMode === 'RAW' ? styles.modeTabActive : ''}`}
-                onClick={() => {
-                  setRawSlipText(generatedSlip);
-                  setEditorMode('RAW');
-                }}
-              >
-                🖨️ Direct Raw ESC/POS Text Editor
-              </button>
+          {/* Left: Interactive Edit Forms */}
+          <div className={styles.formPanel}>
+            {/* Top Toolbar */}
+            <div className={styles.topToolbar}>
+              <div className={styles.segmentedControl}>
+                <button
+                  type="button"
+                  className={`${styles.segmentBtn} ${editorMode === 'VISUAL' ? styles.segmentActive : ''}`}
+                  onClick={() => setEditorMode('VISUAL')}
+                >
+                  🧾 Visual Receipt
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.segmentBtn} ${editorMode === 'RAW' ? styles.segmentActive : ''}`}
+                  onClick={() => setEditorMode('RAW')}
+                >
+                  ⚙️ Raw Text
+                </button>
+              </div>
+
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                Net: <strong style={{ color: '#10b981', fontSize: '0.95rem' }}>₹{grandTotal}</strong>
+              </div>
             </div>
 
             {editorMode === 'RAW' ? (
-              /* Raw Text Editor Mode */
-              <div className={styles.rawEditorWrap}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <span style={{ fontSize: '0.78rem', color: '#10b981', fontWeight: 'bold' }}>
-                    🟢 Direct Monospace ESC/POS Editor (42 cols 80mm / 32 cols 58mm)
-                  </span>
-                  <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                    Type or edit anything directly
-                  </span>
+              <div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+                <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginBottom: '0.4rem' }}>
+                  Directly modify the raw ESC/POS monospace receipt lines:
                 </div>
                 <textarea
                   className={styles.rawTextarea}
                   value={rawSlipText}
-                  onChange={(e) => setRawSlipText(e.target.value)}
-                  placeholder="Raw receipt text..."
-                  spellCheck="false"
+                  onChange={e => setRawSlipText(e.target.value)}
+                  placeholder="Raw thermal slip text..."
                 />
               </div>
             ) : (
-              /* Visual Form Mode */
               <>
-                {/* 1. Customer Section */}
+                {/* 1. Order Type, Table & Staff Meta */}
                 <div className={styles.cardSection}>
                   <div className={styles.sectionTitle}>
-                    <span>👤 Customer &amp; Tax Info</span>
-                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
-                      Table #{bill.tableNumber} • {bill.orderType}
-                    </span>
+                    <span>🍽️ Order Type, Table &amp; Personnel</span>
                   </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '0.5rem' }}>
+                    <div>
+                      <label className={styles.label}>Order Type</label>
+                      <select
+                        className={styles.input}
+                        value={orderType}
+                        onChange={e => setOrderType(e.target.value)}
+                      >
+                        <option value="DINE_IN">🍽️ Dine-In</option>
+                        <option value="TAKEAWAY">🥡 Takeaway</option>
+                        <option value="PARCEL">📦 Parcel</option>
+                        <option value="DELIVERY">🛵 Delivery</option>
+                        <option value="WALK_IN">🚶 Walk-In</option>
+                        <option value="COUNTER">🏪 Counter</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className={styles.label}>Table / Token #</label>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        value={tableNumber}
+                        onChange={e => setTableNumber(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className={styles.label}>Persons / Guests</label>
+                      <input
+                        type="number"
+                        min="1"
+                        max="25"
+                        className={styles.input}
+                        value={persons}
+                        onChange={e => setPersons(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className={styles.label}>Cashier Name</label>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        value={cashierName}
+                        onChange={e => setCashierName(e.target.value)}
+                      />
+                    </div>
+
+                    <div>
+                      <label className={styles.label}>Waiter / Captain</label>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        value={waiterName}
+                        onChange={e => setWaiterName(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Customer Details */}
+                <div className={styles.cardSection}>
+                  <div className={styles.sectionTitle}>
+                    <span>👤 Customer Mobile &amp; Details</span>
+                  </div>
+
                   <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '0.5rem' }}>
-                    <div className={styles.inputGroup}>
+                    <div>
+                      <label className={styles.label}>Mobile Phone Number</label>
+                      <input
+                        type="text"
+                        className={styles.input}
+                        placeholder="e.g. +91 98765 43210"
+                        value={customer.phone}
+                        onChange={e => setCustomer(prev => ({ ...prev, phone: e.target.value }))}
+                      />
+                    </div>
+                    <div>
                       <label className={styles.label}>Customer Name</label>
                       <input
                         type="text"
                         className={styles.input}
                         value={customer.name}
-                        onChange={(e) => setCustomer(prev => ({ ...prev, name: e.target.value }))}
+                        onChange={e => setCustomer(prev => ({ ...prev, name: e.target.value }))}
                       />
-                    </div>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.label}>Phone</label>
-                      <input
-                        type="text"
-                        className={styles.input}
-                        value={customer.phone}
-                        onChange={(e) => setCustomer(prev => ({ ...prev, phone: e.target.value }))}
-                      />
-                    </div>
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.label}>Customer GSTIN</label>
-                      <input
-                        type="text"
-                        className={styles.input}
-                        placeholder="33XXXXX0000X0Z0"
-                        value={customer.gstin}
-                        onChange={(e) => setCustomer(prev => ({ ...prev, gstin: e.target.value.toUpperCase() }))}
-                      />
-                    </div>
-                    <div className={styles.inputGroup}>
-                      <label className={styles.label}>Payment Method</label>
-                      <select
-                        className={styles.input}
-                        value={paymentMode}
-                        onChange={(e) => setPaymentMode(e.target.value)}
-                      >
-                        <option value="CASH">Cash</option>
-                        <option value="ONLINE_UPI">UPI (GPay / PhonePe)</option>
-                        <option value="CARD">Credit / Debit Card</option>
-                        <option value="CREDIT_DUE">Credit / Due</option>
-                      </select>
                     </div>
                   </div>
                 </div>
 
-                {/* 2. Items & Pricing Section */}
+                {/* 3. Line Items (English Only) */}
                 <div className={styles.cardSection}>
                   <div className={styles.sectionTitle}>
-                    <span>🍽️ Bill Items &amp; Rates ({items.length})</span>
+                    <span>🍛 Itemized Dishes (English Names)</span>
                     <button
                       type="button"
-                      style={{ background: 'transparent', border: 'none', color: '#10b981', fontSize: '0.75rem', cursor: 'pointer', fontWeight: 'bold' }}
+                      className={styles.btnAddRow}
                       onClick={() => setShowAddItem(!showAddItem)}
                     >
-                      {showAddItem ? '✕ Close' : '+ Add Item'}
+                      {showAddItem ? '✕ Cancel' : '+ Add Item'}
                     </button>
                   </div>
 
-                  {/* Inline Add Item Form */}
                   {showAddItem && (
-                    <form onSubmit={handleAddNewItem} style={{ background: 'rgba(0,0,0,0.3)', padding: '0.5rem', borderRadius: '6px', display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+                    <form onSubmit={handleAddNewItem} style={{ background: 'rgba(0,0,0,0.3)', padding: '0.6rem', borderRadius: '8px', marginBottom: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '0.4rem' }}>
                         <input
                           type="text"
                           className={styles.input}
-                          placeholder="Dish Name *"
+                          placeholder="Dish Name (English) *"
                           required
                           value={newItem.title}
                           onChange={e => setNewItem(prev => ({ ...prev, title: e.target.value }))}
                         />
-                        <input
-                          type="text"
-                          className={styles.input}
-                          placeholder="Tamil Name"
-                          value={newItem.tamilTitle}
-                          onChange={e => setNewItem(prev => ({ ...prev, tamilTitle: e.target.value }))}
-                        />
-                      </div>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr auto', gap: '0.4rem' }}>
                         <input
                           type="number"
                           className={styles.input}
@@ -523,16 +620,10 @@ function EditBillDialog({
                           value={newItem.price}
                           onChange={e => setNewItem(prev => ({ ...prev, price: e.target.value }))}
                         />
-                        <input
-                          type="number"
-                          className={styles.input}
-                          placeholder="Qty"
-                          min="1"
-                          value={newItem.quantity}
-                          onChange={e => setNewItem(prev => ({ ...prev, quantity: parseInt(e.target.value) || 1 }))}
-                        />
+                      </div>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '0.4rem' }}>
                         <button type="submit" className={styles.btnPrintThermal} style={{ padding: '0.35rem 0.75rem', fontSize: '0.75rem' }}>
-                          + Add
+                          + Add Dish
                         </button>
                       </div>
                     </form>
@@ -541,19 +632,26 @@ function EditBillDialog({
                   <table className={styles.itemsTable}>
                     <thead>
                       <tr>
-                        <th>Item</th>
+                        <th>#</th>
+                        <th>Item Name (English)</th>
                         <th style={{ width: '80px', textAlign: 'center' }}>Qty</th>
-                        <th style={{ width: '70px', textAlign: 'right' }}>Rate (₹)</th>
-                        <th style={{ width: '60px', textAlign: 'right' }}>Total</th>
+                        <th style={{ width: '75px', textAlign: 'right' }}>Rate (₹)</th>
+                        <th style={{ width: '70px', textAlign: 'right' }}>Total</th>
                         <th style={{ width: '25px' }}></th>
                       </tr>
                     </thead>
                     <tbody>
                       {items.map((it, idx) => (
                         <tr key={idx}>
+                          <td style={{ color: '#94a3b8', fontSize: '0.75rem' }}>{idx + 1}</td>
                           <td>
-                            <strong>{it.title}</strong>
-                            {it.tamilTitle && <div style={{ fontSize: '0.68rem', color: '#10b981' }}>{it.tamilTitle}</div>}
+                            <input
+                              type="text"
+                              className={styles.input}
+                              style={{ padding: '0.2rem 0.4rem', fontSize: '0.8rem', fontWeight: 600 }}
+                              value={it.title}
+                              onChange={(e) => handleTitleChange(idx, e.target.value)}
+                            />
                           </td>
                           <td style={{ textAlign: 'center' }}>
                             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px' }}>
@@ -566,12 +664,12 @@ function EditBillDialog({
                             <input
                               type="number"
                               className={styles.input}
-                              style={{ width: '60px', padding: '0.2rem', textAlign: 'right', fontSize: '0.78rem' }}
+                              style={{ width: '65px', padding: '0.2rem', textAlign: 'right', fontSize: '0.78rem' }}
                               value={it.price}
                               onChange={(e) => handlePriceChange(idx, e.target.value)}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: 'bold', color: '#38bdf8' }}>
+                          <td style={{ textAlign: 'right', fontWeight: 'bold', color: '#10b981' }}>
                             ₹{Math.round((it.price || 0) * (it.quantity || 1))}
                           </td>
                           <td>
@@ -585,12 +683,26 @@ function EditBillDialog({
                   </table>
                 </div>
 
-                {/* 3. Adjustments & Format Toggles */}
+                {/* 4. Adjustments & Payment */}
                 <div className={styles.cardSection}>
                   <div className={styles.sectionTitle}>
-                    <span>⚙️ Format Options &amp; Extra Charges</span>
+                    <span>💳 Payment Mode &amp; Adjustments</span>
                   </div>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(110px, 1fr))', gap: '0.4rem' }}>
+                    <div>
+                      <label className={styles.label}>Payment Mode</label>
+                      <select
+                        className={styles.input}
+                        value={paymentMode}
+                        onChange={e => setPaymentMode(e.target.value)}
+                      >
+                        <option value="UPI">📱 UPI</option>
+                        <option value="CASH">💵 Cash</option>
+                        <option value="CARD">💳 Card</option>
+                        <option value="SPLIT">➗ Split</option>
+                      </select>
+                    </div>
+
                     <div>
                       <label className={styles.label}>Discount (₹)</label>
                       <input
@@ -600,6 +712,7 @@ function EditBillDialog({
                         onChange={e => setDiscountFlat(e.target.value)}
                       />
                     </div>
+
                     <div>
                       <label className={styles.label}>Parcel Fee (₹)</label>
                       <input
@@ -609,6 +722,7 @@ function EditBillDialog({
                         onChange={e => setPackagingCharge(e.target.value)}
                       />
                     </div>
+
                     <div>
                       <label className={styles.label}>Delivery Fee (₹)</label>
                       <input
@@ -620,48 +734,22 @@ function EditBillDialog({
                     </div>
                   </div>
 
-                  {/* Format Toggles */}
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', fontSize: '0.75rem', marginTop: '0.35rem' }}>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={showTamilItemNames}
-                        onChange={e => setShowTamilItemNames(e.target.checked)}
-                      />
-                      <span>Show Tamil Names</span>
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={showTaxBreakdown}
-                        onChange={e => setShowTaxBreakdown(e.target.checked)}
-                      />
-                      <span>Show CGST/SGST Taxes</span>
-                    </label>
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', cursor: 'pointer' }}>
-                      <input
-                        type="checkbox"
-                        checked={showCustomerDetails}
-                        onChange={e => setShowCustomerDetails(e.target.checked)}
-                      />
-                      <span>Show Customer Details</span>
-                    </label>
+                  <div style={{ marginTop: '0.4rem' }}>
+                    <label className={styles.label}>Txn Ref / UTR / Auth Code</label>
+                    <input
+                      type="text"
+                      className={styles.input}
+                      placeholder="e.g. UPI/2026/894101"
+                      value={transactionRef}
+                      onChange={e => setTransactionRef(e.target.value)}
+                    />
                   </div>
-
-                  <input
-                    type="text"
-                    className={styles.input}
-                    placeholder="Custom One-Off Footer Note (e.g. Special thanks to Sri Murugan & family)"
-                    value={customFooterNote}
-                    onChange={e => setCustomFooterNote(e.target.value)}
-                    style={{ marginTop: '0.35rem' }}
-                  />
                 </div>
               </>
             )}
           </div>
 
-          {/* Right: Live Slip Preview */}
+          {/* Right: Live Slip Preview (Exact Sample Match) */}
           <div className={styles.previewPanel}>
             <div className={styles.previewToolbar}>
               <strong style={{ fontSize: '0.82rem', color: '#10b981' }}>
@@ -673,21 +761,28 @@ function EditBillDialog({
                   className={`${styles.widthPill} ${paperWidth === '80MM' ? styles.widthPillActive : ''}`}
                   onClick={() => setPaperWidth('80MM')}
                 >
-                  80mm (3-Inch TVSE)
+                  80mm (Standard)
                 </button>
                 <button
                   type="button"
                   className={`${styles.widthPill} ${paperWidth === '58MM' ? styles.widthPillActive : ''}`}
                   onClick={() => setPaperWidth('58MM')}
                 >
-                  58mm (2-Inch)
+                  58mm (Compact)
                 </button>
               </div>
             </div>
 
             {/* Rendered Thermal Paper Slip */}
             <div className={styles.receiptPaper} data-width={paperWidth}>
-              <pre className={styles.receiptPre}>{generatedSlip}</pre>
+              {editorMode === 'RAW' ? (
+                <pre className={styles.receiptPre}>{generatedSlip}</pre>
+              ) : (
+                <div
+                  style={{ width: '100%', display: 'flex', justifyContent: 'center' }}
+                  dangerouslySetInnerHTML={{ __html: visualSlipHtml }}
+                />
+              )}
             </div>
           </div>
         </div>
@@ -720,11 +815,11 @@ function EditBillDialog({
             <button
               type="button"
               className={styles.btnAltAction}
-              onClick={() => handlePrintThermal(generatedSlip)}
-              title="Print slip directly without modifying database records"
+              onClick={() => handlePrintThermal(paperWidth)}
+              title="Print slip directly using exact thermal receipt styling"
               style={{ borderColor: '#38bdf8', color: '#38bdf8' }}
             >
-              🖨️ Print Without Saving
+              🖨️ Print Slip ({paperWidth})
             </button>
 
             <button
