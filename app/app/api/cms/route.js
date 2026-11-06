@@ -29,6 +29,14 @@ export async function GET() {
       });
     }
 
+    if (published && !published.heroSettings) {
+      published.heroSettings = {
+        autoSlideDuration: 5500,
+        autoSlideEnabled: true,
+        desktopFit: 'fit',
+      };
+    }
+
     if (published && Array.isArray(published.buttons)) {
       published.buttons.forEach((b) => {
         if (b.key === 'orderNow' || (b.text && b.text.toLowerCase().includes('order online'))) {

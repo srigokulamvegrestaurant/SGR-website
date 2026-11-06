@@ -1108,22 +1108,132 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
               style={{ background: '#0284c7', color: '#ffffff', border: 'none' }}
               onClick={() => setEditingSlide({
                 id: null,
-                tagIcon: '✨',
-                tagText: 'Special Festival Showcase',
-                titleLine1: 'Pure Ghee Delicacies',
-                titleAccent: 'of Karaikudi Chettinad',
-                description: 'Authentic pure vegetarian culinary treasures prepared fresh with generational mastery.',
-                priceText: 'From ₹90',
+                tagIcon: '',
+                tagText: '',
+                titleLine1: '',
+                titleAccent: '',
+                description: '',
+                priceText: '',
                 desktopImage: '',
                 mobileImage: '',
-                primaryBtn: { icon: '📅', text: 'Table Reservation →', action: 'reservation', bgColor: '#f59e0b', textColor: '#051B41', isVisible: true },
-                secondaryBtn: { icon: '📲', text: 'QR Table Order', action: 'qr', bgColor: 'transparent', textColor: '#ffffff', isVisible: true },
+                desktopFit: 'fit',
+                showButtons: true,
+                btnPosition: 'bottom-left',
+                btnSize: 'medium',
+                btnShape: 'pill',
+                primaryBtn: { icon: '📅', text: 'Table Reservation →', action: 'reservation', link: '#reservation', target: '_self', style: 'solid', bgColor: '#f59e0b', textColor: '#051B41', isVisible: true },
+                secondaryBtn: { icon: '📲', text: 'QR Table Order', action: 'qr', link: '#table-qr', target: '_self', style: 'glass', bgColor: 'rgba(255, 255, 255, 0.15)', textColor: '#ffffff', isVisible: true },
                 alt: 'Sri Gokulam Signature Feast',
                 isActive: true,
               })}
             >
               + Add New Hero Banner
             </button>
+          </div>
+
+          {/* CAROUSEL TIMING & VIEWPORT FIT SETTINGS CARD */}
+          <div
+            style={{
+              background: 'var(--bg-card-subtle, #f8fafc)',
+              border: '1.5px solid #0284c7',
+              borderRadius: '12px',
+              padding: '1rem 1.25rem',
+              marginBottom: '1.5rem',
+              boxShadow: '0 2px 10px rgba(2, 132, 199, 0.06)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
+              <div>
+                <h4 style={{ margin: 0, fontSize: '0.98rem', fontWeight: 800, color: '#0369a1', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  ⏱️ Carousel Auto-Slide &amp; Viewport Fit Settings
+                </h4>
+                <p style={{ margin: '0.25rem 0 0', fontSize: '0.78rem', color: 'var(--text-secondary)' }}>
+                  Set slide rotation timing, desktop viewport display mode, and navigation arrow behaviors.
+                </p>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+                    Auto-Slide Timing:
+                  </label>
+                  <select
+                    value={draft?.heroSettings?.autoSlideDuration ?? 5500}
+                    onChange={(e) => {
+                      const val = Number(e.target.value);
+                      setDraft({
+                        ...draft,
+                        heroSettings: {
+                          ...(draft?.heroSettings || {}),
+                          autoSlideDuration: val,
+                          autoSlideEnabled: val > 0,
+                        },
+                      });
+                      setIsDirty(true);
+                    }}
+                    className={styles.formSelect}
+                    style={{ width: 'auto', minWidth: '160px', padding: '0.4rem 0.75rem', fontWeight: 600 }}
+                  >
+                    <option value={0}>⏸️ Paused (Manual Navigation Only)</option>
+                    <option value={3000}>⚡ 3.0 Seconds (Fast)</option>
+                    <option value={4000}>⏱️ 4.0 Seconds</option>
+                    <option value={5000}>⏱️ 5.0 Seconds</option>
+                    <option value={5500}>⏱️ 5.5 Seconds (Default)</option>
+                    <option value={6000}>⏱️ 6.0 Seconds</option>
+                    <option value={7000}>⏱️ 7.0 Seconds</option>
+                    <option value={8000}>⏱️ 8.0 Seconds</option>
+                    <option value={10000}>⏱️ 10.0 Seconds (Relaxed)</option>
+                  </select>
+                </div>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <label style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--text-primary)', whiteSpace: 'nowrap' }}>
+                    Desktop Fit Mode:
+                  </label>
+                  <select
+                    value={draft?.heroSettings?.desktopFit || 'fit'}
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setDraft({
+                        ...draft,
+                        heroSettings: {
+                          ...(draft?.heroSettings || {}),
+                          desktopFit: val,
+                        },
+                      });
+                      setIsDirty(true);
+                    }}
+                    className={styles.formSelect}
+                    style={{ width: 'auto', minWidth: '220px', padding: '0.4rem 0.75rem', fontWeight: 600 }}
+                  >
+                    <option value="fit">📐 Fit Complete Viewport (No Crop &amp; No Overflow)</option>
+                    <option value="cover">🖼️ Full Width Cover (Fill Container)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            <div
+              style={{
+                marginTop: '0.75rem',
+                paddingTop: '0.65rem',
+                borderTop: '1px solid rgba(2, 132, 199, 0.15)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                flexWrap: 'wrap',
+                gap: '0.5rem',
+                fontSize: '0.74rem',
+                color: '#64748b',
+              }}
+            >
+              <span>
+                🎯 <strong>Smart Navigation:</strong> Left &amp; Right navigation arrows automatically <strong>hide</strong> when only 1 banner exists, and <strong>show</strong> when 2 or more banners exist.
+              </span>
+              <span style={{ color: '#0284c7', fontWeight: 600 }}>
+                📱 Mobile Viewport: Always 100% responsive portrait (9:16) or landscape (16:9)
+              </span>
+            </div>
           </div>
 
           <div className={styles.grid2}>
@@ -1153,7 +1263,18 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                   </p>
 
                   <div style={{ background: 'var(--bg-card-subtle)', padding: '0.45rem 0.65rem', borderRadius: '6px', fontSize: '0.75rem' }}>
-                    🏷️ <strong>Price Badge:</strong> {slide.priceText}
+                    🏷️ <strong>Price Badge:</strong> {slide.priceText || 'None'}
+                  </div>
+
+                  <div style={{ background: 'var(--bg-card-subtle)', padding: '0.45rem 0.65rem', borderRadius: '6px', fontSize: '0.75rem', marginTop: '0.3rem' }}>
+                    🔘 <strong>Buttons:</strong>{' '}
+                    {slide.showButtons === false ? (
+                      <span style={{ color: '#ef4444', fontWeight: 700 }}>Hidden (Graphic Only)</span>
+                    ) : (
+                      <span style={{ color: '#0284c7', fontWeight: 600 }}>
+                        {slide.primaryBtn?.text || 'Reservation'} • Position: {slide.btnPosition || 'bottom-left'}
+                      </span>
+                    )}
                   </div>
 
                   <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
@@ -3413,33 +3534,35 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                 )}
               </div>
 
-              {/* Call-to-Action Buttons Visibility Toggle */}
+              {/* Call-to-Action Buttons & Action Studio */}
               <div
                 className={styles.formGroup}
                 style={{
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '10px',
-                  padding: '0.85rem',
+                  border: '1.5px solid #0284c7',
+                  borderRadius: '12px',
+                  padding: '1rem',
                   background: 'var(--bg-card-subtle, #f8fafc)',
+                  marginTop: '1rem',
                 }}
               >
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', marginBottom: '0.8rem' }}>
                   <div>
-                    <label className={styles.formLabel} style={{ margin: 0, fontWeight: 700 }}>
-                      🔘 Overlay CTA Buttons (Reservation &amp; QR)
-                    </label>
+                    <h4 style={{ margin: 0, fontSize: '0.92rem', fontWeight: 800, color: '#0369a1', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                      🔘 Banner Action Buttons &amp; Customization
+                    </h4>
                     <p style={{ margin: '0.2rem 0 0', fontSize: '0.74rem', color: '#64748b' }}>
-                      Show clickable &quot;Table Reservation&quot; &amp; &quot;QR Table Order&quot; buttons over this banner. Turn OFF if your uploaded graphic banner already has its own buttons or text baked in.
+                      Customize button text, actions, colors, styles, shapes, sizes, and position on this banner.
                     </p>
                   </div>
-                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 600 }}>
+                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.82rem', fontWeight: 700 }}>
                     <input
                       type="checkbox"
-                      checked={editingSlide.primaryBtn?.isVisible !== false}
+                      checked={editingSlide.showButtons !== false}
                       onChange={(e) => {
                         const checked = e.target.checked;
                         setEditingSlide({
                           ...editingSlide,
+                          showButtons: checked,
                           primaryBtn: {
                             ...(editingSlide.primaryBtn || { icon: '📅', text: 'Table Reservation →', action: 'reservation' }),
                             isVisible: checked,
@@ -3452,9 +3575,428 @@ export default function WebsiteCmsDashboard({ currentUser = { name: 'Admin', rol
                       }}
                       style={{ width: '18px', height: '18px', accentColor: '#0284c7' }}
                     />
-                    {editingSlide.primaryBtn?.isVisible !== false ? 'Buttons Visible' : 'Hidden'}
+                    {editingSlide.showButtons !== false ? '✅ Action Buttons Active' : '🚫 Hidden (Graphic Only)'}
                   </label>
                 </div>
+
+                {editingSlide.showButtons !== false && (
+                  <>
+                    {/* Position, Size, and Shape Row */}
+                    <div className={styles.formRow3} style={{ marginBottom: '0.9rem' }}>
+                      <div className={styles.formGroup}>
+                        <label className={styles.formLabel}>📍 Position on Banner</label>
+                        <select
+                          value={editingSlide.btnPosition || 'bottom-left'}
+                          onChange={(e) => setEditingSlide({ ...editingSlide, btnPosition: e.target.value })}
+                          className={styles.formSelect}
+                        >
+                          <option value="bottom-left">Bottom Left (Recommended)</option>
+                          <option value="bottom-center">Bottom Center</option>
+                          <option value="bottom-right">Bottom Right</option>
+                          <option value="center-left">Center Left (Classic)</option>
+                          <option value="center">Dead Center</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label className={styles.formLabel}>📏 Button Size</label>
+                        <select
+                          value={editingSlide.btnSize || 'medium'}
+                          onChange={(e) => setEditingSlide({ ...editingSlide, btnSize: e.target.value })}
+                          className={styles.formSelect}
+                        >
+                          <option value="small">Small (Compact - 12px)</option>
+                          <option value="medium">Medium (Standard - 14px)</option>
+                          <option value="large">Large (Prominent - 16px)</option>
+                        </select>
+                      </div>
+
+                      <div className={styles.formGroup}>
+                        <label className={styles.formLabel}>📐 Button Shape</label>
+                        <select
+                          value={editingSlide.btnShape || 'pill'}
+                          onChange={(e) => setEditingSlide({ ...editingSlide, btnShape: e.target.value })}
+                          className={styles.formSelect}
+                        >
+                          <option value="pill">Pill Shaped (Rounded 9999px)</option>
+                          <option value="rounded">Rounded Corners (8px)</option>
+                          <option value="squared">Square Corners (3px)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* PRIMARY BUTTON CARD */}
+                    <div
+                      style={{
+                        background: '#ffffff',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '10px',
+                        padding: '0.85rem',
+                        marginBottom: '0.9rem',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                        <span style={{ fontWeight: 800, fontSize: '0.84rem', color: '#0369a1' }}>
+                          Primary Button
+                        </span>
+                        <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.76rem', cursor: 'pointer', fontWeight: 600 }}>
+                          <input
+                            type="checkbox"
+                            checked={editingSlide.primaryBtn?.isVisible !== false}
+                            onChange={(e) =>
+                              setEditingSlide({
+                                ...editingSlide,
+                                primaryBtn: {
+                                  ...(editingSlide.primaryBtn || {}),
+                                  isVisible: e.target.checked,
+                                },
+                              })
+                            }
+                            style={{ accentColor: '#0284c7' }}
+                          />
+                          Visible
+                        </label>
+                      </div>
+
+                      {editingSlide.primaryBtn?.isVisible !== false && (
+                        <>
+                          <div className={styles.formRow2}>
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Button Text</label>
+                              <input
+                                type="text"
+                                value={editingSlide.primaryBtn?.text || ''}
+                                onChange={(e) =>
+                                  setEditingSlide({
+                                    ...editingSlide,
+                                    primaryBtn: { ...(editingSlide.primaryBtn || {}), text: e.target.value },
+                                  })
+                                }
+                                placeholder="e.g. Table Reservation →"
+                                className={styles.formInput}
+                              />
+                            </div>
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Button Icon</label>
+                              <input
+                                type="text"
+                                value={editingSlide.primaryBtn?.icon || '📅'}
+                                onChange={(e) =>
+                                  setEditingSlide({
+                                    ...editingSlide,
+                                    primaryBtn: { ...(editingSlide.primaryBtn || {}), icon: e.target.value },
+                                  })
+                                }
+                                placeholder="e.g. 📅, 🍽️, 🛒"
+                                className={styles.formInput}
+                              />
+                            </div>
+                          </div>
+
+                          <div className={styles.formRow2}>
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Action Type</label>
+                              <select
+                                value={editingSlide.primaryBtn?.action || 'reservation'}
+                                onChange={(e) =>
+                                  setEditingSlide({
+                                    ...editingSlide,
+                                    primaryBtn: { ...(editingSlide.primaryBtn || {}), action: e.target.value },
+                                  })
+                                }
+                                className={styles.formSelect}
+                              >
+                                <option value="reservation">📅 Open Table Reservation Modal</option>
+                                <option value="qr">📲 Open QR Table Order Modal</option>
+                                <option value="drawer">🛒 Open Food Order Drawer</option>
+                                <option value="menu">📋 Scroll to Menu Delicacies</option>
+                                <option value="url">🔗 Open Custom Web URL</option>
+                                <option value="tel">📞 Call Restaurant (+91 73583 25113)</option>
+                                <option value="whatsapp">💬 Chat on WhatsApp</option>
+                              </select>
+                            </div>
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Link / URL / Anchor</label>
+                              <input
+                                type="text"
+                                value={editingSlide.primaryBtn?.link || ''}
+                                onChange={(e) =>
+                                  setEditingSlide({
+                                    ...editingSlide,
+                                    primaryBtn: { ...(editingSlide.primaryBtn || {}), link: e.target.value },
+                                  })
+                                }
+                                placeholder="#reservation, #menu, or https://..."
+                                className={styles.formInput}
+                              />
+                            </div>
+                          </div>
+
+                          <div className={styles.formRow3}>
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Style</label>
+                              <select
+                                value={editingSlide.primaryBtn?.style || 'solid'}
+                                onChange={(e) =>
+                                  setEditingSlide({
+                                    ...editingSlide,
+                                    primaryBtn: { ...(editingSlide.primaryBtn || {}), style: e.target.value },
+                                  })
+                                }
+                                className={styles.formSelect}
+                              >
+                                <option value="solid">Solid Background</option>
+                                <option value="outline">Outline Border</option>
+                                <option value="glass">Glassmorphic (Frosted)</option>
+                              </select>
+                            </div>
+
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Bg Color</label>
+                              <div className={styles.colorPickerRow}>
+                                <input
+                                  type="color"
+                                  value={editingSlide.primaryBtn?.bgColor?.startsWith('#') ? editingSlide.primaryBtn.bgColor : '#f59e0b'}
+                                  onChange={(e) =>
+                                    setEditingSlide({
+                                      ...editingSlide,
+                                      primaryBtn: { ...(editingSlide.primaryBtn || {}), bgColor: e.target.value },
+                                    })
+                                  }
+                                  className={styles.colorThumb}
+                                />
+                                <input
+                                  type="text"
+                                  value={editingSlide.primaryBtn?.bgColor || '#f59e0b'}
+                                  onChange={(e) =>
+                                    setEditingSlide({
+                                      ...editingSlide,
+                                      primaryBtn: { ...(editingSlide.primaryBtn || {}), bgColor: e.target.value },
+                                    })
+                                  }
+                                  className={styles.formInput}
+                                />
+                              </div>
+                            </div>
+
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Text Color</label>
+                              <div className={styles.colorPickerRow}>
+                                <input
+                                  type="color"
+                                  value={editingSlide.primaryBtn?.textColor?.startsWith('#') ? editingSlide.primaryBtn.textColor : '#051B41'}
+                                  onChange={(e) =>
+                                    setEditingSlide({
+                                      ...editingSlide,
+                                      primaryBtn: { ...(editingSlide.primaryBtn || {}), textColor: e.target.value },
+                                    })
+                                  }
+                                  className={styles.colorThumb}
+                                />
+                                <input
+                                  type="text"
+                                  value={editingSlide.primaryBtn?.textColor || '#051B41'}
+                                  onChange={(e) =>
+                                    setEditingSlide({
+                                      ...editingSlide,
+                                      primaryBtn: { ...(editingSlide.primaryBtn || {}), textColor: e.target.value },
+                                    })
+                                  }
+                                  className={styles.formInput}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    {/* SECONDARY BUTTON CARD */}
+                    <div
+                      style={{
+                        background: '#ffffff',
+                        border: '1px solid #cbd5e1',
+                        borderRadius: '10px',
+                        padding: '0.85rem',
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.6rem' }}>
+                        <span style={{ fontWeight: 800, fontSize: '0.84rem', color: '#0284c7' }}>
+                          Secondary Button
+                        </span>
+                        <label style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.76rem', cursor: 'pointer', fontWeight: 600 }}>
+                          <input
+                            type="checkbox"
+                            checked={editingSlide.secondaryBtn?.isVisible !== false}
+                            onChange={(e) =>
+                              setEditingSlide({
+                                ...editingSlide,
+                                secondaryBtn: {
+                                  ...(editingSlide.secondaryBtn || {}),
+                                  isVisible: e.target.checked,
+                                },
+                              })
+                            }
+                            style={{ accentColor: '#0284c7' }}
+                          />
+                          Visible
+                        </label>
+                      </div>
+
+                      {editingSlide.secondaryBtn?.isVisible !== false && (
+                        <>
+                          <div className={styles.formRow2}>
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Button Text</label>
+                              <input
+                                type="text"
+                                value={editingSlide.secondaryBtn?.text || ''}
+                                onChange={(e) =>
+                                  setEditingSlide({
+                                    ...editingSlide,
+                                    secondaryBtn: { ...(editingSlide.secondaryBtn || {}), text: e.target.value },
+                                  })
+                                }
+                                placeholder="e.g. QR Table Order"
+                                className={styles.formInput}
+                              />
+                            </div>
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Button Icon</label>
+                              <input
+                                type="text"
+                                value={editingSlide.secondaryBtn?.icon || '📲'}
+                                onChange={(e) =>
+                                  setEditingSlide({
+                                    ...editingSlide,
+                                    secondaryBtn: { ...(editingSlide.secondaryBtn || {}), icon: e.target.value },
+                                  })
+                                }
+                                placeholder="e.g. 📲, 📋, 💬"
+                                className={styles.formInput}
+                              />
+                            </div>
+                          </div>
+
+                          <div className={styles.formRow2}>
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Action Type</label>
+                              <select
+                                value={editingSlide.secondaryBtn?.action || 'qr'}
+                                onChange={(e) =>
+                                  setEditingSlide({
+                                    ...editingSlide,
+                                    secondaryBtn: { ...(editingSlide.secondaryBtn || {}), action: e.target.value },
+                                  })
+                                }
+                                className={styles.formSelect}
+                              >
+                                <option value="qr">📲 Open QR Table Order Modal</option>
+                                <option value="reservation">📅 Open Table Reservation Modal</option>
+                                <option value="drawer">🛒 Open Food Order Drawer</option>
+                                <option value="menu">📋 Scroll to Menu Delicacies</option>
+                                <option value="url">🔗 Open Custom Web URL</option>
+                                <option value="tel">📞 Call Restaurant (+91 73583 25113)</option>
+                                <option value="whatsapp">💬 Chat on WhatsApp</option>
+                              </select>
+                            </div>
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Link / URL / Anchor</label>
+                              <input
+                                type="text"
+                                value={editingSlide.secondaryBtn?.link || ''}
+                                onChange={(e) =>
+                                  setEditingSlide({
+                                    ...editingSlide,
+                                    secondaryBtn: { ...(editingSlide.secondaryBtn || {}), link: e.target.value },
+                                  })
+                                }
+                                placeholder="#table-qr, #menu, or https://..."
+                                className={styles.formInput}
+                              />
+                            </div>
+                          </div>
+
+                          <div className={styles.formRow3}>
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Style</label>
+                              <select
+                                value={editingSlide.secondaryBtn?.style || 'glass'}
+                                onChange={(e) =>
+                                  setEditingSlide({
+                                    ...editingSlide,
+                                    secondaryBtn: { ...(editingSlide.secondaryBtn || {}), style: e.target.value },
+                                  })
+                                }
+                                className={styles.formSelect}
+                              >
+                                <option value="glass">Glassmorphic (Frosted)</option>
+                                <option value="solid">Solid Background</option>
+                                <option value="outline">Outline Border</option>
+                              </select>
+                            </div>
+
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Bg Color</label>
+                              <div className={styles.colorPickerRow}>
+                                <input
+                                  type="color"
+                                  value={editingSlide.secondaryBtn?.bgColor?.startsWith('#') ? editingSlide.secondaryBtn.bgColor : '#0284c7'}
+                                  onChange={(e) =>
+                                    setEditingSlide({
+                                      ...editingSlide,
+                                      secondaryBtn: { ...(editingSlide.secondaryBtn || {}), bgColor: e.target.value },
+                                    })
+                                  }
+                                  className={styles.colorThumb}
+                                />
+                                <input
+                                  type="text"
+                                  value={editingSlide.secondaryBtn?.bgColor || 'rgba(255, 255, 255, 0.15)'}
+                                  onChange={(e) =>
+                                    setEditingSlide({
+                                      ...editingSlide,
+                                      secondaryBtn: { ...(editingSlide.secondaryBtn || {}), bgColor: e.target.value },
+                                    })
+                                  }
+                                  className={styles.formInput}
+                                />
+                              </div>
+                            </div>
+
+                            <div className={styles.formGroup}>
+                              <label className={styles.formLabel}>Text Color</label>
+                              <div className={styles.colorPickerRow}>
+                                <input
+                                  type="color"
+                                  value={editingSlide.secondaryBtn?.textColor?.startsWith('#') ? editingSlide.secondaryBtn.textColor : '#ffffff'}
+                                  onChange={(e) =>
+                                    setEditingSlide({
+                                      ...editingSlide,
+                                      secondaryBtn: { ...(editingSlide.secondaryBtn || {}), textColor: e.target.value },
+                                    })
+                                  }
+                                  className={styles.colorThumb}
+                                />
+                                <input
+                                  type="text"
+                                  value={editingSlide.secondaryBtn?.textColor || '#ffffff'}
+                                  onChange={(e) =>
+                                    setEditingSlide({
+                                      ...editingSlide,
+                                      secondaryBtn: { ...(editingSlide.secondaryBtn || {}), textColor: e.target.value },
+                                    })
+                                  }
+                                  className={styles.formInput}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  </>
+                )}
               </div>
             </div>
             <div className={styles.modalFooter}>

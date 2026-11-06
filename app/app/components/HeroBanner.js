@@ -5,10 +5,15 @@ import FloatingParticles from './FloatingParticles';
 import styles from './HeroBanner.module.css';
 
 const BANNER_SLIDES = [];
+const DEFAULT_BANNER_DURATION = 5500; // 5.5s fallback
 
-const BANNER_DURATION = 5500; // 5.5s smooth, readable autoplay
-
-export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenReservationModal, slides }) {
+export default function HeroBanner({
+  onOpenOrderDrawer,
+  onOpenQrModal,
+  onOpenReservationModal,
+  slides,
+  settings,
+}) {
   const rawSlides = (Array.isArray(slides) && slides.length > 0) ? slides : BANNER_SLIDES;
   const activeSlides = rawSlides.map((slide) => {
     let pBtn = slide.primaryBtn;
@@ -21,6 +26,7 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
     }
     return { ...slide, primaryBtn: pBtn, secondaryBtn: sBtn };
   });
+
   const [currentIdx, setCurrentIdx] = useState(0);
   const [progressKey, setProgressKey] = useState(0);
   const [isHovered, setIsHovered] = useState(false);
@@ -28,6 +34,19 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
 
+  // Settings & Configuration
+  const autoSlideDuration =
+    typeof settings?.autoSlideDuration === 'number'
+      ? settings.autoSlideDuration
+      : DEFAULT_BANNER_DURATION;
+  const isAutoSlideEnabled =
+    settings?.autoSlideEnabled !== false && autoSlideDuration > 0;
+  const desktopFit = settings?.desktopFit || 'fit';
+
+  // Has multiple slides -> show navigation arrows, dots, and allow autoplay
+  const hasMultipleSlides = activeSlides.length > 1;
+
+  // Check if dedicated mobile portrait banners exist
   const hasDedicatedMobileBanners = activeSlides.some(
     (s) => Boolean(s.mobileImage && s.mobileImage.trim() !== '' && s.mobileImage !== s.desktopImage)
   );
@@ -41,24 +60,26 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
   }, [activeSlides.length]);
 
   const next = useCallback(() => {
+    if (!hasMultipleSlides) return;
     setCurrentIdx((prevIdx) => (prevIdx + 1) % activeSlides.length);
     setProgressKey((k) => k + 1);
-  }, [activeSlides.length]);
+  }, [activeSlides.length, hasMultipleSlides]);
 
   const prev = useCallback(() => {
+    if (!hasMultipleSlides) return;
     setCurrentIdx((prevIdx) => (prevIdx - 1 + activeSlides.length) % activeSlides.length);
     setProgressKey((k) => k + 1);
-  }, [activeSlides.length]);
+  }, [activeSlides.length, hasMultipleSlides]);
 
-  // Autoplay handler — Pauses during user hover so manual navigation is never interrupted
+  // Autoplay handler — Only runs when 2+ slides exist and duration > 0
   const resetAutoplay = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    if (isHovered) return;
+    if (isHovered || !hasMultipleSlides || !isAutoSlideEnabled) return;
     intervalRef.current = setInterval(() => {
       setCurrentIdx((prevIdx) => (prevIdx + 1) % activeSlides.length);
       setProgressKey((k) => k + 1);
-    }, BANNER_DURATION);
-  }, [activeSlides.length, isHovered]);
+    }, autoSlideDuration);
+  }, [activeSlides.length, isHovered, hasMultipleSlides, isAutoSlideEnabled, autoSlideDuration]);
 
   useEffect(() => {
     resetAutoplay();
@@ -78,6 +99,7 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
 
   // Mobile Touch Swipe support
   const handleTouchStart = (e) => {
+    if (!hasMultipleSlides) return;
     if (e && e.touches && e.touches[0]) {
       touchStartX.current = e.touches[0].clientX;
       touchStartY.current = e.touches[0].clientY;
@@ -85,11 +107,11 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
   };
 
   const handleTouchEnd = (e) => {
+    if (!hasMultipleSlides) return;
     if (e && e.changedTouches && e.changedTouches[0]) {
       const diffX = touchStartX.current - e.changedTouches[0].clientX;
       const diffY = touchStartY.current - e.changedTouches[0].clientY;
 
-      // Trigger horizontal slide if horizontal motion > 24px and > vertical motion
       if (Math.abs(diffX) > 24 && Math.abs(diffX) > Math.abs(diffY)) {
         if (diffX > 0) next();
         else prev();
@@ -103,7 +125,7 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
   };
 
   // Button Action Click Handler
-  const handleBtnClick = (action, fallbackHref, e) => {
+  const handleBtnClick = (action, fallbackHref, target, e) => {
     if (e && e.preventDefault) e.preventDefault();
     if (e && e.stopPropagation) e.stopPropagation();
 
@@ -120,14 +142,40 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
       return;
     }
 
-    if (act === 'drawer' || act.includes('drawer') || act.includes('order')) {
+    if (act === 'drawer' || act.includes('drawer') || act === 'cart' || act.includes('order')) {
       if (onOpenOrderDrawer) onOpenOrderDrawer();
       return;
     }
 
-    if (fallbackHref) {
+    if (act === 'menu' || href.includes('#menu')) {
+      const el = document.querySelector('#menu');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+
+    if (act === 'tel' || (fallbackHref && fallbackHref.startsWith('tel:'))) {
+      window.location.href = fallbackHref || 'tel:+917358325113';
+      return;
+    }
+
+    if (act === 'whatsapp' || (fallbackHref && fallbackHref.includes('wa.me'))) {
+      window.open(fallbackHref || 'https://wa.me/917358325113', '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    if (fallbackHref && fallbackHref.startsWith('http')) {
+      window.open(fallbackHref, target === '_self' ? '_self' : '_blank', 'noopener,noreferrer');
+      return;
+    }
+
+    if (fallbackHref && fallbackHref.startsWith('#')) {
       const el = document.querySelector(fallbackHref);
       if (el) el.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+
+    if (fallbackHref) {
+      window.location.href = fallbackHref;
     }
   };
 
@@ -180,17 +228,23 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
       onTouchEnd={handleTouchEnd}
       onTouchCancel={handleTouchCancel}
     >
-      {/* Auto-Slide Progress Bar at top of banner */}
-      <div className={styles.progressBarWrap}>
-        <div key={progressKey} className={styles.progressBarFill}></div>
-      </div>
+      {/* Auto-Slide Progress Bar at top of banner — Only when multiple slides & autoplay enabled */}
+      {hasMultipleSlides && isAutoSlideEnabled && (
+        <div className={styles.progressBarWrap}>
+          <div
+            key={progressKey}
+            className={styles.progressBarFill}
+            style={{ animationDuration: `${autoSlideDuration}ms` }}
+          ></div>
+        </div>
+      )}
 
       {/* Sliding Viewport */}
       <div className={`${styles.sliderViewport} ${hasDedicatedMobileBanners ? styles.viewportHasMobilePortrait : ''}`}>
         {/* Floating Ambient Golden Ghee Particles */}
         <FloatingParticles count={14} />
 
-        {/* Physical Horizontal Moving Track (Translates 0%, -100%, -200%, -300%) with GPU acceleration */}
+        {/* Physical Horizontal Moving Track with GPU acceleration */}
         <div
           className={styles.slidesTrack}
           style={{ transform: `translate3d(-${currentIdx * 100}%, 0, 0)` }}
@@ -202,33 +256,107 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
               (slide.titleAccent && slide.titleAccent.trim()) ||
               (slide.description && slide.description.trim())
             );
-            const hasPrimaryBtn = Boolean(slide.primaryBtn && slide.primaryBtn.isVisible !== false && slide.primaryBtn.text);
-            const hasSecondaryBtn = Boolean(slide.secondaryBtn && slide.secondaryBtn.isVisible !== false && slide.secondaryBtn.text);
+
+            const isButtonsAllowed = slide.showButtons !== false;
+            const hasPrimaryBtn = Boolean(
+              isButtonsAllowed && slide.primaryBtn && slide.primaryBtn.isVisible !== false && slide.primaryBtn.text
+            );
+            const hasSecondaryBtn = Boolean(
+              isButtonsAllowed && slide.secondaryBtn && slide.secondaryBtn.isVisible !== false && slide.secondaryBtn.text
+            );
             const hasButtons = hasPrimaryBtn || hasSecondaryBtn;
             const hasPrice = Boolean(slide.priceText && slide.priceText.trim());
+
+            // Helper to render a customized button
+            const renderButton = (btn, isPrimary = true) => {
+              if (!btn || btn.isVisible === false || !btn.text) return null;
+
+              const shapeClass =
+                slide.btnShape === 'squared'
+                  ? styles.btnSquared
+                  : slide.btnShape === 'rounded'
+                  ? styles.btnRounded
+                  : styles.btnPill;
+
+              const sizeClass =
+                slide.btnSize === 'small'
+                  ? styles.btnSmall
+                  : slide.btnSize === 'large'
+                  ? styles.btnLarge
+                  : styles.btnMedium;
+
+              const styleType = btn.style || (isPrimary ? 'solid' : 'glass');
+              const customStyles = {
+                backgroundColor:
+                  styleType === 'outline'
+                    ? 'transparent'
+                    : btn.bgColor || (isPrimary ? '#f59e0b' : 'rgba(255, 255, 255, 0.15)'),
+                color: btn.textColor || (isPrimary ? '#051B41' : '#ffffff'),
+                border:
+                  styleType === 'outline'
+                    ? `2px solid ${btn.bgColor || (isPrimary ? '#f59e0b' : '#ffffff')}`
+                    : undefined,
+              };
+
+              return (
+                <button
+                  key={isPrimary ? 'p-btn' : 's-btn'}
+                  type="button"
+                  className={`${styles.ctaBtnBase} ${shapeClass} ${sizeClass} ${
+                    styleType === 'glass' ? styles.btnGlass : ''
+                  }`}
+                  style={customStyles}
+                  onClick={(e) => handleBtnClick(btn.action, btn.link, btn.target, e)}
+                >
+                  {btn.icon && <span className={styles.btnIcon}>{btn.icon}</span>}
+                  <span className={styles.btnText}>{btn.text}</span>
+                </button>
+              );
+            };
+
+            const positionClass =
+              slide.btnPosition === 'bottom-center'
+                ? styles.posBottomCenter
+                : slide.btnPosition === 'bottom-right'
+                ? styles.posBottomRight
+                : slide.btnPosition === 'center-left'
+                ? styles.posCenterLeft
+                : slide.btnPosition === 'center'
+                ? styles.posCenter
+                : styles.posBottomLeft;
 
             return (
               <div
                 className={`${styles.slide} ${idx === currentIdx ? styles.slideActive : ''} ${!hasTextContent ? styles.slideGraphicOnly : ''}`}
                 key={slide.id || idx}
               >
+                {/* Ambient Blurred Backdrop for widescreen displays */}
+                <div
+                  className={styles.ambientBackdrop}
+                  style={{
+                    backgroundImage: `url(${slide.desktopImage || slide.image || ''})`,
+                  }}
+                  aria-hidden="true"
+                />
+
+                {/* Picture element containing desktop and mobile source */}
                 <picture className={styles.pictureWrapper}>
                   {slide.mobileImage && <source media="(max-width: 640px)" srcSet={slide.mobileImage} />}
                   <img
-                    className={styles.slidePhoto}
+                    className={`${styles.slidePhoto} ${desktopFit === 'cover' ? styles.slidePhotoCover : ''}`}
                     src={slide.desktopImage || slide.image}
                     alt={slide.alt || 'Sri Gokulam Chettinad Feast'}
                     loading={idx === 0 ? 'eager' : 'lazy'}
                   />
                 </picture>
 
-                {/* Only render dark gradient mask if slide has text to contrast against */}
+                {/* Only render dark gradient mask if slide has HTML text overlay to contrast against */}
                 {hasTextContent && <div className={styles.gradientMask}></div>}
 
-                {/* Content Overlay */}
-                {(hasTextContent || hasButtons || hasPrice) && (
-                  <div className={`${styles.innerContainer} ${!hasTextContent ? styles.innerContainerGraphicOnly : ''}`}>
-                    <div className={`${styles.contentBox} ${!hasTextContent ? styles.contentBoxGraphicOnly : ''}`}>
+                {/* Standard Content Overlay (when slide has HTML text) */}
+                {hasTextContent && (
+                  <div className={styles.innerContainer}>
+                    <div className={styles.contentBox}>
                       {Boolean(slide.tagText && slide.tagText.trim()) && (
                         <div className={styles.tagPill}>
                           <span>{slide.tagIcon}</span> {slide.tagText}
@@ -248,24 +376,8 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
 
                       {hasButtons && (
                         <div className={styles.btnGroup}>
-                          {hasPrimaryBtn && (
-                            <button
-                              type="button"
-                              className={styles.ctaPrimary}
-                              onClick={(e) => handleBtnClick(slide.primaryBtn.action, slide.primaryBtn.href || '#reservation', e)}
-                            >
-                              <span>{slide.primaryBtn.icon || '📅'}</span> {slide.primaryBtn.text}
-                            </button>
-                          )}
-                          {hasSecondaryBtn && (
-                            <button
-                              type="button"
-                              className={styles.ctaSecondary}
-                              onClick={(e) => handleBtnClick(slide.secondaryBtn.action, slide.secondaryBtn.href || '#table-qr', e)}
-                            >
-                              <span>{slide.secondaryBtn.icon || '📲'}</span> {slide.secondaryBtn.text}
-                            </button>
-                          )}
+                          {hasPrimaryBtn && renderButton(slide.primaryBtn, true)}
+                          {hasSecondaryBtn && renderButton(slide.secondaryBtn, false)}
                         </div>
                       )}
                     </div>
@@ -277,63 +389,77 @@ export default function HeroBanner({ onOpenOrderDrawer, onOpenQrModal, onOpenRes
                     )}
                   </div>
                 )}
+
+                {/* Graphic-Only Banner Overlay: Positioned action buttons without obscuring banner graphics */}
+                {!hasTextContent && hasButtons && (
+                  <div className={`${styles.btnGroupPositioned} ${positionClass}`}>
+                    {hasPrimaryBtn && renderButton(slide.primaryBtn, true)}
+                    {hasSecondaryBtn && renderButton(slide.secondaryBtn, false)}
+                  </div>
+                )}
               </div>
             );
           })}
         </div>
 
-        {/* Manual Navigation Arrows — Placed AFTER slidesTrack with explicit stopPropagation */}
-        <button
-          type="button"
-          className={`${styles.navArrow} ${styles.arrowLeft}`}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            prev();
-            resetAutoplay();
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-          aria-label="Previous Slide"
-        >
-          &#10094;
-        </button>
-        <button
-          type="button"
-          className={`${styles.navArrow} ${styles.arrowRight}`}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            next();
-            resetAutoplay();
-          }}
-          onPointerDown={(e) => e.stopPropagation()}
-          onTouchStart={(e) => e.stopPropagation()}
-          aria-label="Next Slide"
-        >
-          &#10095;
-        </button>
+        {/* Manual Navigation Arrows — ONLY rendered when 2 or more banners exist */}
+        {hasMultipleSlides && (
+          <>
+            <button
+              type="button"
+              className={`${styles.navArrow} ${styles.arrowLeft}`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                prev();
+                resetAutoplay();
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              aria-label="Previous Slide"
+            >
+              &#10094;
+            </button>
+            <button
+              type="button"
+              className={`${styles.navArrow} ${styles.arrowRight}`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                next();
+                resetAutoplay();
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              aria-label="Next Slide"
+            >
+              &#10095;
+            </button>
+          </>
+        )}
       </div>
 
-      {/* Pagination Dots with Glowing Active State */}
-      <div className={styles.paginationDots}>
-        {activeSlides.map((_, i) => (
-          <button
-            key={i}
-            type="button"
-            className={`${styles.dot} ${i === currentIdx ? styles.dotActive : ''}`}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              goTo(i);
-              resetAutoplay();
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-            onTouchStart={(e) => e.stopPropagation()}
-            aria-label={`Go to slide ${i + 1}`}
-          />
-        ))}
-      </div>
+      {/* Pagination Dots with Glowing Active State — ONLY rendered when 2 or more banners exist */}
+      {hasMultipleSlides && (
+        <div className={styles.paginationDots}>
+          {activeSlides.map((_, i) => (
+            <button
+              key={i}
+              type="button"
+              className={`${styles.dot} ${i === currentIdx ? styles.dotActive : ''}`}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                goTo(i);
+                resetAutoplay();
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+              onTouchStart={(e) => e.stopPropagation()}
+              aria-label={`Go to slide ${i + 1}`}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }

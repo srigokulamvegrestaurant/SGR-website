@@ -304,6 +304,7 @@ export default function Home() {
               <HeroBanner
                 key="hero"
                 slides={cms?.heroSlides}
+                settings={cms?.heroSettings}
                 onOpenOrderDrawer={() => setDrawerOpen(true)}
                 onOpenQrModal={() => setQrModalOpen(true)}
                 onOpenReservationModal={() => setReservationModalOpen(true)}

@@ -14,6 +14,12 @@ export const DEFAULT_CMS_SECTIONS = [
 
 export const DEFAULT_HERO_SLIDES = [];
 
+export const DEFAULT_HERO_SETTINGS = {
+  autoSlideDuration: 5500,
+  autoSlideEnabled: true,
+  desktopFit: 'fit',
+};
+
 export const DEFAULT_BUTTONS = [
   {
     id: 'btn_reservation',
@@ -353,6 +359,7 @@ export function createInitialContentSnapshot() {
   return {
     sections: JSON.parse(JSON.stringify(DEFAULT_CMS_SECTIONS)),
     heroSlides: JSON.parse(JSON.stringify(DEFAULT_HERO_SLIDES)),
+    heroSettings: JSON.parse(JSON.stringify(DEFAULT_HERO_SETTINGS)),
     buttons: JSON.parse(JSON.stringify(DEFAULT_BUTTONS)),
     pages: JSON.parse(JSON.stringify(DEFAULT_PAGES)),
     design: JSON.parse(JSON.stringify(DEFAULT_DESIGN)),
