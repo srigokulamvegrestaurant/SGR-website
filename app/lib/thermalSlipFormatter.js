@@ -59,12 +59,12 @@ export function sanitizeEnglishTitle(title = '', fallback = 'Delicacy') {
 // Format human-friendly Bill Title by order type
 export function formatBillTitle(orderType = 'DINE_IN') {
   const t = String(orderType || '').toUpperCase().trim();
-  if (t === 'DINE_IN' || t === 'DINEIN' || t.includes('DINE')) return 'Dine-In Bill';
+  if (t === 'DINE_IN' || t === 'DINEIN' || t === 'MANUAL_DINE_IN' || t.includes('DINE')) return 'Dine-In Bill';
+  if (t === 'COUNTER' || t.includes('COUNTER')) return 'Counter Bill';
   if (t === 'TAKEAWAY' || t.includes('TAKEAWAY')) return 'Takeaway Bill';
   if (t === 'PARCEL' || t.includes('PARCEL')) return 'Parcel Bill';
   if (t === 'DELIVERY' || t.includes('DELIVERY')) return 'Delivery Bill';
   if (t === 'WALK_IN' || t === 'WALKIN' || t.includes('WALK')) return 'Walk-In Bill';
-  if (t === 'COUNTER' || t.includes('COUNTER')) return 'Counter Bill';
   return 'Restaurant Bill';
 }
 
@@ -73,14 +73,18 @@ export function formatTableDisplay(orderType = 'DINE_IN', tableNumber = '04') {
   const t = String(orderType || '').toUpperCase().trim();
   const rawTable = String(tableNumber || '01').trim();
   
-  if (t === 'DINE_IN' || t === 'DINEIN' || t.includes('DINE')) {
+  if (t === 'DINE_IN' || t === 'DINEIN' || t === 'MANUAL_DINE_IN' || t.includes('DINE')) {
     const numPart = rawTable.replace(/^[Tt\-#\s]+/, '');
     const formattedNum = numPart.padStart(2, '0');
     return { label: 'Table No', value: `T-${formattedNum}` };
   }
-  if (t === 'TAKEAWAY') {
+  if (t === 'TAKEAWAY' || t.includes('TAKEAWAY')) {
     const num = rawTable.replace(/^[TtKk\-#\s]+/, '') || '01';
     return { label: 'Token No', value: `TK-${num}` };
+  }
+  if (t === 'COUNTER' || t.includes('COUNTER')) {
+    const num = rawTable.replace(/^[CcTtRr\-#\s]+/, '') || '01';
+    return { label: 'Token No', value: `CTR-${num}` };
   }
   if (t === 'PARCEL') {
     const num = rawTable.replace(/^[Pp\-#\s]+/, '') || '01';
@@ -89,7 +93,7 @@ export function formatTableDisplay(orderType = 'DINE_IN', tableNumber = '04') {
   if (t === 'DELIVERY') {
     return { label: 'Delivery', value: `DEL-${rawTable || '01'}` };
   }
-  if (t === 'COUNTER' || t === 'WALK_IN' || t === 'WALKIN') {
+  if (t === 'WALK_IN' || t === 'WALKIN') {
     return { label: 'Counter', value: `C-01` };
   }
   return { label: 'Table No', value: rawTable };

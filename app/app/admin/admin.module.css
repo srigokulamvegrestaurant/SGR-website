@@ -2772,6 +2772,152 @@ input:checked + .slider:before {
   background: rgba(59, 130, 246, 0.1);
 }
 
+/* ─── Universal POS Order Search & Duplicate Prevention ─── */
+.posUnifiedSearchWrap {
+  position: relative;
+  width: 100%;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.posUnifiedSearchRow {
+  display: flex;
+  align-items: center;
+  background: var(--bg-card);
+  border: 2px solid #38bdf8;
+  border-radius: 8px;
+  padding: 0.4rem 0.85rem;
+  box-shadow: 0 2px 8px rgba(56, 189, 248, 0.15);
+  transition: all 0.2s ease;
+}
+
+.posUnifiedSearchRow:focus-within {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+}
+
+.posUnifiedSearchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  width: 100%;
+}
+
+.posUnifiedSearchInput::placeholder {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+.posUnifiedSearchClear {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  padding: 0.2rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.posUnifiedSearchClear:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.posSearchResultsDrawer {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+  border-radius: 10px;
+  padding: 0.85rem;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.35);
+  z-index: 100;
+  max-height: 420px;
+  overflow-y: auto;
+}
+
+.posSearchOrderCard {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-subtle);
+  border-radius: 8px;
+  padding: 0.65rem 0.85rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.posSearchOrderCard:hover {
+  border-color: #38bdf8;
+  background: rgba(56, 189, 248, 0.05);
+}
+
+.posDuplicateAlertBanner {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.15) 0%, rgba(245, 158, 11, 0.1) 100%);
+  border: 1px solid #f59e0b;
+  border-radius: 8px;
+  padding: 0.6rem 0.85rem;
+  margin-bottom: 0.65rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.btnQuickSettleGreen {
+  background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+  user-select: none;
+}
+
+.btnQuickSettleGreen:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.btnQuickSettleBlue {
+  background: linear-gradient(135deg, #0284c7 0%, #38bdf8 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.45rem 0.85rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  transition: opacity 0.15s ease, transform 0.1s ease;
+  user-select: none;
+}
+
+.btnQuickSettleBlue:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
 /* POS Main Grid: Left Catalog, Right Cart */
 .posMainGrid {
   display: grid;

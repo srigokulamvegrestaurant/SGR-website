@@ -83,6 +83,13 @@ function ManualBillDialog({
   const cgstRate = taxExempt ? 0 : (settings?.billing_payments?.taxRateCgst ?? settings?.taxRateCgst ?? 2.5);
   const sgstRate = taxExempt ? 0 : (settings?.billing_payments?.taxRateSgst ?? settings?.taxRateSgst ?? 2.5);
 
+  // Active unbilled order on this table (Duplicate Prevention)
+  const activeTableOrder = useMemo(() => {
+    if (!tableNumber) return null;
+    const clean = String(tableNumber).replace(/^[Tt\-#\s]+/, '').padStart(2, '0');
+    return (activeTables || []).find(t => (String(t.tableNumber) === String(tableNumber) || String(t.tableNumber) === clean) && t.items?.length > 0);
+  }, [tableNumber, activeTables]);
+
   // CRM suggestions filter
   const crmMatches = useMemo(() => {
     if (!customerSearch || customerSearch.trim().length < 2) return [];
@@ -367,6 +374,20 @@ function ManualBillDialog({
               </button>
               <button
                 type="button"
+                className={`${styles.orderTypeBtn} ${orderType === 'MANUAL_DINE_IN' ? styles.orderTypeBtnActive : ''}`}
+                onClick={() => setOrderType('MANUAL_DINE_IN')}
+              >
+                📝 Manual Dine-In
+              </button>
+              <button
+                type="button"
+                className={`${styles.orderTypeBtn} ${orderType === 'COUNTER' ? styles.orderTypeBtnActive : ''}`}
+                onClick={() => setOrderType('COUNTER')}
+              >
+                ⚡ Counter
+              </button>
+              <button
+                type="button"
                 className={`${styles.orderTypeBtn} ${orderType === 'TAKEAWAY' ? styles.orderTypeBtnActive : ''}`}
                 onClick={() => setOrderType('TAKEAWAY')}
               >
@@ -386,24 +407,62 @@ function ManualBillDialog({
               >
                 🛵 Delivery
               </button>
-              <button
-                type="button"
-                className={`${styles.orderTypeBtn} ${orderType === 'WALK_IN' ? styles.orderTypeBtnActive : ''}`}
-                onClick={() => setOrderType('WALK_IN')}
-              >
-                🚶 Walk-In
-              </button>
-              <button
-                type="button"
-                className={`${styles.orderTypeBtn} ${orderType === 'COUNTER' ? styles.orderTypeBtnActive : ''}`}
-                onClick={() => setOrderType('COUNTER')}
-              >
-                🏪 Counter
-              </button>
             </div>
 
+            {/* Active order alert banner to prevent duplicate billing */}
+            {activeTableOrder && (orderType === 'DINE_IN' || orderType === 'MANUAL_DINE_IN') && (
+              <div style={{
+                background: 'rgba(234, 179, 8, 0.12)',
+                border: '1px solid #eab308',
+                borderRadius: '6px',
+                padding: '0.45rem 0.75rem',
+                margin: '0.4rem 0',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '0.5rem',
+                flexWrap: 'wrap',
+              }}>
+                <div style={{ fontSize: '0.78rem', color: '#b45309' }}>
+                  <strong>⚠️ Active KOT Found for Table #{tableNumber}:</strong> {activeTableOrder.items.length} dishes (₹{activeTableOrder.subtotal}) • {activeTableOrder.activeOrders?.[0]?.customerName || 'Guest'} {activeTableOrder.activeOrders?.[0]?.customerPhone ? `(${activeTableOrder.activeOrders[0].customerPhone})` : ''}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const loadedItems = activeTableOrder.items.map(it => ({
+                      id: it.id || `dish_${Date.now()}`,
+                      title: sanitizeEnglishTitle(it.title || 'Dish'),
+                      price: Number(it.price) || 0,
+                      quantity: Number(it.quantity) || 1,
+                      station: it.station || 'TIFFIN',
+                    }));
+                    setCartItems(loadedItems);
+                    if (activeTableOrder.activeOrders?.[0]?.customerName) {
+                      setCustomer(prev => ({
+                        ...prev,
+                        name: activeTableOrder.activeOrders[0].customerName,
+                        phone: activeTableOrder.activeOrders[0].customerPhone || '',
+                      }));
+                    }
+                  }}
+                  style={{
+                    background: '#eab308',
+                    color: '#000',
+                    border: 'none',
+                    borderRadius: '4px',
+                    padding: '0.3rem 0.65rem',
+                    fontSize: '0.72rem',
+                    fontWeight: 800,
+                    cursor: 'pointer',
+                  }}
+                >
+                  ⚡ Load KOT Items (Avoid Duplicate Bill)
+                </button>
+              </div>
+            )}
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
-              {orderType === 'DINE_IN' && (
+              {(orderType === 'DINE_IN' || orderType === 'MANUAL_DINE_IN') && (
                 <>
                   <div className={styles.tableInputWrap}>
                     <span className={styles.label}>Table #:</span>

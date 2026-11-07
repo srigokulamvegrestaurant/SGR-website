@@ -209,6 +209,7 @@ export default function WaiterTerminal() {
   // Quick Order Punching State
   const [orderTargetTable, setOrderTargetTable] = useState('');
   const [orderGuestName, setOrderGuestName] = useState('Walk-in Guest');
+  const [orderCustomerPhone, setOrderCustomerPhone] = useState('');
   const [orderGuestCount, setOrderGuestCount] = useState(2);
   const [orderCategory, setOrderCategory] = useState('ALL');
   const [orderSearchQuery, setOrderSearchQuery] = useState('');
@@ -487,6 +488,9 @@ export default function WaiterTerminal() {
         tables: [cleanTableNum],
         orderType: 'DINE_IN',
         guestName: orderGuestName.trim() || `Table #${cleanTableNum}`,
+        customerName: orderGuestName.trim() || `Table #${cleanTableNum}`,
+        guestPhone: orderCustomerPhone.trim(),
+        customerPhone: orderCustomerPhone.trim(),
         guestCount: orderGuestCount,
         cookingNotes: fullNotes,
         items: cartItems.map(it => ({
@@ -513,6 +517,8 @@ export default function WaiterTerminal() {
       setOrderCart({});
       setSelectedPrefs([]);
       setOrderNotes('');
+      setOrderCustomerPhone('');
+      setOrderGuestName('Walk-in Guest');
       setShowMobileCartDrawer(false);
       setActiveTab('tables');
       fetchData();
@@ -1212,6 +1218,26 @@ export default function WaiterTerminal() {
                   </select>
                 </div>
 
+                {/* Customer Name & Mobile for Method 2 & CRM Duplicate Prevention */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem', margin: '0.35rem 0' }}>
+                  <input
+                    type="text"
+                    placeholder={lang === 'ta' ? 'பெயர் (விருப்பம்)' : 'Name (Optional)'}
+                    value={orderGuestName}
+                    onChange={e => setOrderGuestName(e.target.value)}
+                    className={styles.tableSelectField}
+                    style={{ fontSize: '0.76rem', padding: '5px 8px' }}
+                  />
+                  <input
+                    type="tel"
+                    placeholder={lang === 'ta' ? 'மொபைல் எண்' : 'Mobile No.'}
+                    value={orderCustomerPhone}
+                    onChange={e => setOrderCustomerPhone(e.target.value)}
+                    className={styles.tableSelectField}
+                    style={{ fontSize: '0.76rem', padding: '5px 8px' }}
+                  />
+                </div>
+
                 {/* Chettinad Cooking Preferences */}
                 <div className={styles.preferenceChipsTitle}>{t.cookingPref}</div>
                 <div className={styles.preferenceChips}>
@@ -1553,6 +1579,26 @@ export default function WaiterTerminal() {
                     <option key={n} value={n}>{n} {t.diners}</option>
                   ))}
                 </select>
+              </div>
+
+              {/* Customer Name & Mobile for Method 2 & CRM Duplicate Prevention */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.35rem', margin: '0.35rem 0' }}>
+                <input
+                  type="text"
+                  placeholder={lang === 'ta' ? 'பெயர் (விருப்பம்)' : 'Name (Optional)'}
+                  value={orderGuestName}
+                  onChange={e => setOrderGuestName(e.target.value)}
+                  className={styles.tableSelectField}
+                  style={{ fontSize: '0.76rem', padding: '6px 8px' }}
+                />
+                <input
+                  type="tel"
+                  placeholder={lang === 'ta' ? 'மொபைல் எண்' : 'Mobile No.'}
+                  value={orderCustomerPhone}
+                  onChange={e => setOrderCustomerPhone(e.target.value)}
+                  className={styles.tableSelectField}
+                  style={{ fontSize: '0.76rem', padding: '6px 8px' }}
+                />
               </div>
 
               {/* Preferences */}

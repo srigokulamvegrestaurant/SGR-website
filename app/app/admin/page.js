@@ -179,10 +179,12 @@ export default function AdminPage() {
   const [editBillTarget, setEditBillTarget] = useState(null);
   const [showSlipDesignerModal, setShowSlipDesignerModal] = useState(false);
 
-  // Enhanced POS States (18 Requirements)
-  const [posOrderType, setPosOrderType] = useState('DINE_IN'); // DINE_IN, TAKEAWAY, DELIVERY
+  // Enhanced POS States (4 Billing Methods: Dine-In, Manual Dine-In, Counter, Takeaway)
+  const [posOrderType, setPosOrderType] = useState('DINE_IN'); // DINE_IN, MANUAL_DINE_IN, COUNTER, TAKEAWAY, DELIVERY
   const [posCustomer, setPosCustomer] = useState({ name: 'Walk-in Guest', phone: '', tag: 'Walk-in' });
   const [posSearch, setPosSearch] = useState('');
+  const [posGlobalSearch, setPosGlobalSearch] = useState('');
+  const [showActiveOrdersModal, setShowActiveOrdersModal] = useState(false);
   const [posCategory, setPosCategory] = useState('all');
   const [posCart, setPosCart] = useState([]);
   const [posActiveView, setPosActiveView] = useState('CART'); // 'CART' or 'TABLE_BILL'
@@ -962,6 +964,54 @@ export default function AdminPage() {
     return Math.max(0, Number(cashTendered) - netPayable);
   }, [cashTendered, netPayable]);
 
+  // Universal POS Search across Active Orders and Settled Bills (Search by Bill #, KOT #, Table #, Phone, Name, Token, Type)
+  const posSearchResults = useMemo(() => {
+    if (!posGlobalSearch || posGlobalSearch.trim().length < 2) return null;
+    const q = posGlobalSearch.toLowerCase().trim();
+    const qDigits = q.replace(/\D/g, '');
+
+    // Active unbilled orders (from posData.activeOrders or tables)
+    const active = (posData.activeOrders || []).filter(o => {
+      const matchNum = o.orderNumber?.toLowerCase().includes(q) || o.kotNumber?.toLowerCase().includes(q);
+      const matchTable = String(o.tableNumber).toLowerCase().includes(q);
+      const matchToken = o.tokenNumber?.toLowerCase().includes(q);
+      const matchCustomer = o.customerName?.toLowerCase().includes(q);
+      const matchType = o.orderType?.toLowerCase().includes(q);
+      const matchPhone = qDigits.length >= 3 && (String(o.customerPhone || '').replace(/\D/g, '').includes(qDigits) || String(o.guestPhone || '').replace(/\D/g, '').includes(qDigits));
+      return matchNum || matchTable || matchToken || matchCustomer || matchType || matchPhone;
+    });
+
+    // Settled bills
+    const bills = (posData.recentBills || []).filter(b => {
+      const matchBillNo = b.billNumber?.toLowerCase().includes(q);
+      const matchTable = String(b.tableNumber).toLowerCase().includes(q);
+      const matchCustomer = b.customer?.name?.toLowerCase().includes(q);
+      const matchMode = b.paymentMode?.toLowerCase().includes(q);
+      const matchStatus = b.paymentStatus?.toLowerCase().includes(q) || b.status?.toLowerCase().includes(q);
+      const matchPhone = qDigits.length >= 3 && String(b.customer?.phone || '').replace(/\D/g, '').includes(qDigits);
+      return matchBillNo || matchTable || matchCustomer || matchMode || matchStatus || matchPhone;
+    });
+
+    return { active, bills };
+  }, [posGlobalSearch, posData.activeOrders, posData.recentBills]);
+
+  // Active unbilled order check for currently selected table (Duplicate Prevention)
+  const currentTableActiveOrder = useMemo(() => {
+    if (!selectedTable?.tableNumber) return null;
+    const clean = String(selectedTable.tableNumber).replace(/^[Tt\-#\s]+/, '').padStart(2, '0');
+    return (posData.tables || []).find(t => (String(t.tableNumber) === String(selectedTable.tableNumber) || String(t.tableNumber) === clean) && t.items?.length > 0);
+  }, [selectedTable, posData.tables]);
+
+  // Active unbilled order check for customer phone (Duplicate Prevention)
+  const customerActiveOrder = useMemo(() => {
+    const cleanPh = String(posCustomer.phone || '').replace(/\D/g, '');
+    if (!cleanPh || cleanPh.length < 8) return null;
+    return (posData.activeOrders || []).find(o => {
+      const oPh = String(o.customerPhone || o.guestPhone || '').replace(/\D/g, '');
+      return oPh && oPh.includes(cleanPh);
+    });
+  }, [posCustomer.phone, posData.activeOrders]);
+
   // ─── POS Food Item & Cart Operations (Requirements 1, 4) ──────────────────
   const handleDishClick = (dish) => {
     if ((dish.variants && dish.variants.length > 0) || (dish.addOns && dish.addOns.length > 0)) {
@@ -1108,7 +1158,7 @@ export default function AdminPage() {
     }
   };
 
-  // ─── KOT Punch & Kitchen Routing (Requirement 6, 16) ────────────────────
+  // ─── KOT Punch & Kitchen Routing (4 Methods) ────────────────────
   const handlePunchKot = async () => {
     if (posCart.length === 0) {
       showNotice('Shopping cart is empty', true);
@@ -1116,13 +1166,14 @@ export default function AdminPage() {
     }
     setLoading(true);
     try {
+      const tableNum = posOrderType === 'TAKEAWAY' ? 'TK' : (posOrderType === 'COUNTER' ? 'CTR' : (selectedTable?.tableNumber || '01'));
       const res = await fetch('/api/admin/pos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'PUNCH_KOT',
           orderType: posOrderType,
-          tableNumber: posOrderType === 'TAKEAWAY' ? 'TK' : (selectedTable?.tableNumber || '01'),
+          tableNumber: tableNum,
           customer: posCustomer,
           items: posCart,
           cashierName: currentUser.name,
@@ -1151,10 +1202,97 @@ export default function AdminPage() {
     }
   };
 
+  // Method 3 (Counter) & Method 4 (Takeaway) Instant Payment & Print
+  const handleInstantPayAndPunch = async (mode = 'CASH') => {
+    if (posCart.length === 0) {
+      showNotice('Shopping cart is empty', true);
+      return;
+    }
+    setLoading(true);
+    try {
+      const tableNum = posOrderType === 'TAKEAWAY' ? 'TK' : (posOrderType === 'COUNTER' ? 'CTR' : (selectedTable?.tableNumber || '01'));
+      const res = await fetch('/api/admin/pos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'PUNCH_KOT',
+          orderType: posOrderType,
+          tableNumber: tableNum,
+          customer: posCustomer,
+          items: posCart,
+          cashierName: currentUser.name,
+          paymentMode: mode,
+          payImmediate: true,
+          paymentStatus: 'PAID',
+          paperWidth: posData.settings?.bill_slip_format?.paperWidth || '80MM',
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        playChime('notification');
+        showNotice(`Bill #${data.bill?.billNumber} settled immediately! (₹${data.bill?.totalAmount})`);
+        if (data.thermalReceipt) setActiveReceipt(data.thermalReceipt);
+        if (data.bill) setLastSettledBill(data.bill);
+        setPosCart([]);
+        fetchPos();
+        fetchKds();
+        fetchFloor();
+        fetchAnalytics();
+      } else {
+        showNotice(data.error || 'Failed to settle order', true);
+      }
+    } catch (e) {
+      showNotice('Network error settling order', true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Method 3 & Method 4: Pay upon collection
+  const handlePendingCollectionKot = async () => {
+    if (posCart.length === 0) {
+      showNotice('Shopping cart is empty', true);
+      return;
+    }
+    setLoading(true);
+    try {
+      const tableNum = posOrderType === 'TAKEAWAY' ? 'TK' : (posOrderType === 'COUNTER' ? 'CTR' : (selectedTable?.tableNumber || '01'));
+      const res = await fetch('/api/admin/pos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action: 'PUNCH_KOT',
+          orderType: posOrderType,
+          tableNumber: tableNum,
+          customer: posCustomer,
+          items: posCart,
+          cashierName: currentUser.name,
+          markPending: true,
+          paymentStatus: 'PENDING_PAYMENT',
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        playChime('urgent');
+        showNotice(`Token #${data.tokenNumber || data.kot?.kotNumber} routed to Kitchen (Pay on Collection)!`);
+        setPosCart([]);
+        fetchPos();
+        fetchKds();
+        fetchFloor();
+      } else {
+        showNotice(data.error || 'Failed to punch order', true);
+      }
+    } catch (e) {
+      showNotice('Network error punching order', true);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // ─── POS Bill Settlement & Thermal Slip (Requirements 9, 10, 11, 12) ─────
-  const handleSettleBill = async () => {
-    const tableNum = posOrderType === 'TAKEAWAY' ? 'TK' : selectedTable?.tableNumber;
-    if (!tableNum && posOrderType === 'DINE_IN') {
+  const handleSettleBill = async (overrideMode = null, markPending = false, targetOrder = null) => {
+    const tableNum = targetOrder?.tableNumber || (posOrderType === 'TAKEAWAY' ? 'TK' : (posOrderType === 'COUNTER' ? 'CTR' : selectedTable?.tableNumber));
+    if (!tableNum && (posOrderType === 'DINE_IN' || posOrderType === 'MANUAL_DINE_IN')) {
       showNotice('Please select an active table to settle', true);
       return;
     }
@@ -1164,42 +1302,47 @@ export default function AdminPage() {
       setManagerPinAction({
         type: 'SETTLE_WITH_DISCOUNT',
         title: `Authorize ${discountPercent}% Discount`,
-        onConfirm: () => executeSettleBill(),
+        onConfirm: () => executeSettleBill(overrideMode, markPending, targetOrder),
       });
       setShowManagerPinModal(true);
       return;
     }
 
-    await executeSettleBill();
+    await executeSettleBill(overrideMode, markPending, targetOrder);
   };
 
-  const executeSettleBill = async () => {
+  const executeSettleBill = async (overrideMode = null, markPending = false, targetOrder = null) => {
     setLoading(true);
     try {
-      const tableNum = posOrderType === 'TAKEAWAY' ? 'TK' : selectedTable?.tableNumber;
+      const effectiveMode = overrideMode || paymentMode;
+      const tableNum = targetOrder?.tableNumber || (posOrderType === 'TAKEAWAY' ? 'TK' : (posOrderType === 'COUNTER' ? 'CTR' : selectedTable?.tableNumber));
       const res = await fetch('/api/admin/pos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action: 'SETTLE_BILL',
           tableNumber: tableNum,
-          orderType: posOrderType,
-          customer: posCustomer,
-          paymentMode,
-          splitDetails: paymentMode === 'SPLIT' ? splitLines : null,
+          orderId: targetOrder?.id || targetOrder?.orderId || null,
+          tokenNumber: targetOrder?.tokenNumber || null,
+          orderType: targetOrder?.orderType || posOrderType,
+          customer: targetOrder?.customer || posCustomer,
+          paymentMode: effectiveMode,
+          splitDetails: effectiveMode === 'SPLIT' ? splitLines : null,
           transactionRef,
           discountPercent: Number(discountPercent) || 0,
           discountFlat: Number(discountFlat) || 0,
           discountReason: discountReason || 'Counter Settlement',
           serviceChargePercent: serviceChargeEnabled ? 5 : 0,
           cashierName: currentUser.name,
+          markPending,
+          paperWidth: posData.settings?.bill_slip_format?.paperWidth || '80MM',
         }),
       });
 
       const data = await res.json();
       if (data.success) {
         playChime('notification');
-        showNotice(`Bill ${data.bill.billNumber} settled: ₹${data.bill.totalAmount}`);
+        showNotice(`Bill ${data.bill.billNumber} settled: ₹${data.bill.totalAmount} (${data.bill.paymentStatus})`);
         setActiveReceipt(data.thermalReceipt);
         setLastSettledBill(data.bill);
         fetchPos();
@@ -4033,33 +4176,52 @@ Status: SHIFT CLOSED & VERIFIED
           <div className={styles.posSystemWrap}>
             {/* ─── Requirement 15 & 17: POS Top Toolbar, Status Bar & Quick Actions ─── */}
             <div className={styles.posTopBar}>
-              {/* Order Type Toggle (Requirement 2) */}
+              {/* Order Type Toggle (4 Real-World Billing Methods) */}
               <div className={styles.posOrderTypePills}>
                 <button
                   type="button"
                   className={`${styles.posTypeBtn} ${posOrderType === 'DINE_IN' ? styles.posTypeBtnActive : ''}`}
-                  onClick={() => setPosOrderType('DINE_IN')}
+                  onClick={() => { setPosOrderType('DINE_IN'); setPosActiveView('CART'); }}
+                  title="Method 1: Dine-In Table Bill (Waiter/QR order, pay at counter or at table via Paytm/UPI machine)"
                 >
-                  🍽️ Dine-In
+                  🍽️ Dine-In (M1)
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.posTypeBtn} ${posOrderType === 'MANUAL_DINE_IN' ? styles.posTypeBtnActive : ''}`}
+                  onClick={() => { setPosOrderType('MANUAL_DINE_IN'); setPosActiveView('CART'); }}
+                  title="Method 2: Manual Dine-In (Search by Name/Mobile to prevent duplicate bills)"
+                >
+                  📝 Manual Dine-In (M2)
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.posTypeBtn} ${posOrderType === 'COUNTER' ? styles.posTypeBtnActive : ''}`}
+                  onClick={() => { setPosOrderType('COUNTER'); setPosActiveView('CART'); }}
+                  title="Method 3: Counter Food Order (Coffee, Snacks, Tiffin direct at counter - Pay now or on collection)"
+                >
+                  ⚡ Counter (M3)
                 </button>
                 <button
                   type="button"
                   className={`${styles.posTypeBtn} ${posOrderType === 'TAKEAWAY' ? styles.posTypeBtnActive : ''}`}
-                  onClick={() => setPosOrderType('TAKEAWAY')}
+                  onClick={() => { setPosOrderType('TAKEAWAY'); setPosActiveView('CART'); }}
+                  title="Method 4: Takeaway Order (Pay immediately or pay when parcel is ready)"
                 >
-                  🥡 Takeaway
+                  🥡 Takeaway (M4)
                 </button>
                 <button
                   type="button"
                   className={`${styles.posTypeBtn} ${posOrderType === 'DELIVERY' ? styles.posTypeBtnActive : ''}`}
-                  onClick={() => setPosOrderType('DELIVERY')}
+                  onClick={() => { setPosOrderType('DELIVERY'); setPosActiveView('CART'); }}
+                  title="Direct Delivery or Swiggy/Zomato dispatch"
                 >
                   🛵 Delivery
                 </button>
               </div>
 
-              {/* Table Selection Chip (Requirement 3) */}
-              {posOrderType === 'DINE_IN' ? (
+              {/* Table / Token Selection Chip */}
+              {(posOrderType === 'DINE_IN' || posOrderType === 'MANUAL_DINE_IN') ? (
                 <div
                   className={styles.posSessionPill}
                   onClick={() => setShowTablePickerModal(true)}
@@ -4067,9 +4229,17 @@ Status: SHIFT CLOSED & VERIFIED
                 >
                   🪑 Table #{selectedTable?.tableNumber || '01'} ({selectedTable?.section?.replace('_', ' ') || 'Ground Floor'}) ▾
                 </div>
+              ) : posOrderType === 'COUNTER' ? (
+                <div className={styles.posSessionPill} style={{ borderColor: '#f59e0b', color: '#f59e0b', fontWeight: 800 }}>
+                  ⚡ Token #CTR-{100 + (((posData.activeOrders || []).filter(o => o.orderType === 'COUNTER').length) % 900) + 1}
+                </div>
+              ) : posOrderType === 'TAKEAWAY' ? (
+                <div className={styles.posSessionPill} style={{ borderColor: '#10b981', color: '#10b981', fontWeight: 800 }}>
+                  🥡 Token #TK-{100 + (((posData.activeOrders || []).filter(o => o.orderType === 'TAKEAWAY').length) % 900) + 1}
+                </div>
               ) : (
-                <div className={styles.posSessionPill} style={{ borderColor: '#10b981', color: '#10b981' }}>
-                  {posOrderType === 'TAKEAWAY' ? `🥡 Token #TK-${(posData.recentBills?.length || 0) + 101}` : '🛵 Swiggy/Zomato/Direct'}
+                <div className={styles.posSessionPill} style={{ borderColor: '#38bdf8', color: '#38bdf8' }}>
+                  🛵 Direct / Swiggy / Zomato
                 </div>
               )}
 
@@ -4141,6 +4311,18 @@ Status: SHIFT CLOSED & VERIFIED
                 <button
                   type="button"
                   className={styles.posActionBtn}
+                  onClick={() => setShowActiveOrdersModal(true)}
+                  style={{
+                    color: (posData.activeOrders?.length || 0) > 0 ? '#10b981' : undefined,
+                    fontWeight: (posData.activeOrders?.length || 0) > 0 ? 800 : undefined,
+                  }}
+                  title="View all active unbilled orders across the 4 billing methods"
+                >
+                  ⚡ Active Orders ({posData.activeOrders?.length || 0})
+                </button>
+                <button
+                  type="button"
+                  className={styles.posActionBtn}
                   onClick={() => setShowBillsHistoryModal(true)}
                   title="Settled bills history, reprints, voids & refunds"
                 >
@@ -4165,6 +4347,175 @@ Status: SHIFT CLOSED & VERIFIED
                   ⚙️ Format Slip
                 </button>
               </div>
+            </div>
+
+            {/* ─── Universal POS Order Search Bar (Bill #, KOT #, Table #, Phone, Name, Token, Type) ─── */}
+            <div className={styles.posUnifiedSearchWrap}>
+              <div className={styles.posUnifiedSearchRow}>
+                <span style={{ fontSize: '1.1rem', marginRight: '0.5rem' }}>🔎</span>
+                <input
+                  type="text"
+                  className={styles.posUnifiedSearchInput}
+                  placeholder="Universal Order Search: Bill # (SGK...), KOT #, Table #, Customer Phone (10 digits), Customer Name, or Token..."
+                  value={posGlobalSearch}
+                  onChange={e => setPosGlobalSearch(e.target.value)}
+                />
+                {posGlobalSearch && (
+                  <button
+                    type="button"
+                    className={styles.posUnifiedSearchClear}
+                    onClick={() => setPosGlobalSearch('')}
+                  >
+                    ✕ Clear
+                  </button>
+                )}
+              </div>
+
+              {/* Live Search Results Dropdown */}
+              {posSearchResults && (
+                <div className={styles.posSearchResultsDrawer}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.35rem' }}>
+                    <span style={{ fontWeight: 800, fontSize: '0.85rem', color: 'var(--text-primary)' }}>
+                      Search Results for &quot;{posGlobalSearch}&quot;
+                    </span>
+                    <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                      {posSearchResults.active.length} Active Orders • {posSearchResults.bills.length} Settled Bills
+                    </span>
+                  </div>
+
+                  {/* Active Orders List */}
+                  {posSearchResults.active.length > 0 && (
+                    <div style={{ marginBottom: '0.75rem' }}>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#10b981', marginBottom: '0.35rem' }}>
+                        🟢 ACTIVE / UNBILLED ORDERS (Load to Settle &amp; Avoid Duplicate):
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        {posSearchResults.active.map(ord => (
+                          <div key={ord.id} className={styles.posSearchOrderCard}>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <strong style={{ color: 'var(--text-primary)' }}>
+                                  {ord.tokenNumber ? ord.tokenNumber : `Table #${ord.tableNumber}`}
+                                </strong>
+                                <span style={{
+                                  fontSize: '0.65rem',
+                                  fontWeight: 800,
+                                  padding: '0.1rem 0.4rem',
+                                  borderRadius: '9999px',
+                                  background: 'rgba(56, 189, 248, 0.15)',
+                                  color: '#38bdf8',
+                                }}>
+                                  {ord.orderNumber || ord.kotNumber}
+                                </span>
+                                <span style={{
+                                  fontSize: '0.65rem',
+                                  fontWeight: 800,
+                                  padding: '0.1rem 0.4rem',
+                                  borderRadius: '9999px',
+                                  background: ord.paymentStatus === 'PAID' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(234, 179, 8, 0.15)',
+                                  color: ord.paymentStatus === 'PAID' ? '#10b981' : '#eab308',
+                                }}>
+                                  {ord.paymentStatus}
+                                </span>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                                  {ord.orderType}
+                                </span>
+                              </div>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                                👤 {ord.customerName} {ord.customerPhone ? `(${ord.customerPhone})` : ''} • {ord.itemCount} items
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                              <strong style={{ fontSize: '1rem', color: '#10b981' }}>
+                                ₹{ord.totalAmount}
+                              </strong>
+                              <button
+                                type="button"
+                                className={styles.btnQuickSettleGreen}
+                                onClick={() => {
+                                  const tbl = (posData.tables || []).find(t => String(t.tableNumber) === String(ord.tableNumber));
+                                  if (tbl) {
+                                    setSelectedTable(tbl);
+                                    setPosOrderType('DINE_IN');
+                                    setPosActiveView('TABLE_BILL');
+                                  } else {
+                                    handleSettleBill('CASH', false, ord);
+                                  }
+                                  setPosGlobalSearch('');
+                                  showNotice(`Loaded active order for ${ord.tokenNumber || `Table #${ord.tableNumber}`}`);
+                                }}
+                              >
+                                ⚡ Load &amp; Settle (No Duplicate)
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Settled Bills List */}
+                  {posSearchResults.bills.length > 0 && (
+                    <div>
+                      <div style={{ fontSize: '0.75rem', fontWeight: 800, color: '#38bdf8', marginBottom: '0.35rem' }}>
+                        📜 SETTLED BILLS (Reprint, Edit, Void):
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                        {posSearchResults.bills.map(b => (
+                          <div key={b.id || b.billNumber} className={styles.posSearchOrderCard}>
+                            <div>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                <strong style={{ color: 'var(--text-primary)' }}>
+                                  #{b.billNumber}
+                                </strong>
+                                <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                                  Table #{b.tableNumber} • {b.paymentMode} • {b.paymentStatus || 'PAID'}
+                                </span>
+                              </div>
+                              <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                                👤 {b.customer?.name || 'Walk-in'} {b.customer?.phone ? `(${b.customer.phone})` : ''} • {new Date(b.createdAt).toLocaleTimeString()}
+                              </div>
+                            </div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                              <strong style={{ fontSize: '1rem', color: '#10b981' }}>
+                                ₹{b.totalAmount}
+                              </strong>
+                              <button
+                                type="button"
+                                className={styles.btnThermalPrint}
+                                style={{ padding: '0.3rem 0.6rem', fontSize: '0.72rem' }}
+                                onClick={() => {
+                                  handlePrintReceipt(b, '80MM');
+                                  setPosGlobalSearch('');
+                                }}
+                              >
+                                🖨️ Slip
+                              </button>
+                              <button
+                                type="button"
+                                className={styles.btnNavAlt}
+                                style={{ padding: '0.3rem 0.6rem', fontSize: '0.72rem' }}
+                                onClick={() => {
+                                  setEditBillTarget({ bill: b, thermalSlip: b.thermalSlip });
+                                  setPosGlobalSearch('');
+                                }}
+                              >
+                                ✏️ Edit
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {posSearchResults.active.length === 0 && posSearchResults.bills.length === 0 && (
+                    <div style={{ padding: '1rem', textAlign: 'center', color: 'var(--text-muted)', fontSize: '0.82rem' }}>
+                      No active orders or bills found matching &quot;{posGlobalSearch}&quot;.
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* ─── Main POS Workspace: Left Menu Catalog, Right Cart & Bill ─── */}
@@ -4265,7 +4616,7 @@ Status: SHIFT CLOSED & VERIFIED
                     >
                       🛒 Cart ({posCart.length})
                     </button>
-                    {posOrderType === 'DINE_IN' && (
+                    {(posOrderType === 'DINE_IN' || posOrderType === 'MANUAL_DINE_IN') && (
                       <button
                         type="button"
                         className={`${styles.posCartTabBtn} ${posActiveView === 'TABLE_BILL' ? styles.posCartTabBtnActive : ''}`}
@@ -4286,6 +4637,65 @@ Status: SHIFT CLOSED & VERIFIED
                     Customer: <strong>{posCustomer.name}</strong> • {posCustomer.phone || 'Walk-in'}
                   </span>
                 </div>
+
+                {/* Duplicate Prevention Alert for Active Table */}
+                {currentTableActiveOrder && (posOrderType === 'DINE_IN' || posOrderType === 'MANUAL_DINE_IN') && (
+                  <div className={styles.posDuplicateAlertBanner}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      <span style={{ fontSize: '1.2rem' }}>🔔</span>
+                      <div>
+                        <div style={{ fontWeight: 800, color: '#f59e0b', fontSize: '0.82rem' }}>
+                          Active Order found for Table #{selectedTable?.tableNumber}! ({currentTableActiveOrder.items?.length || 0} dishes • ₹{currentTableActiveOrder.subtotal?.toFixed(2)})
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          Guest: {currentTableActiveOrder.activeOrders?.[0]?.customerName || 'Walk-in'} {currentTableActiveOrder.activeOrders?.[0]?.customerPhone ? `(${currentTableActiveOrder.activeOrders[0].customerPhone})` : ''}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className={styles.btnQuickSettleGreen}
+                      style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}
+                      onClick={() => setPosActiveView('TABLE_BILL')}
+                    >
+                      ⚡ Load &amp; Settle (₹{Math.round(currentTableActiveOrder.subtotal * 1.05)})
+                    </button>
+                  </div>
+                )}
+
+                {/* Duplicate Prevention Alert for Customer Phone */}
+                {customerActiveOrder && (
+                  <div className={styles.posDuplicateAlertBanner} style={{ borderColor: '#3b82f6', background: 'rgba(59, 130, 246, 0.1)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem' }}>
+                      <span style={{ fontSize: '1.2rem' }}>👤</span>
+                      <div>
+                        <div style={{ fontWeight: 800, color: '#3b82f6', fontSize: '0.82rem' }}>
+                          Active Order for Phone {posCustomer.phone} ({customerActiveOrder.tokenNumber || `Table #${customerActiveOrder.tableNumber}`})
+                        </div>
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          {customerActiveOrder.items?.length || 0} items • Amount: ₹{customerActiveOrder.totalAmount} • Status: {customerActiveOrder.status}
+                        </div>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className={styles.btnQuickSettleBlue}
+                      style={{ padding: '0.3rem 0.65rem', fontSize: '0.75rem' }}
+                      onClick={() => {
+                        const tbl = (posData.tables || []).find(t => String(t.tableNumber) === String(customerActiveOrder.tableNumber));
+                        if (tbl) {
+                          setSelectedTable(tbl);
+                          setPosOrderType('DINE_IN');
+                          setPosActiveView('TABLE_BILL');
+                        } else {
+                          handleSettleBill('CASH', false, customerActiveOrder);
+                        }
+                      }}
+                    >
+                      ⚡ Load Order
+                    </button>
+                  </div>
+                )}
 
                 {/* ─── VIEW 1: ACTIVE CART (Requirement 4) ─── */}
                 {posActiveView === 'CART' ? (
@@ -4385,25 +4795,93 @@ Status: SHIFT CLOSED & VERIFIED
                       </div>
                     </div>
 
-                    {/* Cart Actions */}
+                    {/* Cart Actions for 4 Methods */}
                     <div className={styles.posCartButtonBox}>
-                      <button
-                        type="button"
-                        className={styles.btnPunchKot}
-                        onClick={handlePunchKot}
-                        disabled={loading || posCart.length === 0}
-                      >
-                        {loading ? 'Routing to Kitchen...' : `🍳 Punch KOT & Route to Kitchen (${posOrderType === 'TAKEAWAY' ? 'Takeaway' : `Table #${selectedTable?.tableNumber || '01'}`})`}
-                      </button>
-                      {selectedTable?.subtotal > 0 && posOrderType === 'DINE_IN' && (
-                        <button
-                          type="button"
-                          className={styles.posActionBtn}
-                          style={{ justifyContent: 'center', height: '40px' }}
-                          onClick={() => setPosActiveView('TABLE_BILL')}
-                        >
-                          📋 Switch to Table Billing Tab (₹{Math.round(selectedTable.subtotal * 1.05)})
-                        </button>
+                      {posOrderType === 'COUNTER' ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', width: '100%' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.45rem' }}>
+                            <button
+                              type="button"
+                              className={styles.btnQuickSettleGreen}
+                              onClick={() => handleInstantPayAndPunch('CASH')}
+                              disabled={loading || posCart.length === 0}
+                              style={{ height: '42px', fontSize: '0.82rem' }}
+                            >
+                              💵 Instant Cash (PAID)
+                            </button>
+                            <button
+                              type="button"
+                              className={styles.btnQuickSettleBlue}
+                              onClick={() => handleInstantPayAndPunch('ONLINE_UPI')}
+                              disabled={loading || posCart.length === 0}
+                              style={{ height: '42px', fontSize: '0.82rem' }}
+                            >
+                              📱 Instant UPI (PAID)
+                            </button>
+                          </div>
+                          <button
+                            type="button"
+                            className={styles.btnPunchKot}
+                            style={{ background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' }}
+                            onClick={handlePendingCollectionKot}
+                            disabled={loading || posCart.length === 0}
+                          >
+                            ⏳ Route Token to Kitchen (Pay on Collection)
+                          </button>
+                        </div>
+                      ) : posOrderType === 'TAKEAWAY' ? (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.45rem', width: '100%' }}>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.45rem' }}>
+                            <button
+                              type="button"
+                              className={styles.btnQuickSettleGreen}
+                              onClick={() => handleInstantPayAndPunch('CASH')}
+                              disabled={loading || posCart.length === 0}
+                              style={{ height: '42px', fontSize: '0.82rem' }}
+                            >
+                              🥡 Pay Now (Cash)
+                            </button>
+                            <button
+                              type="button"
+                              className={styles.btnQuickSettleBlue}
+                              onClick={() => handleInstantPayAndPunch('ONLINE_UPI')}
+                              disabled={loading || posCart.length === 0}
+                              style={{ height: '42px', fontSize: '0.82rem' }}
+                            >
+                              📱 Pay Now (UPI)
+                            </button>
+                          </div>
+                          <button
+                            type="button"
+                            className={styles.btnPunchKot}
+                            style={{ background: 'linear-gradient(135deg, #d97706 0%, #f59e0b 100%)' }}
+                            onClick={handlePendingCollectionKot}
+                            disabled={loading || posCart.length === 0}
+                          >
+                            ⏳ Takeaway Token (Pay on Pickup)
+                          </button>
+                        </div>
+                      ) : (
+                        <>
+                          <button
+                            type="button"
+                            className={styles.btnPunchKot}
+                            onClick={handlePunchKot}
+                            disabled={loading || posCart.length === 0}
+                          >
+                            {loading ? 'Routing to Kitchen...' : `🍳 Punch KOT & Route to Kitchen (${posOrderType === 'MANUAL_DINE_IN' ? 'Manual Dine-In' : `Table #${selectedTable?.tableNumber || '01'}`})`}
+                          </button>
+                          {selectedTable?.subtotal > 0 && (posOrderType === 'DINE_IN' || posOrderType === 'MANUAL_DINE_IN') && (
+                            <button
+                              type="button"
+                              className={styles.posActionBtn}
+                              style={{ justifyContent: 'center', height: '40px' }}
+                              onClick={() => setPosActiveView('TABLE_BILL')}
+                            >
+                              📋 Switch to Table Billing Tab (₹{Math.round(selectedTable.subtotal * 1.05)})
+                            </button>
+                          )}
+                        </>
                       )}
                     </div>
                   </>
@@ -4681,13 +5159,86 @@ Status: SHIFT CLOSED & VERIFIED
                           </div>
                         )}
 
+                        {/* High-Speed 1-Click Settlement Action Buttons */}
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.45rem', marginBottom: '0.5rem' }}>
+                          <button
+                            type="button"
+                            className={styles.btnQuickSettleGreen}
+                            onClick={() => handleSettleBill('CASH')}
+                            disabled={loading || netPayable <= 0}
+                            title="Settle with exact cash in 1 click"
+                          >
+                            💵 Cash &amp; Slip
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.btnQuickSettleBlue}
+                            onClick={() => handleSettleBill('ONLINE_UPI')}
+                            disabled={loading || netPayable <= 0}
+                            title="Settle with dynamic UPI QR in 1 click"
+                          >
+                            📱 UPI &amp; Slip
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.btnNavAlt}
+                            style={{ borderColor: '#8b5cf6', color: '#8b5cf6', fontWeight: 800, fontSize: '0.78rem' }}
+                            onClick={() => handleSettleBill('CARD')}
+                            disabled={loading || netPayable <= 0}
+                            title="Settle with Card in 1 click"
+                          >
+                            💳 Card &amp; Slip
+                          </button>
+                        </div>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.45rem', marginBottom: '0.5rem' }}>
+                          <button
+                            type="button"
+                            className={styles.btnNavAlt}
+                            style={{ borderColor: '#38bdf8', color: '#38bdf8', fontSize: '0.75rem', fontWeight: 700 }}
+                            onClick={() => {
+                              if (selectedTable?.items?.length > 0) {
+                                setEditBillTarget({
+                                  bill: {
+                                    billNumber: `SGK${Math.floor(100000 + Math.random() * 900000)}`,
+                                    tableNumber: selectedTable.tableNumber,
+                                    orderType: posOrderType,
+                                    customer: posCustomer,
+                                    items: selectedTable.items,
+                                    subtotal: selectedTable.subtotal,
+                                    totalAmount: netPayable,
+                                    paymentMode,
+                                    paymentStatus: 'PAID',
+                                    createdAt: new Date().toISOString(),
+                                  },
+                                  thermalSlip: activeReceipt,
+                                });
+                              } else {
+                                showNotice('No items on table to edit', true);
+                              }
+                            }}
+                          >
+                            ✏️ Edit Details Before Print
+                          </button>
+                          <button
+                            type="button"
+                            className={styles.btnNavAlt}
+                            style={{ borderColor: '#f59e0b', color: '#f59e0b', fontSize: '0.75rem', fontWeight: 700 }}
+                            onClick={() => handleSettleBill(paymentMode, true)}
+                            disabled={loading || netPayable <= 0}
+                            title="Mark bill as Pending (Pay Later upon food pickup/collection)"
+                          >
+                            ⏳ Mark as Pending (Pay Later)
+                          </button>
+                        </div>
+
                         {/* Settle Action */}
                         <button
                           className={styles.btnSettle}
-                          onClick={handleSettleBill}
+                          onClick={() => handleSettleBill()}
                           disabled={loading}
                         >
-                          {loading ? 'Processing...' : `Settle ₹${netPayable} & Print Slip (Table #${selectedTable?.tableNumber})`}
+                          {loading ? 'Processing...' : `Settle ₹${netPayable} & Print Slip (${posOrderType === 'COUNTER' ? 'Counter' : (posOrderType === 'TAKEAWAY' ? 'Takeaway' : `Table #${selectedTable?.tableNumber}`)})`}
                         </button>
                       </>
                     )}
@@ -11781,6 +12332,127 @@ Status: SHIFT CLOSED & VERIFIED
                 type="button"
                 className={styles.btnNavAlt}
                 onClick={() => setShowHeldOrdersModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ─── Active Orders Across 4 Billing Methods Modal ─── */}
+      {showActiveOrdersModal && (
+        <div className={styles.posModalOverlay}>
+          <div className={styles.posModalBox} style={{ maxWidth: '720px' }}>
+            <div className={styles.posModalHeader}>
+              <div>
+                <h3 className={styles.posModalTitle} style={{ color: '#10b981' }}>
+                  ⚡ All Active Orders ({posData.activeOrders?.length || 0})
+                </h3>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                  Active unbilled orders across Dine-In, Manual Dine-In, Counter and Takeaway
+                </span>
+              </div>
+              <button
+                type="button"
+                className={styles.posModalCloseBtn}
+                onClick={() => setShowActiveOrdersModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {(!posData.activeOrders || posData.activeOrders.length === 0) ? (
+              <div style={{ textAlign: 'center', padding: '2.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                🎉 No active pending orders! All tables and tokens are settled.
+              </div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '420px', overflowY: 'auto' }}>
+                {posData.activeOrders.map(ord => (
+                  <div
+                    key={ord.id}
+                    style={{
+                      background: 'var(--bg-card-subtle)',
+                      border: '1px solid var(--border-subtle)',
+                      borderRadius: '8px',
+                      padding: '0.75rem',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>
+                          {ord.tokenNumber ? ord.tokenNumber : `Table #${ord.tableNumber}`}
+                        </strong>
+                        <span style={{
+                          fontSize: '0.65rem',
+                          fontWeight: 800,
+                          padding: '0.1rem 0.4rem',
+                          borderRadius: '9999px',
+                          background: 'rgba(56, 189, 248, 0.15)',
+                          color: '#38bdf8',
+                        }}>
+                          {ord.orderNumber || ord.kotNumber}
+                        </span>
+                        <span style={{
+                          fontSize: '0.65rem',
+                          fontWeight: 800,
+                          padding: '0.1rem 0.4rem',
+                          borderRadius: '9999px',
+                          background: ord.paymentStatus === 'PAID' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(234, 179, 8, 0.15)',
+                          color: ord.paymentStatus === 'PAID' ? '#10b981' : '#eab308',
+                        }}>
+                          {ord.paymentStatus}
+                        </span>
+                        <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                          {ord.orderType}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.2rem' }}>
+                        👤 {ord.customerName} {ord.customerPhone ? `(${ord.customerPhone})` : ''} • {ord.itemCount} items ({ord.items?.map(i => i.title).slice(0, 3).join(', ')}{ord.items?.length > 3 ? '...' : ''})
+                      </div>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.15rem' }}>
+                        Status: <span style={{ fontWeight: 700, color: '#38bdf8' }}>{ord.status}</span> • Ordered: {new Date(ord.createdAt).toLocaleTimeString()}
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <strong style={{ fontSize: '1.05rem', color: '#10b981' }}>
+                        ₹{ord.totalAmount}
+                      </strong>
+                      <button
+                        type="button"
+                        className={styles.btnQuickSettleGreen}
+                        onClick={() => {
+                          const tbl = (posData.tables || []).find(t => String(t.tableNumber) === String(ord.tableNumber));
+                          if (tbl) {
+                            setSelectedTable(tbl);
+                            setPosOrderType('DINE_IN');
+                            setPosActiveView('TABLE_BILL');
+                          } else {
+                            handleSettleBill('CASH', false, ord);
+                          }
+                          setShowActiveOrdersModal(false);
+                          showNotice(`Loaded active order for ${ord.tokenNumber || `Table #${ord.tableNumber}`}`);
+                        }}
+                      >
+                        ⚡ Settle Bill (No Duplicate)
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+              <button
+                type="button"
+                className={styles.btnNavAlt}
+                onClick={() => setShowActiveOrdersModal(false)}
               >
                 Close
               </button>

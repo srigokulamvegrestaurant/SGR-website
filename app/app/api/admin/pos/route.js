@@ -43,6 +43,33 @@ export async function GET(request) {
       };
     });
 
+    // Flat list of all currently active/unbilled orders (Dine-In, Manual Dine-In, Counter, Takeaway)
+    const allActiveOrders = (db.orders || [])
+      .filter(o => o.status !== 'CANCELLED' && o.status !== 'PAID_SETTLED' && o.paymentStatus !== 'PAID')
+      .map(o => {
+        const subtotal = o.subtotal || (o.items || []).reduce((s, it) => s + (Number(it.price) || 0) * (Number(it.quantity) || 1), 0);
+        const tNum = o.tableNumber || (o.tables && o.tables[0]) || '01';
+        return {
+          id: o.id || o.orderId,
+          orderId: o.orderId || o.id,
+          orderNumber: o.orderNumber || o.kotNumber || o.id,
+          kotNumber: o.kotNumber || o.orderNumber || o.id,
+          tableNumber: tNum,
+          tokenNumber: o.tokenNumber || (o.orderType === 'COUNTER' ? (tNum.startsWith('CTR') ? tNum : `CTR-${tNum}`) : (o.orderType === 'TAKEAWAY' ? (tNum.startsWith('TK') ? tNum : `TK-${tNum}`) : null)),
+          orderType: o.orderType || (tNum === 'TK' || tNum.startsWith('TK') ? 'TAKEAWAY' : (tNum.startsWith('CTR') ? 'COUNTER' : 'DINE_IN')),
+          customerName: o.customerName || o.guestName || 'Guest',
+          customerPhone: o.customerPhone || o.guestPhone || '',
+          items: o.items || [],
+          itemCount: (o.items || []).length,
+          subtotal,
+          totalAmount: o.totalAmount || Math.round(subtotal * 1.05),
+          status: o.status || 'NEW',
+          paymentStatus: o.paymentStatus || 'UNPAID',
+          createdAt: o.createdAt || new Date().toISOString(),
+          waiterName: o.waiterName || o.verifiedBy || '',
+        };
+      });
+
     const recentBills = (db.bills || []).slice(-150).reverse().map(b => {
       if (!b.thermalSlipHtml || !b.thermalSlip) {
         b.thermalSlip = generateThermalReceiptText({
@@ -121,6 +148,7 @@ export async function GET(request) {
     return NextResponse.json({
       success: true,
       tables: activeTables,
+      activeOrders: allActiveOrders,
       menu: db.menu || [],
       customers: db.customers || [],
       recentBills,
@@ -149,7 +177,36 @@ export async function POST(request) {
     const db = await getDbAsync();
 
     // ──────────────────────────────────────────────────────────────────────────
-    // ACTION 1: PUNCH KOT & SEND TO KITCHEN STATIONS
+    // ACTION 0: CHECK FOR EXISTING ACTIVE ORDER (DUPLICATE PREVENTION)
+    // ──────────────────────────────────────────────────────────────────────────
+    if (action === 'CHECK_DUPLICATE_ORDER') {
+      const { tableNumber, customerPhone, customerName, orderType } = body;
+      const cleanPhone = String(customerPhone || '').replace(/\D/g, '');
+      const cleanTable = String(tableNumber || '').replace(/^[Tt\-#\s]+/, '').padStart(2, '0');
+
+      const matchedOrders = (db.orders || []).filter(o => {
+        if (o.status === 'CANCELLED' || o.status === 'PAID_SETTLED' || o.paymentStatus === 'PAID') return false;
+        if (cleanTable && (String(o.tableNumber) === cleanTable || o.tables?.includes(cleanTable))) return true;
+        if (cleanPhone && cleanPhone.length >= 7) {
+          const oPhone = String(o.customerPhone || o.guestPhone || '').replace(/\D/g, '');
+          if (oPhone && (oPhone.includes(cleanPhone) || cleanPhone.includes(oPhone))) return true;
+        }
+        if (customerName && customerName.trim().length >= 3 && customerName.trim() !== 'Walk-in Guest') {
+          const cNameLower = customerName.toLowerCase().trim();
+          if (o.customerName?.toLowerCase().includes(cNameLower) || o.guestName?.toLowerCase().includes(cNameLower)) return true;
+        }
+        return false;
+      });
+
+      return NextResponse.json({
+        success: true,
+        hasActiveOrder: matchedOrders.length > 0,
+        activeOrders: matchedOrders,
+      });
+    }
+
+    // ──────────────────────────────────────────────────────────────────────────
+    // ACTION 1: PUNCH KOT & SEND TO KITCHEN STATIONS (4 REAL-WORLD METHODS)
     // ──────────────────────────────────────────────────────────────────────────
     if (action === 'PUNCH_KOT') {
       const {
@@ -158,14 +215,34 @@ export async function POST(request) {
         customer = { name: 'Walk-in', phone: '' },
         items = [],
         cashierName = 'Rajan (POS 01)',
+        paymentMode = 'CASH',
+        splitDetails = null,
+        transactionRef = '',
+        payImmediate = false,
+        markPending = false,
       } = body;
 
       if (!items || items.length === 0) {
         return NextResponse.json({ success: false, error: 'Shopping cart is empty' }, { status: 400 });
       }
 
-      const tPad = String(tableNumber).padStart(2, '0');
-      const kotNumber = `KOT-${orderType === 'TAKEAWAY' ? 'TK' : tPad}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const tPad = String(tableNumber || '01').replace(/^[Tt\-#\s]+/, '').padStart(2, '0');
+      let effectiveTable = tPad;
+      let tokenNumber = body.tokenNumber || null;
+
+      if (orderType === 'COUNTER') {
+        const counterSeq = 100 + (((db.orders || []).filter(o => o.orderType === 'COUNTER').length) % 900) + 1;
+        tokenNumber = tokenNumber || `CTR-${counterSeq}`;
+        effectiveTable = tokenNumber;
+      } else if (orderType === 'TAKEAWAY') {
+        const tkSeq = 100 + (((db.orders || []).filter(o => o.orderType === 'TAKEAWAY').length) % 900) + 1;
+        tokenNumber = tokenNumber || `TK-${tkSeq}`;
+        effectiveTable = tokenNumber;
+      } else {
+        effectiveTable = tPad;
+      }
+
+      const kotNumber = `KOT-${effectiveTable}-${Math.floor(1000 + Math.random() * 9000)}`;
       const orderId = `ord_${Date.now()}`;
       const createdAt = new Date().toISOString();
 
@@ -187,21 +264,27 @@ export async function POST(request) {
       // Deduct ingredients from BOM inventory
       const bomAlerts = deductRecipeBom(enrichedItems, db);
 
+      const isPaid = payImmediate === true || body.paymentStatus === 'PAID';
+      const isPending = markPending === true || body.paymentStatus === 'PENDING_PAYMENT';
+      const initialPaymentStatus = isPaid ? 'PAID' : (isPending ? 'PENDING_PAYMENT' : 'UNPAID');
+      const initialStatus = isPaid ? 'COMPLETED' : 'NEW';
+
       // Create Order
       const newOrder = {
         id: orderId,
         orderId,
         orderNumber: kotNumber,
-        tableNumber: orderType === 'TAKEAWAY' ? 'TK' : tPad,
+        tableNumber: effectiveTable,
+        tokenNumber,
         orderType,
         customerName: customer.name || 'Walk-in Guest',
         customerPhone: customer.phone || '',
         guestName: customer.name || 'Guest',
         items: enrichedItems,
         subtotal,
-        status: 'NEW',
-        paymentStatus: 'UNPAID',
-        paymentMethod: null,
+        status: initialStatus,
+        paymentStatus: initialPaymentStatus,
+        paymentMethod: isPaid ? paymentMode : null,
         cashierName,
         createdAt,
       };
@@ -214,20 +297,21 @@ export async function POST(request) {
         id: `kot_${Date.now()}`,
         kotNumber,
         orderId,
-        tableNumber: orderType === 'TAKEAWAY' ? 'TK' : tPad,
+        tableNumber: effectiveTable,
+        tokenNumber,
         orderType,
         customerName: customer.name || 'Walk-in',
         items: enrichedItems,
         station: enrichedItems[0]?.station || 'TIFFIN',
-        status: 'NEW',
+        status: initialStatus,
         createdAt,
       };
 
       db.kots = db.kots || [];
       db.kots.push(newKot);
 
-      // If Dine-in, mark table as OCCUPIED
-      if (orderType === 'DINE_IN') {
+      // If Dine-in or Manual Dine-In, mark table as OCCUPIED
+      if (orderType === 'DINE_IN' || orderType === 'MANUAL_DINE_IN') {
         const table = (db.tables || []).find(t => String(t.tableNumber) === String(tableNumber) || String(t.tableNumber) === tPad);
         if (table) {
           table.status = 'OCCUPIED';
@@ -254,18 +338,102 @@ export async function POST(request) {
         }
       }
 
+      // If immediate payment (Method 3 Counter Instant Pay or Method 4 Takeaway Pay Now)
+      let generatedBill = null;
+      let thermalSlip = null;
+      let thermalSlipHtml = null;
+
+      if (isPaid) {
+        const cgstRate = db.settings?.taxRateCgst ?? 2.5;
+        const sgstRate = db.settings?.taxRateSgst ?? 2.5;
+        const cgst = (subtotal * cgstRate) / 100;
+        const sgst = (subtotal * sgstRate) / 100;
+        const rawTotal = subtotal + cgst + sgst;
+        const totalAmount = Math.round(rawTotal);
+        const roundOff = Number((totalAmount - rawTotal).toFixed(2));
+        const billNumber = body.billNumber || `SGK${Math.floor(100000 + Math.random() * 900000)}`;
+
+        generatedBill = {
+          id: `bill_${Date.now()}`,
+          billNumber,
+          tableNumber: effectiveTable,
+          tokenNumber,
+          orderType,
+          persons: Math.max(1, Number(body.persons) || 1),
+          cashierName,
+          customer: {
+            name: customer.name || 'Walk-in Guest',
+            phone: customer.phone || '',
+          },
+          items: enrichedItems.map(it => ({
+            ...it,
+            title: sanitizeEnglishTitle(it.title || 'Item'),
+          })),
+          subtotal,
+          discountAmount: 0,
+          serviceChargeAmount: 0,
+          cgst,
+          sgst,
+          roundOff,
+          totalAmount,
+          paymentStatus: 'PAID',
+          paymentMode,
+          splitDetails: paymentMode === 'SPLIT' ? splitDetails : null,
+          transactionRef,
+          createdAt,
+          settledAt: createdAt,
+        };
+
+        thermalSlip = generateThermalReceiptText({
+          ...generatedBill,
+          settings: db.settings,
+        });
+
+        thermalSlipHtml = generateThermalSlipHtml({
+          ...generatedBill,
+          paperWidth: body.paperWidth || '80MM',
+          settings: db.settings,
+        });
+
+        generatedBill.thermalSlip = thermalSlip;
+        generatedBill.thermalSlipHtml = thermalSlipHtml;
+
+        db.bills = db.bills || [];
+        db.bills.push(generatedBill);
+
+        newOrder.settledBillNumber = billNumber;
+
+        // Shift sales tracking
+        if (db.shifts && db.shifts.length > 0) {
+          const shift = db.shifts[0];
+          if (paymentMode === 'CASH') shift.cashSales = (shift.cashSales || 0) + totalAmount;
+          else if (paymentMode === 'ONLINE_UPI' || paymentMode === 'ONLINE' || paymentMode === 'UPI') shift.upiSales = (shift.upiSales || 0) + totalAmount;
+          else if (paymentMode === 'CARD') shift.cardSales = (shift.cardSales || 0) + totalAmount;
+        }
+
+        recordAuditLog({
+          user: cashierName,
+          role: 'CASHIER',
+          module: 'POS_BILLING',
+          action: 'INSTANT_COUNTER_SETTLEMENT',
+          detail: `Instant Bill #${billNumber} (${orderType}) for ${effectiveTable} settled by ${cashierName} (₹${totalAmount} via ${paymentMode}).`,
+        });
+      }
+
       await saveDbAsync(db);
 
       // Broadcast real-time SSE event for KDS & Table displays
       try {
         broadcast('KOT_CREATED', {
           kotNumber,
-          tableNumber: orderType === 'TAKEAWAY' ? 'TK' : tPad,
+          tableNumber: effectiveTable,
+          tokenNumber,
           orderType,
           itemsCount: enrichedItems.length,
           subtotal,
           station: newKot.station,
-          status: 'NEW',
+          status: initialStatus,
+          paymentStatus: initialPaymentStatus,
         });
       } catch (e) {
         console.error('SSE broadcast error:', e);
@@ -273,15 +441,21 @@ export async function POST(request) {
 
       return NextResponse.json({
         success: true,
-        message: `KOT ${kotNumber} created & routed to Kitchen successfully`,
+        message: isPaid ? `Bill #${generatedBill?.billNumber} settled immediately` : `KOT ${kotNumber} created & routed to Kitchen successfully`,
         kot: newKot,
         order: newOrder,
+        tokenNumber,
+        isPaid,
+        isPending,
+        bill: generatedBill,
+        thermalReceipt: thermalSlip,
+        thermalSlipHtml,
         bomAlerts,
       });
     }
 
     // ──────────────────────────────────────────────────────────────────────────
-    // ACTION 2: SETTLE BILL (FULL, PARTIAL, SPLIT & THERMAL RECEIPT)
+    // ACTION 2: SETTLE BILL (FULL, PARTIAL, SPLIT & THERMAL RECEIPT - 4 METHODS)
     // ──────────────────────────────────────────────────────────────────────────
     if (action === 'SETTLE_BILL') {
       const {
@@ -296,28 +470,68 @@ export async function POST(request) {
         discountReason = '',
         serviceChargePercent = 0,
         cashierName = 'Rajan (POS 01)',
+        tokenNumber,
+        orderId,
+        kotNumber,
+        markPending = false,
+        paperWidth = '80MM',
       } = body;
 
-      if (!tableNumber && orderType === 'DINE_IN') {
-        return NextResponse.json({ success: false, error: 'Table number is required for Dine-in' }, { status: 400 });
-      }
+      const tPad = String(tableNumber || '').replace(/^[Tt\-#\s]+/, '').padStart(2, '0');
+      const targetOrderId = orderId || body.orderNumber || kotNumber;
+      const targetToken = tokenNumber || (orderType === 'COUNTER' ? tableNumber : (orderType === 'TAKEAWAY' ? tableNumber : null));
 
-      const tPad = String(tableNumber || '').padStart(2, '0');
-
-      // Find active orders for this table or takeaway
-      const activeOrders = (db.orders || []).filter(o => {
-        if (orderType === 'TAKEAWAY') {
-          return (o.orderType === 'TAKEAWAY' || o.tableNumber === 'TK') && o.status !== 'CANCELLED' && o.status !== 'PAID_SETTLED';
+      // Find active orders for this specific target, token, table, or order type
+      let activeOrders = (db.orders || []).filter(o => {
+        if (o.status === 'CANCELLED' || o.status === 'PAID_SETTLED') return false;
+        if (targetOrderId && (o.id === targetOrderId || o.orderId === targetOrderId || o.orderNumber === targetOrderId || o.kotNumber === targetOrderId)) {
+          return true;
         }
-        return (String(o.tableNumber) === String(tableNumber) || String(o.tableNumber) === tPad || o.tables?.includes(tPad) || o.tables?.includes(String(tableNumber))) &&
-          o.status !== 'CANCELLED' && o.status !== 'PAID_SETTLED';
+        if (targetToken && (o.tokenNumber === targetToken || o.tableNumber === targetToken)) {
+          return true;
+        }
+        if (orderType === 'COUNTER' && (o.orderType === 'COUNTER' || String(o.tableNumber).startsWith('CTR'))) {
+          if (tableNumber && (String(o.tableNumber) === String(tableNumber) || o.tokenNumber === String(tableNumber))) return true;
+          return !targetOrderId && !targetToken; // Match all if unspecified
+        }
+        if (orderType === 'TAKEAWAY' && (o.orderType === 'TAKEAWAY' || o.tableNumber === 'TK' || String(o.tableNumber).startsWith('TK'))) {
+          if (tableNumber && (String(o.tableNumber) === String(tableNumber) || o.tokenNumber === String(tableNumber))) return true;
+          return !targetOrderId && !targetToken;
+        }
+        // Dine-In / Manual Dine-In match by table
+        if (tableNumber) {
+          return (String(o.tableNumber) === String(tableNumber) || String(o.tableNumber) === tPad || o.tables?.includes(tPad) || o.tables?.includes(String(tableNumber)));
+        }
+        return false;
       });
 
-      if (activeOrders.length === 0) {
-        return NextResponse.json({ success: false, error: 'No active unbilled orders found' }, { status: 404 });
+      // Direct items fallback if punching and settling in one fast step without a prior KOT
+      if (activeOrders.length === 0 && Array.isArray(body.items) && body.items.length > 0) {
+        const fallbackOrderId = `ord_${Date.now()}`;
+        const newOrder = {
+          id: fallbackOrderId,
+          orderId: fallbackOrderId,
+          orderNumber: `ORD-${Date.now().toString().slice(-4)}`,
+          tableNumber: String(tableNumber || (orderType === 'COUNTER' ? 'CTR-01' : (orderType === 'TAKEAWAY' ? 'TK-01' : tPad))),
+          tokenNumber: targetToken || null,
+          orderType,
+          customerName: customer?.name || 'Walk-in Guest',
+          customerPhone: customer?.phone || '',
+          items: body.items,
+          status: markPending ? 'PREPARING' : 'COMPLETED',
+          paymentStatus: markPending ? 'PENDING_PAYMENT' : 'PAID',
+          createdAt: new Date().toISOString(),
+        };
+        db.orders = db.orders || [];
+        db.orders.push(newOrder);
+        activeOrders = [newOrder];
       }
 
-      // Aggregate items
+      if (activeOrders.length === 0) {
+        return NextResponse.json({ success: false, error: 'No active unbilled orders found for this selection' }, { status: 404 });
+      }
+
+      // Aggregate items across active orders
       const items = [];
       let subtotal = 0;
       activeOrders.forEach(ord => {
@@ -363,11 +577,16 @@ export async function POST(request) {
 
       const billNumber = body.billNumber || `SGK${Math.floor(100000 + Math.random() * 900000)}`;
       const settledAt = new Date().toISOString();
+      const isPending = markPending === true || body.paymentStatus === 'PENDING_PAYMENT';
+      const effectivePaymentStatus = isPending ? 'PENDING_PAYMENT' : 'PAID';
+
+      const finalTableDisplay = targetToken || (orderType === 'TAKEAWAY' ? (tableNumber || 'TK-01') : (orderType === 'COUNTER' ? (tableNumber || 'CTR-01') : String(tableNumber || tPad)));
 
       const newBill = {
         id: `bill_${Date.now()}`,
         billNumber,
-        tableNumber: orderType === 'TAKEAWAY' ? 'TK' : String(tableNumber),
+        tableNumber: finalTableDisplay,
+        tokenNumber: targetToken || null,
         orderType,
         persons: Math.max(1, Number(body.persons) || 1),
         waiterName: body.waiterName || '',
@@ -384,23 +603,29 @@ export async function POST(request) {
         sgst,
         roundOff,
         totalAmount,
-        paymentStatus: 'PAID',
+        paymentStatus: effectivePaymentStatus,
         paymentMode,
         splitDetails: paymentMode === 'SPLIT' ? splitDetails : null,
         transactionRef,
         cashierName,
         createdAt: settledAt,
-        settledAt,
+        settledAt: isPending ? null : settledAt,
       };
 
       db.bills = db.bills || [];
       db.bills.push(newBill);
 
-      // Mark all orders as PAID_SETTLED
+      // Update status of matched active orders
       activeOrders.forEach(ord => {
-        ord.status = 'PAID_SETTLED';
-        ord.paymentStatus = 'PAID';
-        ord.settledBillNumber = billNumber;
+        if (isPending) {
+          ord.paymentStatus = 'PENDING_PAYMENT';
+          ord.status = 'PREPARING';
+          ord.billNumber = billNumber;
+        } else {
+          ord.status = 'PAID_SETTLED';
+          ord.paymentStatus = 'PAID';
+          ord.settledBillNumber = billNumber;
+        }
       });
 
       // Automatically record customer transaction in CRM
@@ -414,12 +639,13 @@ export async function POST(request) {
         });
       }
 
-      // Update Table Status to CLEANING for Dine-In
-      if (orderType === 'DINE_IN') {
+      // Update Table Status to CLEANING for Dine-In & Manual Dine-In
+      if (orderType === 'DINE_IN' || orderType === 'MANUAL_DINE_IN') {
         const table = (db.tables || []).find(t => String(t.tableNumber) === String(tableNumber) || String(t.tableNumber) === tPad);
         if (table) {
           table.status = 'CLEANING';
           table.activeOrderId = null;
+          table.billRequested = false;
         }
       }
 
@@ -691,6 +917,36 @@ export async function POST(request) {
 
       db.bills = db.bills || [];
       db.bills.push(newBill);
+
+      // Clear active orders for this table or customer to prevent duplicate billing
+      const tPad = String(tableNumber || '').replace(/^[Tt\-#\s]+/, '').padStart(2, '0');
+      (db.orders || []).forEach(o => {
+        if (o.status !== 'CANCELLED' && o.status !== 'PAID_SETTLED') {
+          if (tableNumber && (String(o.tableNumber) === String(tableNumber) || String(o.tableNumber) === tPad || o.tables?.includes(tPad) || o.tables?.includes(String(tableNumber)))) {
+            o.status = 'PAID_SETTLED';
+            o.paymentStatus = 'PAID';
+            o.settledBillNumber = billNumber;
+          } else if (customer.phone && customer.phone.trim().length >= 8) {
+            const cleanPh = customer.phone.trim().replace(/\D/g, '');
+            const ordPh = String(o.customerPhone || o.guestPhone || '').replace(/\D/g, '');
+            if (ordPh && (ordPh === cleanPh || cleanPh.includes(ordPh))) {
+              o.status = 'PAID_SETTLED';
+              o.paymentStatus = 'PAID';
+              o.settledBillNumber = billNumber;
+            }
+          }
+        }
+      });
+
+      // Free table if dine-in
+      if (orderType === 'DINE_IN' || orderType === 'MANUAL_DINE_IN') {
+        const tbl = (db.tables || []).find(t => String(t.tableNumber) === String(tableNumber) || String(t.tableNumber) === tPad);
+        if (tbl) {
+          tbl.status = 'CLEANING';
+          tbl.activeOrderId = null;
+          tbl.billRequested = false;
+        }
+      }
 
       // Update shifts sales totals
       if (db.shifts && db.shifts.length > 0) {
