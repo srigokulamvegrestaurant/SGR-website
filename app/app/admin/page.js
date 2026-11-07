@@ -12,6 +12,7 @@ import ManualBillModal from './components/ManualBillModal';
 import EditBillBeforePrintModal from './components/EditBillBeforePrintModal';
 import BillSlipFormatDesigner from './components/BillSlipFormatDesigner';
 import BillingManagementModal from './components/BillingManagementModal';
+import BillingMethodDetailModal from './components/BillingMethodDetailModal';
 import { generateThermalSlipHtml, sanitizeEnglishTitle } from '@/lib/thermalSlipFormatter';
 
 // Pre-seeded staff roles
@@ -26,6 +27,98 @@ const STAFF_PRESETS = [
 ];
 
 const DEFAULT_POS_MENU = [];
+
+const DISH_DEFAULT_PRICES = {
+  // Breakfast & Tiffin
+  'dish_bf_01': 120, 'mini tiffin': 120,
+  'dish_bf_02': 40, 'idli': 40,
+  'dish_bf_03': 80, 'ghee pongal': 80, 'pongal': 80,
+  'dish_bf_04': 70, 'ghee podi idli': 70,
+  'dish_bf_05': 35, 'vada': 35, 'medu vada': 35,
+  'dish_bf_06': 50, 'sambar vada': 50,
+  'dish_bf_07': 75, 'poori': 75, 'poori masala': 75,
+  'dish_bf_08': 60, 'plain dosa': 60,
+  'dish_bf_09': 85, 'podi dosa': 85,
+  'dish_bf_10': 90, 'ghee roast': 90, 'ghee roast dosa': 90,
+  'dish_bf_11': 85, 'masala dosa': 85,
+  'dish_bf_12': 80, 'onion uthappam': 80,
+  'dish_bf_13': 70, 'plain uthappam': 70,
+  'dish_bf_14': 60, 'rava kesari': 60,
+  'mini idli': 55, 'idli 65': 85, 'idli manchurian': 95, 'chilli idli': 95,
+  'pepper idli': 80, 'idli masala': 85,
+  
+  // Meals & Rice
+  'dish_lu_01': 70, 'lemon rice': 70,
+  'dish_lu_02': 70, 'sambar rice': 70, 'sambar sadham': 70,
+  'dish_lu_03': 60, 'curd rice': 60,
+  'dish_lu_10': 110, 'mini meals': 110,
+  'dish_lu_11': 160, 'veg meals': 160, 'chettinad meals': 160, 'raja meals': 160, 'meals': 160,
+  'tomato rice': 70, 'coriander rice': 70,
+  
+  // Snacks & Evening
+  'dish_es_01': 60, 'kandharappam': 60,
+  'dish_es_03': 60, 'kuzhi paniyaram': 60,
+  'dish_es_04': 60, 'vellai paniyaram': 60, 'paniyaram': 60,
+  'dish_es_05': 45, 'medhu vadai': 45,
+  'dish_es_06': 40, 'bajji': 40,
+  'dish_es_07': 40, 'bonda': 40,
+  'samosa': 30, 'onion pakoda': 45,
+  
+  // Dinner
+  'dish_dn_08': 65, 'idiyappam': 65,
+  'dish_dn_10': 60, 'chapathi': 60,
+  'dish_dn_11': 60, 'parotta': 60,
+  'veg chapathi': 70, 'mushroom chapathi': 85, 'paneer chapathi': 90,
+  'kothu parotta': 95,
+  
+  // Beverages & Sweets
+  'filter coffee': 25, 'degree coffee': 25, 'kumbakonam degree coffee': 25, 'coffee': 25,
+  'tea': 20, 'masala tea': 25, 'ginger tea': 25, 'milk': 20, 'badam milk': 35,
+  'elaneer payasam': 50, 'badam halwa': 60, 'gulab jamun': 40, 'rasagulla': 40,
+  'jigarthanda': 60,
+};
+
+function getDishPrice(dish) {
+  if (dish && dish.price && Number(dish.price) > 0) return Number(dish.price);
+  if (!dish) return 60;
+  const cleanId = String(dish.id || '').toLowerCase();
+  const cleanTitle = String(dish.title || '').toLowerCase().trim();
+  if (DISH_DEFAULT_PRICES[cleanId]) return DISH_DEFAULT_PRICES[cleanId];
+  if (DISH_DEFAULT_PRICES[cleanTitle]) return DISH_DEFAULT_PRICES[cleanTitle];
+  for (const [k, p] of Object.entries(DISH_DEFAULT_PRICES)) {
+    if (cleanTitle === k || cleanTitle.includes(k) || k.includes(cleanTitle)) return p;
+  }
+  const cat = String(dish.category || '').toLowerCase();
+  if (cat.includes('meal')) return 160;
+  if (cat.includes('beverage') || cat.includes('drink')) return 25;
+  if (cat.includes('sweet') || cat.includes('dessert')) return 50;
+  if (cat.includes('dosa')) return 80;
+  if (cat.includes('snack')) return 45;
+  return 60;
+}
+
+function getCategoryVisual(category) {
+  const cat = String(category || '').toLowerCase();
+  if (cat.includes('tiffin') || cat.includes('breakfast')) {
+    return { gradient: 'linear-gradient(135deg, #c2410c 0%, #7c2d12 100%)', icon: '🥞', label: 'Tiffin' };
+  }
+  if (cat.includes('meal') || cat.includes('lunch')) {
+    return { gradient: 'linear-gradient(135deg, #047857 0%, #064e3b 100%)', icon: '🍛', label: 'Raja Meals' };
+  }
+  if (cat.includes('chettinad') || cat.includes('special')) {
+    return { gradient: 'linear-gradient(135deg, #b91c1c 0%, #7f1d1d 100%)', icon: '🌶️', label: 'Chettinad' };
+  }
+  if (cat.includes('beverage') || cat.includes('drink') || cat.includes('coffee')) {
+    return { gradient: 'linear-gradient(135deg, #713f12 0%, #451a03 100%)', icon: '☕', label: 'Degree Coffee' };
+  }
+  if (cat.includes('sweet') || cat.includes('dessert')) {
+    return { gradient: 'linear-gradient(135deg, #7e22ce 0%, #581c87 100%)', icon: '🍨', label: 'Traditional Sweets' };
+  }
+  if (cat.includes('snack')) {
+    return { gradient: 'linear-gradient(135deg, #d97706 0%, #92400e 100%)', icon: '🥟', label: 'Hot Snacks' };
+  }
+  return { gradient: 'linear-gradient(135deg, #1e3a8a 0%, #0f172a 100%)', icon: '🍲', label: 'Delicacy' };
+}
 
 export default function AdminPage() {
   // Theme State (Light / Dark) — Scoped strictly to Admin Container!
@@ -185,6 +278,8 @@ export default function AdminPage() {
   const [posSearch, setPosSearch] = useState('');
   const [posGlobalSearch, setPosGlobalSearch] = useState('');
   const [showActiveOrdersModal, setShowActiveOrdersModal] = useState(false);
+  const [showMethodInfoModal, setShowMethodInfoModal] = useState(false);
+  const [methodModalTab, setMethodModalTab] = useState('M1');
   const [posCategory, setPosCategory] = useState('all');
   const [posCart, setPosCart] = useState([]);
   const [posActiveView, setPosActiveView] = useState('CART'); // 'CART' or 'TABLE_BILL'
@@ -1014,8 +1109,10 @@ export default function AdminPage() {
 
   // ─── POS Food Item & Cart Operations (Requirements 1, 4) ──────────────────
   const handleDishClick = (dish) => {
+    const dishPrice = getDishPrice(dish);
+    const resolvedDish = { ...dish, price: dishPrice };
     if ((dish.variants && dish.variants.length > 0) || (dish.addOns && dish.addOns.length > 0)) {
-      setCustomizingDish(dish);
+      setCustomizingDish(resolvedDish);
       setCustomVariant(dish.variants ? dish.variants[0] : null);
       setCustomAddOns([]);
       setCustomNotes('');
@@ -1032,7 +1129,7 @@ export default function AdminPage() {
           id: `it_${Date.now()}_${Math.random()}`,
           dishId: dish.id,
           title: dish.title,
-          price: dish.price,
+          price: dishPrice,
           quantity: 1,
           variant: null,
           addOns: [],
@@ -1041,7 +1138,7 @@ export default function AdminPage() {
         }];
       });
       playChime('notification');
-      showNotice(`Added ${dish.title} to Cart`);
+      showNotice(`Added ${dish.title} (₹${dishPrice}) to Cart`);
     }
   };
 
@@ -4185,6 +4282,17 @@ Status: SHIFT CLOSED & VERIFIED
                   title="Method 1: Dine-In Table Bill (Waiter/QR order, pay at counter or at table via Paytm/UPI machine)"
                 >
                   🍽️ Dine-In (M1)
+                  <span
+                    className={styles.methodInfoPill}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMethodModalTab('M1');
+                      setShowMethodInfoModal(true);
+                    }}
+                    title="View Method 1 (Dine-In) details and instructions"
+                  >
+                    ⓘ
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -4193,6 +4301,17 @@ Status: SHIFT CLOSED & VERIFIED
                   title="Method 2: Manual Dine-In (Search by Name/Mobile to prevent duplicate bills)"
                 >
                   📝 Manual Dine-In (M2)
+                  <span
+                    className={styles.methodInfoPill}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMethodModalTab('M2');
+                      setShowMethodInfoModal(true);
+                    }}
+                    title="View Method 2 (Manual Dine-In) details and instructions"
+                  >
+                    ⓘ
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -4201,6 +4320,17 @@ Status: SHIFT CLOSED & VERIFIED
                   title="Method 3: Counter Food Order (Coffee, Snacks, Tiffin direct at counter - Pay now or on collection)"
                 >
                   ⚡ Counter (M3)
+                  <span
+                    className={styles.methodInfoPill}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMethodModalTab('M3');
+                      setShowMethodInfoModal(true);
+                    }}
+                    title="View Method 3 (Counter Food Order) details and instructions"
+                  >
+                    ⓘ
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -4209,6 +4339,17 @@ Status: SHIFT CLOSED & VERIFIED
                   title="Method 4: Takeaway Order (Pay immediately or pay when parcel is ready)"
                 >
                   🥡 Takeaway (M4)
+                  <span
+                    className={styles.methodInfoPill}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMethodModalTab('M4');
+                      setShowMethodInfoModal(true);
+                    }}
+                    title="View Method 4 (Takeaway Order) details and instructions"
+                  >
+                    ⓘ
+                  </span>
                 </button>
                 <button
                   type="button"
@@ -4217,6 +4358,17 @@ Status: SHIFT CLOSED & VERIFIED
                   title="Direct Delivery or Swiggy/Zomato dispatch"
                 >
                   🛵 Delivery
+                  <span
+                    className={styles.methodInfoPill}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMethodModalTab('DELIVERY');
+                      setShowMethodInfoModal(true);
+                    }}
+                    title="View Delivery workflow details"
+                  >
+                    ⓘ
+                  </span>
                 </button>
               </div>
 
@@ -4567,41 +4719,72 @@ Status: SHIFT CLOSED & VERIFIED
                         dish.category.toLowerCase().includes(q)
                       );
                     })
-                    .map(dish => (
-                      <div
-                        key={dish.id}
-                        className={styles.posDishCard}
-                        onClick={() => handleDishClick(dish)}
-                        title={`Click to add ${dish.title} to Cart`}
-                      >
-                        {(() => {
-                          const posImg = dish.image || (typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + dish.id) || localStorage.getItem('sgr_dish_img_' + dish.title)) : null);
-                          return (
-                            <img
-                              src={posImg || "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='28'%3E🍲%3C/text%3E%3C/svg%3E"}
-                              alt={dish.title}
-                              className={styles.posDishThumb}
-                              loading="eager"
-                              decoding="async"
-                              onError={(e) => {
-                                e.currentTarget.onerror = null;
-                                e.currentTarget.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%231f2937'/%3E%3Ctext x='50%25' y='55%25' dominant-baseline='middle' text-anchor='middle' font-size='28'%3E🍲%3C/text%3E%3C/svg%3E";
+                    .map(dish => {
+                      const dishPrice = getDishPrice(dish);
+                      const catVisual = getCategoryVisual(dish.category);
+                      const posImg = dish.image || (typeof window !== 'undefined' ? (localStorage.getItem('sgr_dish_img_' + dish.id) || localStorage.getItem('sgr_dish_img_' + dish.title)) : null);
+
+                      return (
+                        <div
+                          key={dish.id}
+                          className={styles.posDishCard}
+                          onClick={() => handleDishClick({ ...dish, price: dishPrice })}
+                          title={`Click to add ${dish.title} (₹${dishPrice}) to Cart`}
+                        >
+                          <div className={styles.posDishThumbWrap}>
+                            {/* Pure Veg Indicator Badge */}
+                            <div className={styles.posDishVegBadge} title="100% Pure Vegetarian">
+                              <div className={styles.posDishVegDot} />
+                            </div>
+
+                            {/* Category Pill Tag */}
+                            <div className={styles.posDishCategoryTag}>
+                              {dish.category || catVisual.label}
+                            </div>
+
+                            {posImg ? (
+                              <img
+                                src={posImg}
+                                alt={dish.title}
+                                className={styles.posDishThumb}
+                                loading="eager"
+                                decoding="async"
+                                onError={(e) => {
+                                  e.currentTarget.onerror = null;
+                                  e.currentTarget.style.display = 'none';
+                                  const placeholder = e.currentTarget.parentElement ? e.currentTarget.parentElement.querySelector(`.${styles.posDishPlaceholder}`) : null;
+                                  if (placeholder) placeholder.style.display = 'flex';
+                                }}
+                              />
+                            ) : null}
+
+                            <div
+                              className={styles.posDishPlaceholder}
+                              style={{
+                                background: catVisual.gradient,
+                                display: posImg ? 'none' : 'flex',
                               }}
-                            />
-                          );
-                        })()}
-                        <div className={styles.posDishInfo}>
-                          <span className={styles.posDishTitle}>{dish.title}</span>
-                          {dish.tamilTitle && (
-                            <span className={styles.posDishTaTitle}>{dish.tamilTitle}</span>
-                          )}
-                          <div className={styles.posDishBottom}>
-                            <span className={styles.posDishPrice}>₹{dish.price}</span>
-                            <span className={styles.posDishAddBadge}>+ Add</span>
+                            >
+                              <span className={styles.posDishPlaceholderIcon}>{catVisual.icon}</span>
+                              <span className={styles.posDishPlaceholderCat}>{dish.category || catVisual.label}</span>
+                            </div>
+                          </div>
+
+                          <div className={styles.posDishInfo}>
+                            <div>
+                              <div className={styles.posDishTitle}>{dish.title}</div>
+                              {dish.tamilTitle && (
+                                <div className={styles.posDishTaTitle}>{dish.tamilTitle}</div>
+                              )}
+                            </div>
+                            <div className={styles.posDishBottom}>
+                              <span className={styles.posDishPrice}>₹{dishPrice}</span>
+                              <span className={styles.posDishAddBadge}>+ Add</span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                 </div>
               </div>
 
@@ -17784,6 +17967,18 @@ Status: SHIFT CLOSED & VERIFIED
           currentUser={currentUser}
         />
       )}
+
+      {/* ─── POS Billing Method Detail Guide Modal (M1 - M4 + Delivery) ─── */}
+      <BillingMethodDetailModal
+        isOpen={showMethodInfoModal}
+        onClose={() => setShowMethodInfoModal(false)}
+        initialTab={methodModalTab}
+        onSelectMethod={(methodType) => {
+          setPosOrderType(methodType);
+          setPosActiveView('CART');
+          showNotice(`Switched to ${methodType.replace(/_/g, ' ')} mode`);
+        }}
+      />
 
       {/* ─── Footer with Mandatory Attribution ─── */}
       <footer className={styles.adminFooter}>

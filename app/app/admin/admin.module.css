@@ -2987,82 +2987,208 @@ input:checked + .slider:before {
 
 .posDishesGrid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-  gap: 0.75rem;
-  max-height: 480px;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.85rem;
+  max-height: 520px;
   overflow-y: auto;
-  padding-right: 0.25rem;
+  padding-right: 0.35rem;
 }
 
 .posDishCard {
-  background: var(--bg-card-subtle);
+  background: var(--bg-card);
   border: 1px solid var(--border-subtle);
-  border-radius: 10px;
+  border-radius: 12px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  min-height: 205px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
   user-select: none;
   touch-action: manipulation;
   position: relative;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
 }
 
 .posDishCard:hover,
 .posDishCard:active {
-  transform: translateY(-2px);
+  transform: translateY(-3px);
   border-color: #3b82f6;
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.2);
+}
+
+.posDishThumbWrap {
+  width: 100%;
+  height: 95px;
+  position: relative;
+  overflow: hidden;
+  background: #18181b;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .posDishThumb {
   width: 100%;
-  height: 85px;
+  height: 100%;
   object-fit: cover;
-  background: #18181b;
+  display: block;
+}
+
+.posDishPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: #ffffff;
+}
+
+.posDishPlaceholderIcon {
+  font-size: 1.8rem;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.posDishPlaceholderCat {
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.posDishVegBadge {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  width: 16px;
+  height: 16px;
+  background: #ffffff;
+  border: 1.5px solid #16a34a;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  z-index: 2;
+}
+
+.posDishVegDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #16a34a;
+}
+
+.posDishCategoryTag {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  color: #f1f5f9;
+  font-size: 0.62rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  z-index: 2;
 }
 
 .posDishInfo {
-  padding: 0.55rem;
+  padding: 0.6rem 0.65rem 0.65rem;
   display: flex;
   flex-direction: column;
-  flex: 1;
+  flex: 1 1 auto;
+  justify-content: space-between;
+  background: var(--bg-card);
+  gap: 0.35rem;
 }
 
 .posDishTitle {
-  font-size: 0.82rem;
-  font-weight: 700;
+  font-size: 0.85rem;
+  font-weight: 800;
   color: var(--text-primary);
   line-height: 1.25;
-  margin-bottom: 0.15rem;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .posDishTaTitle {
-  font-size: 0.68rem;
+  font-size: 0.72rem;
+  font-weight: 600;
   color: var(--text-muted);
-  margin-bottom: 0.35rem;
+  line-height: 1.2;
+  margin: 0;
 }
 
 .posDishBottom {
-  margin-top: auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: auto;
+  padding-top: 0.4rem;
+  border-top: 1px dashed var(--border-subtle);
 }
 
 .posDishPrice {
-  font-size: 0.95rem;
-  font-weight: 800;
+  font-size: 0.98rem;
+  font-weight: 900;
   color: #10b981;
+  letter-spacing: -0.02em;
 }
 
 .posDishAddBadge {
   background: #2563eb;
   color: #ffffff;
   border-radius: 6px;
-  padding: 0.2rem 0.5rem;
+  padding: 0.25rem 0.55rem;
   font-size: 0.72rem;
   font-weight: 800;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  box-shadow: 0 1px 4px rgba(37, 99, 235, 0.3);
+  transition: all 0.15s ease;
+}
+
+.posDishCard:hover .posDishAddBadge {
+  background: #1d4ed8;
+  transform: scale(1.05);
+}
+
+/* Info Icon on Method Pills (M1 - M4) */
+.methodInfoPill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 17px;
+  height: 17px;
+  border-radius: 50%;
+  font-size: 0.68rem;
+  font-weight: 900;
+  line-height: 1;
+  background: rgba(255, 255, 255, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  color: inherit;
+  margin-left: 0.35rem;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.methodInfoPill:hover {
+  background: #ffffff;
+  color: #1e3a8a !important;
+  transform: scale(1.2);
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
 }
 
 /* POS Cart & Bill Pane */
