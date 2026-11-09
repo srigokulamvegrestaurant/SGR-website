@@ -340,3 +340,4 @@ export default function BillingMethodDetailModal({ isOpen, onClose, initialTab =
     </div>
   );
 }
+
